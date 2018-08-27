@@ -301,11 +301,11 @@ int PDSoftMuonMvaEstimator::IPsign_(int iMuon)
 // =====================================================================================
 bool PDSoftMuonMvaEstimator::useIp(TString methodName)
 {
-	return !methodNameContains("woIP")
+	return !methodName.Contains("woIP");
 }
 
 // =====================================================================================
 bool PDSoftMuonMvaEstimator::useIso(TString methodName)
 {
-	return !methodNameContains("woIso")
+	return !methodName.Contains("woIso");
 }
