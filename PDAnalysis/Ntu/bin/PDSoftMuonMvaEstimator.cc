@@ -81,10 +81,12 @@ void PDSoftMuonMvaEstimator::setupReader(TMVA::Reader &reader, TString weightFil
 	reader.AddVariable( "muoGNchi2", &muoGNchi2_ );
 	reader.AddVariable( "muoVMuHits", &muoVMuHits_ );
 	reader.AddVariable( "muoNumMatches", &muoNumMatches_ );
-	if(ipFlag_) reader.AddVariable( "trkDxy/trkExy", &trkDxy_ );
-	if(ipFlag_) reader.AddVariable( "trkDz/trkEz", &trkDz_ );	
-	if(isoFlag_) reader.AddVariable( "muoPFiso", &muoPFiso_ );
 	reader.AddVariable( "muoQprod", &muoQprod_ );
+	if(useIp(methodName)){
+		reader.AddVariable( "trkDxy/trkExy", &trkDxy_ );
+		reader.AddVariable( "trkDz/trkEz", &trkDz_ );
+	}
+	if(useIso(methodName)) reader.AddVariable( "muoPFiso", &muoPFiso_ );
 
 	reader.AddSpectator( "muoEvt", &DUMMY_ );
 
@@ -248,64 +250,62 @@ float PDSoftMuonMvaEstimator::computeMvaEndcap(int iMuon)
 bool PDSoftMuonMvaEstimator::MuonPassedPreselection(int iMuon)
 {
 
-  if ( muoChi2LM->at( iMuon ) > 5000 ) {return false;}
-  if ( muoChi2LP->at( iMuon ) > 2000 ) {return false;}
-  if ( muoGlbTrackTailProb->at( iMuon ) > 5000 ) {return false;}
-  if ( muoTrkKink->at( iMuon ) > 900 ) {return false;}
-  if ( muoGlbKinkFinderLOG->at( iMuon ) > 50 ) {return false;}
-  if ( muoTimeAtIpInOutErr->at( iMuon ) > 4 ) {return false;}
-  if ( muoOuterChi2->at( iMuon ) > 1000 ) {return false;}
-  if ( muoInnerChi2->at( iMuon ) > 10 ) {return false;}
-  if ( muoTrkRelChi2->at( iMuon ) > 3 ) {return false;}
+	if ( muoChi2LM->at( iMuon ) > 5000 ) {return false;}
+	if ( muoChi2LP->at( iMuon ) > 2000 ) {return false;}
+	if ( muoGlbTrackTailProb->at( iMuon ) > 5000 ) {return false;}
+	if ( muoTrkKink->at( iMuon ) > 900 ) {return false;}
+	if ( muoGlbKinkFinderLOG->at( iMuon ) > 50 ) {return false;}
+	if ( muoTimeAtIpInOutErr->at( iMuon ) > 4 ) {return false;}
+	if ( muoOuterChi2->at( iMuon ) > 1000 ) {return false;}
+	if ( muoInnerChi2->at( iMuon ) > 10 ) {return false;}
+	if ( muoTrkRelChi2->at( iMuon ) > 3 ) {return false;}
 
-  return true;
+	return true;
 }
 
 // =====================================================================================
 int PDSoftMuonMvaEstimator::IPsign_(int iMuon)
 {
-  int itkmu = muonTrack( iMuon, PDEnumString::muInner );
-  int ipftkmu = trkPFC->at(itkmu);
-  int IPsign = ((double)rand() / (RAND_MAX)) < 0.5 ? -1 : +1; //random value +-1
+	int itkmu = muonTrack( iMuon, PDEnumString::muInner );
+	int ipftkmu = trkPFC->at(itkmu);
+	int IPsign = ((double)rand() / (RAND_MAX)) < 0.5 ? -1 : +1; //random value +-1
 
-  int iJet = trkJet->at(itkmu);
-  if(iJet<0 && ipftkmu>=0) iJet=pfcJet->at(ipftkmu);
-  
-  if(iJet>=0){
-    IPsign = dSign(itkmu, iJet);
-  }else{
-    int coneNtrk = 0;
-    float pxCone = 0, pyCone = 0;
+	int iJet = trkJet->at(itkmu);
+	if(iJet<0 && ipftkmu>=0) iJet=pfcJet->at(ipftkmu);
 
-    for(int ipf = 0; ipf<nPF; ++ipf){
+	if(iJet>=0){
+	IPsign = dSign(itkmu, iJet);
+	}else{
+	int coneNtrk = 0;
+	float pxCone = 0, pyCone = 0;
 
-      if( deltaR(pfcEta->at(ipf), pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > 0.4 ) continue;
-      //if(std::find(signalTracks.begin(), signalTracks.end(), pfcTrk->at(ipf)) != signalTracks.end()) continue;
-      if(pfcTrk->at(ipf) == itkmu) continue;
-      if(pfcPt->at(ipf) < 0.2) continue;
-      if(abs(pfcEta->at(ipf)) > 2.5) continue;
-      //if( !(( trkQuality->at( itk ) >> 2 ) & 1) ) continue;
-      ++coneNtrk;
-      pxCone += pfcPt->at(ipf)*TMath::Cos(pfcPhi->at(ipf));
-      pyCone += pfcPt->at(ipf)*TMath::Sin(pfcPhi->at(ipf));
+	for(int ipf = 0; ipf<nPF; ++ipf){
 
-    }
-    if(coneNtrk>=2) IPsign = dSign(itkmu, pxCone, pyCone);
-  }
+		if( deltaR(pfcEta->at(ipf), pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > 0.4 ) continue;
+		//if(std::find(signalTracks.begin(), signalTracks.end(), pfcTrk->at(ipf)) != signalTracks.end()) continue;
+		if(pfcTrk->at(ipf) == itkmu) continue;
+		if(pfcPt->at(ipf) < 0.2) continue;
+		if(abs(pfcEta->at(ipf)) > 2.5) continue;
+		//if( !(( trkQuality->at( itk ) >> 2 ) & 1) ) continue;
+		++coneNtrk;
+		pxCone += pfcPt->at(ipf)*TMath::Cos(pfcPhi->at(ipf));
+		pyCone += pfcPt->at(ipf)*TMath::Sin(pfcPhi->at(ipf));
+
+	}
+	if(coneNtrk>=2) IPsign = dSign(itkmu, pxCone, pyCone);
+	}
 
   return IPsign;
 }
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::ipFlag(bool newValue)
+bool PDSoftMuonMvaEstimator::useIp(TString methodName)
 {
-	ipFlag_ = newValue;
-	return;
+	return !methodNameContains("woIP")
 }
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::isoFlag(bool newValue)
+bool PDSoftMuonMvaEstimator::useIso(TString methodName)
 {
-	isoFlag_ = newValue;
-	return;
+	return !methodNameContains("woIso")
 }

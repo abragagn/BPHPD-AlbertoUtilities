@@ -19,67 +19,65 @@ class PDSoftMuonMvaEstimator: public virtual PDAnalyzerUtil
 ,                             public virtual PDMuonVar {
 
 public:
-  PDSoftMuonMvaEstimator();
-  ~PDSoftMuonMvaEstimator();
-  
-  void setupReaderBarrel(TString weightFileBarrel, TString methodNameBarrel);
-  void setupReaderEndcap(TString weightFileEndcap, TString methodNameEndcap);
-  float computeMvaBarrel(int iMuon);
-  float computeMvaEndcap(int iMuon);
-  bool MuonPassedPreselection(int iMuon);
-  int IPsign_(int iMuon);
-  void ipFlag(bool newValue);
-  void isoFlag(bool newValue);
-  void fixIP(bool newValue);
+    PDSoftMuonMvaEstimator();
+    ~PDSoftMuonMvaEstimator();
+
+    void setupReaderBarrel(TString weightFileBarrel, TString methodNameBarrel);
+    void setupReaderEndcap(TString weightFileEndcap, TString methodNameEndcap);
+    float computeMvaBarrel(int iMuon);
+    float computeMvaEndcap(int iMuon);
+    bool MuonPassedPreselection(int iMuon);
+    int IPsign_(int iMuon);
+
 
 private:
-  void setupReader(TMVA::Reader &reader, TString weightFile, TString methodName);
-  void computeMvaVariables(int iMuon);
+    void setupReader(TMVA::Reader &reader, TString weightFile, TString methodName);
+    void computeMvaVariables(int iMuon);
+    bool useIp(TString methodName);
+    bool useIso(TString methodName);
 
-  TMVA::Reader readerBarrel;
-  TMVA::Reader readerEndcap;
+    TMVA::Reader readerBarrel;
+    TMVA::Reader readerEndcap;
 
-  TString methodNameBarrel_;
-  TString methodNameEndcap_;
-
-  bool isoFlag_ = true;
-  bool ipFlag_= true;
-
-  // MVA Variable
-  float muoPt_;
-  float absMuoEta_;
-
-  float muoSegmComp_;
-  float muoChi2LM_;
-  float muoChi2LP_;
-  float muoGlbTrackTailProb_;
-  float muoIValFrac_;
-  float muoLWH_;
-  float muoTrkKink_;
-  float muoGlbKinkFinderLOG_;
-  float muoTimeAtIpInOutErr_;
-  float muoOuterChi2_;
-  float muoInnerChi2_ ;
-  float muoTrkRelChi2_;
-  float muoVMuonHitComb_;
-
-  float muoGlbDeltaEtaPhi_;
-  float muoStaRelChi2_;
-  float muoTimeAtIpInOut_;
-  float muoValPixHits_;
-  float muoNTrkVHits_;
-  float muoGNchi2_;
-  float muoVMuHits_;
-  float muoNumMatches_;
+    TString methodNameBarrel_;
+    TString methodNameEndcap_;
 
 
-  float trkDxy_;
-  float trkDz_;
+    // MVA Variable
+    float muoPt_;
+    float absMuoEta_;
 
-  float muoPFiso_;
-  float muoQprod_;
+    float muoSegmComp_;
+    float muoChi2LM_;
+    float muoChi2LP_;
+    float muoGlbTrackTailProb_;
+    float muoIValFrac_;
+    float muoLWH_;
+    float muoTrkKink_;
+    float muoGlbKinkFinderLOG_;
+    float muoTimeAtIpInOutErr_;
+    float muoOuterChi2_;
+    float muoInnerChi2_ ;
+    float muoTrkRelChi2_;
+    float muoVMuonHitComb_;
 
-  float DUMMY_;
+    float muoGlbDeltaEtaPhi_;
+    float muoStaRelChi2_;
+    float muoTimeAtIpInOut_;
+    float muoValPixHits_;
+    float muoNTrkVHits_;
+    float muoGNchi2_;
+    float muoVMuHits_;
+    float muoNumMatches_;
+
+
+    float trkDxy_;
+    float trkDz_;
+
+    float muoPFiso_;
+    float muoQprod_;
+
+    float DUMMY_;
 
 };
 
