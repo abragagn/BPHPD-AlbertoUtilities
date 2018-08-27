@@ -36,7 +36,6 @@ PDAnalyzer::PDAnalyzer() {
   setUserParameter( "minPtMuon", "2." );
   setUserParameter( "maxEtaMuon", "2.4" );
   setUserParameter( "outputFile", "ntu.root" );
-  setUserParameter( "useKerasAsMVA", "f" );
 
   setUserParameter( "ptCut", "40.0" ); //needed for paolo's code for unknow reasons
 
@@ -60,7 +59,6 @@ void PDAnalyzer::beginJob() {
   getUserParameter( "verbose", verbose );
   getUserParameter( "minPtMuon", minPtMuon );
   getUserParameter( "maxEtaMuon", maxEtaMuon );
-  getUserParameter( "useKerasAsMVA", useKerasAsMVA );
 
   getUserParameter( "ptCut", ptCut ); //needed for paolo's code for unknow reasons
 
@@ -74,16 +72,11 @@ void PDAnalyzer::beginJob() {
   tWriter = new PDSecondNtupleWriter;            // second ntuple
   tWriter->open( getUserParameter("outputFile"), "RECREATE" ); // second ntuple
 
-  if(useKerasAsMVA){
-    weightFileBarrel = "/lustre/cmswork/abragagn/weights/TMVAClassification_DNN_Barrel.weights.xml";
-    weightFileEndcap = "/lustre/cmswork/abragagn/weights/TMVAClassification_DNN_Endcap.weights.xml";
+  weightFileBarrel = "/lustre/cmswork/abragagn/weights/TMVAClassification_DNN_Barrel.weights.xml";
+  weightFileEndcap = "/lustre/cmswork/abragagn/weights/TMVAClassification_DNN_Endcap.weights.xml";
 
-    methodNameBarrel = "DNN_Barrel";
-    methodNameEndcap = "DNN_Endcap";
-  }
-
-  setupReaderBarrel( weightFileBarrel, methodNameBarrel);
-  setupReaderEndcap( weightFileEndcap, methodNameEndcap);
+  setupReaderBarrel( weightFileBarrel );
+  setupReaderEndcap( weightFileEndcap );
 
 
   return;

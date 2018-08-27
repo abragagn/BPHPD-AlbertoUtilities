@@ -97,22 +97,22 @@ void PDSoftMuonMvaEstimator::setupReader(TMVA::Reader &reader, TString weightFil
 }
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::setupReaderBarrel(TString weightFileBarrel, TString methodNameBarrel)
+void PDSoftMuonMvaEstimator::setupReaderBarrel(TString weightFileBarrel)
 {
 
-	methodNameBarrel_ = methodNameBarrel;
-	setupReader(readerBarrel, weightFileBarrel, methodNameBarrel);
+	methodNameBarrel_ = methodNameFromWeightName(weightFileBarrel) ;
+	setupReader(readerBarrel, weightFileBarrel, methodNameBarrel_);
 
 	return;
 
 }
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::setupReaderEndcap(TString weightFileEndcap, TString methodNameEndcap)
+void PDSoftMuonMvaEstimator::setupReaderEndcap(TString weightFileEndcap)
 {
 
-	methodNameEndcap_ = methodNameEndcap;
-	setupReader(readerEndcap, weightFileEndcap, methodNameEndcap);
+	methodNameEndcap_ = methodNameFromWeightName(weightFileEndcap) ;
+	setupReader(readerEndcap, weightFileEndcap, methodNameEndcap_);
 
 	return;
 
@@ -308,4 +308,13 @@ bool PDSoftMuonMvaEstimator::useIp(TString methodName)
 bool PDSoftMuonMvaEstimator::useIso(TString methodName)
 {
 	return !methodName.Contains("woIso");
+}
+// =====================================================================================
+TString PDSoftMuonMvaEstimator::methodNameFromWeightName(TString weightsName)
+{
+	TString prefix = "TMVAClassification_";
+	int start = weightsName.Index(prefix) + prefix.Length();
+	int length = weightsName.Index(".weights") - start;
+	TString name( weightsName(start, length) );
+	return name;
 }

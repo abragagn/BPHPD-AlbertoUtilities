@@ -66,8 +66,6 @@ class PDAnalyzer: public virtual PDAnalyzerUtil
   TString outputFile;
   float minPtMuon, maxEtaMuon;
 
-  bool useKerasAsMVA;
-
   int nselMu;
 
   TH1D* hmass_JPsi;

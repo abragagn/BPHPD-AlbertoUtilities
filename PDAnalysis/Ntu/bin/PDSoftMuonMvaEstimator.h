@@ -22,8 +22,8 @@ public:
     PDSoftMuonMvaEstimator();
     ~PDSoftMuonMvaEstimator();
 
-    void setupReaderBarrel(TString weightFileBarrel, TString methodNameBarrel);
-    void setupReaderEndcap(TString weightFileEndcap, TString methodNameEndcap);
+    void setupReaderBarrel(TString weightFileBarrel);
+    void setupReaderEndcap(TString weightFileEndcap);
     float computeMvaBarrel(int iMuon);
     float computeMvaEndcap(int iMuon);
     bool MuonPassedPreselection(int iMuon);
@@ -35,6 +35,7 @@ private:
     void computeMvaVariables(int iMuon);
     bool useIp(TString methodName);
     bool useIso(TString methodName);
+    TString methodNameFromWeightName(TString weightname);
 
     TMVA::Reader readerBarrel;
     TMVA::Reader readerEndcap;

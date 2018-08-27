@@ -67,9 +67,6 @@ public:
 	TString weightFileBarrel = "/lustre/cmswork/abragagn/weights/TMVAClassification_BDT_GlobalBarrel.weights.xml";
 	TString weightFileEndcap = "/lustre/cmswork/abragagn/weights/TMVAClassification_BDT_GlobalEndcap.weights.xml";
 
-	TString methodNameBarrel = "BDT_GlobalBarrel";
-	TString methodNameEndcap = "BDT_GlobalEndcap";
-
 	void SetMassRangeJPsi(float newValue){ MassRangeJPsi = newValue; }
 	void SetBsMassRange(float lower, float upper) {	BsMassRange[0] = lower; BsMassRange[1] = upper; }
 	void SetBpMassRange(float lower, float upper) {	BuMassRange[0] = lower; BuMassRange[1] = upper; }
