@@ -1,0 +1,8 @@
+<use   name="root"/>
+<use   name="NtuAnalysis/Common"/>
+<use   name="NtuTool/Common"/>
+<use   name="NtuTool/Read"/>
+<use   name="PDAnalysis/Ntu"/>
+<environment>
+  <bin   file="treeAnalyze.cc" name="pdTreeAnalyze"></bin>
+</environment>
