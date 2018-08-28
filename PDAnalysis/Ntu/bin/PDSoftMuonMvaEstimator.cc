@@ -70,7 +70,7 @@ void PDSoftMuonMvaEstimator::setupReader(TMVA::Reader &reader, TString weightFil
 	reader.AddVariable( "muoGlbKinkFinderLOG", &muoGlbKinkFinderLOG_ );
 	reader.AddVariable( "muoTimeAtIpInOutErr", &muoTimeAtIpInOutErr_ );
 	reader.AddVariable( "muoOuterChi2", &muoOuterChi2_ );
-	reader.AddVariable( "muoInnerChi2", &muoInnerChi2_ );  
+	reader.AddVariable( "muoInnerChi2", &muoInnerChi2_ );
 	reader.AddVariable( "muoTrkRelChi2", &muoTrkRelChi2_ );
 	reader.AddVariable( "muoVMuonHitComb", &muoVMuonHitComb_ );
 	reader.AddVariable( "muoGlbDeltaEtaPhi", &muoGlbDeltaEtaPhi_ );
@@ -138,7 +138,7 @@ void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon){
 	muoGlbKinkFinderLOG_ = muoGlbKinkFinderLOG->at(iMuon);
 	muoTimeAtIpInOutErr_ = muoTimeAtIpInOutErr->at(iMuon);
 	muoOuterChi2_ = muoOuterChi2->at(iMuon);
-	muoInnerChi2_ =  muoInnerChi2->at(iMuon);
+	muoInnerChi2_ = muoInnerChi2->at(iMuon);
 	muoTrkRelChi2_ = muoTrkRelChi2->at(iMuon);
 	muoVMuonHitComb_ = muoVMuonHitComb->at(iMuon);
 
@@ -197,7 +197,7 @@ float PDSoftMuonMvaEstimator::computeMvaBarrel(int iMuon)
 	//VARIABLE EXTRACTION
 	computeMvaVariables(iMuon);
 
-  //PRESELECTION
+	//PRESELECTION
 	if(!MuonPassedPreselection(iMuon))
 	{
 		return -2;
@@ -295,7 +295,7 @@ int PDSoftMuonMvaEstimator::IPsign_(int iMuon)
 	if(coneNtrk>=2) IPsign = dSign(itkmu, pxCone, pyCone);
 	}
 
-  return IPsign;
+	return IPsign;
 }
 
 // =====================================================================================
