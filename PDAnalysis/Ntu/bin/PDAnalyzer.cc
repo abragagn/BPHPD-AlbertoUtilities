@@ -72,8 +72,12 @@ void PDAnalyzer::beginJob() {
   tWriter = new PDSecondNtupleWriter;            // second ntuple
   tWriter->open( getUserParameter("outputFile"), "RECREATE" ); // second ntuple
 
-  weightFileBarrel = "/lustre/cmswork/abragagn/weights/TMVAClassification_DNN_Barrel.weights.xml";
-  weightFileEndcap = "/lustre/cmswork/abragagn/weights/TMVAClassification_DNN_Endcap.weights.xml";
+  bool bdtFlag = false;
+
+  if(bdtFlag){
+    weightFileBarrel = "/lustre/cmswork/abragagn/weights/TMVAClassification_DNN_Barrel.weights.xml";
+    weightFileEndcap = "/lustre/cmswork/abragagn/weights/TMVAClassification_DNN_Endcap.weights.xml";
+  }
 
   setupReaderBarrel( weightFileBarrel );
   setupReaderEndcap( weightFileEndcap );

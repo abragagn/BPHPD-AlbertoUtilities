@@ -64,8 +64,8 @@ public:
 	float BuMassRange[2] = {5.0, 6.0};
 	float BdMassRange[2] = {5.0, 6.0};
 
-	TString weightFileBarrel = "/lustre/cmswork/abragagn/weights/TMVAClassification_BDT_GlobalBarrel.weights.xml";
-	TString weightFileEndcap = "/lustre/cmswork/abragagn/weights/TMVAClassification_BDT_GlobalEndcap.weights.xml";
+	TString weightFileBarrel = "/lustre/cmswork/abragagn/weights/2016/TMVAClassification_DNNGlobalBarrel2016wIPwIso.weights.xml";
+	TString weightFileEndcap = "/lustre/cmswork/abragagn/weights/2016/TMVAClassification_DNNGlobalEndcap2016wIPwIso.weights.xml";
 
 	void SetMassRangeJPsi(float newValue){ MassRangeJPsi = newValue; }
 	void SetBsMassRange(float lower, float upper) {	BsMassRange[0] = lower; BsMassRange[1] = upper; }
