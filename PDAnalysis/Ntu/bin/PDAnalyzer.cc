@@ -75,8 +75,8 @@ void PDAnalyzer::beginJob() {
   bool bdtFlag = false;
 
   if(bdtFlag){
-    weightFileBarrel = "/lustre/cmswork/abragagn/weights/TMVAClassification_DNN_Barrel.weights.xml";
-    weightFileEndcap = "/lustre/cmswork/abragagn/weights/TMVAClassification_DNN_Endcap.weights.xml";
+    weightFileBarrel = "/lustre/cmswork/abragagn/weights/TMVAClassification_BDTGlobalBarrel2016wIPwIso.weights.xml";
+    weightFileEndcap = "/lustre/cmswork/abragagn/weights/TMVAClassification_BDTGlobalEndcap2016wIPwIso.weights.xml";
   }
 
   setupReaderBarrel( weightFileBarrel );
