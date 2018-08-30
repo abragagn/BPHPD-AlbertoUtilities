@@ -183,6 +183,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 		nselMu++;
 
 		int itkmu = muonTrack( iMuon, PDEnumString::muInner );
+		if(itkmu < 0) continue
 
 		// gen info
 
@@ -201,7 +202,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 		(tWriter->muoEta)->push_back( muoEta->at( iMuon ) );
 		(tWriter->muoPhi)->push_back( muoPhi->at(iMuon) );
 
-		(tWriter->trkDxy)->push_back( trkDxy->at(itkmu) );
+		(tWriter->trkDxy)->push_back( abs(trkDxy->at(itkmu)) * IPsign(iMuon) );
 		(tWriter->trkDz)->push_back( trkDz->at(itkmu) );
 		(tWriter->trkExy)->push_back( trkExy->at(itkmu) );
 		(tWriter->trkEz)->push_back( trkEz->at(itkmu) );

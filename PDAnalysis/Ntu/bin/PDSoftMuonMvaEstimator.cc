@@ -19,18 +19,19 @@
 //		0. Change isoFlag_ and ipFlag_ with the corresponding function if you want to veto these variables
 //		1. Initialize the discriminator in PDAnalyzer::beginJob with 'void PDSoftMuonMvaEstimator::setupReaderBarrel(std::string weightFileBarrel)'
 //			-You can find the weights in /lustre/cmswork/abragagn/weights/
-//		2. Compute the needed muon variables for each event with 'void computeMuonVar()' (in PDAnalyzer::analyze)
+//		2. In PDAnalyzer::analyze compute the needed muon variables for each event with 'void computeMuonVar() 
+//			and fill the jetCartesian coordinates vectors convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz);
 //		3. Compute the Mva response with 'float PDSoftMuonMvaEstimator::computeMvaBarrel(int iMuon)'
 //			-Make sure to feed muons with the right pseudorapidity range otherwise you'll get invalid response
 //		4. For endcap is the same, change every name accordingly
-//			-a barrel ID and a endcap ID can be initialize at the same time
+//			-one barrel ID and one endcap ID can be initialize at the same time
 //			4.1 The function 'float AlbertoUtil::getMvaMuonValue(int iMuon)' takes care automatically of the pseudorapidity range
 //
 //
 //
 //
 //		---Possible output values---
-
+//
 //		-1 = the muon is not a global muon
 //		-2 = the muon do not pass basic preselection
 //		-3 = the muon is not in the pseudorapidity range of the discriminator
@@ -266,6 +267,7 @@ bool PDSoftMuonMvaEstimator::MuonPassedPreselection(int iMuon)
 // =====================================================================================
 int PDSoftMuonMvaEstimator::IPsign_(int iMuon)
 {
+
 	int itkmu = muonTrack( iMuon, PDEnumString::muInner );
 	int ipftkmu = trkPFC->at(itkmu);
 	int IPsign = ((double)rand() / (RAND_MAX)) < 0.5 ? -1 : +1; //random value +-1
