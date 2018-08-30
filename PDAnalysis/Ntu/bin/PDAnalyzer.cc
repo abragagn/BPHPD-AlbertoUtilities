@@ -183,7 +183,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 		nselMu++;
 
 		int itkmu = muonTrack( iMuon, PDEnumString::muInner );
-		if(itkmu < 0) continue
+		if(itkmu < 0) continue;
 
 		// gen info
 
