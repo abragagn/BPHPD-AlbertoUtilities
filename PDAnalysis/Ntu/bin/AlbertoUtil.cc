@@ -558,7 +558,6 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 	for( int i=0; i<nPVertices; ++i ){
 
 		if(fabs(svtZ->at(isvt) - pvtZ->at( i )) > 1.0 ) continue;
-		if(pvtBadQuality->at(i) == 0) continue;
 
 		TVector3 vPV(pvtX->at( i ), pvtY->at( i ), pvtZ->at( i ) );
 		TVector3 vPointing;
