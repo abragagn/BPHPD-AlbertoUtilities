@@ -28,6 +28,7 @@ public:
 	float computeMvaEndcap(int iMuon);
 	bool MuonPassedPreselection(int iMuon);
 	int IPsign_(int iMuon);
+	int IPsign_(int iMuon, int iPV);
 
 
 private:

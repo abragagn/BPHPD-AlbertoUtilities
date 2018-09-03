@@ -476,7 +476,12 @@ int AlbertoUtil::IPsign(int iMuon)
 
 	return IPsign_(iMuon);
 }
+// =====================================================================================
+int AlbertoUtil::IPsign(int iMuon, int iPV)
+{
 
+	return IPsign_(iMuon, iPV);
+}
 // =====================================================================================
 float AlbertoUtil::GetMvaMuonValue(int iMuon)
 { 
@@ -539,5 +544,43 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
 	nEvt/=hist->GetBinWidth(0);
 
 	return nEvt;
+
+}
+// =====================================================================================
+int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
+{
+	int ssPV = -1;
+	float bestPointing = -1;
+
+	TVector3 vSsBp(t.Px(),t.Py(),t.Pz());
+	TVector3 vSVT( svtX->at(isvt), svtY->at(isvt), svtZ->at(isvt) );
+
+	for( int i=0; i<nPVertices; ++i ){
+
+		if(fabs(svtZ->at(isvt) - pvtZ->at( i )) > 1.0 ) continue;
+		if(pvtBadQuality->at(i) == 0) continue;
+
+		TVector3 vPV(pvtX->at( i ), pvtY->at( i ), pvtZ->at( i ) );
+		TVector3 vPointing;
+		vPointing = vSVT - vPV;
+		float pointingAngle = vPointing.Angle(vSsBp);
+
+		if(TMath::Cos(pointingAngle) > bestPointing ){
+			bestPointing = TMath::Cos(pointingAngle);
+			ssPV = trkPVtx->at(i);
+		}
+
+	}
+
+	return ssPV;
+}
+// =====================================================================================
+float AlbertoUtil::GetSignedDxy(int iMuon, int iPV)
+{
+
+	int dxy = dXY( muonTrack( iMuon, PDEnumString::muInner ), pvtX->at(iPV), pvtY->at(iPV) );
+	int sign = IPsign(iMuon, iPV);
+
+	return dxy*sign;
 
 }

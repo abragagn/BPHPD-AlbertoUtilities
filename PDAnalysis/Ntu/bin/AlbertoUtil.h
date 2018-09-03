@@ -9,6 +9,7 @@
 #include "PDAnalyzerUtil.h"
 #include "PDSoftMuonMvaEstimator.h"
 #include "TF1.h"
+#include "TLorentzVector.h"
 
 class AlbertoUtil: 	public virtual PDAnalyzerUtil
 ,										public virtual PDSoftMuonMvaEstimator
@@ -100,8 +101,12 @@ public:
 	bool isMvaMuon(int iMuon, float wpB, float wpE);
 	float GetMvaMuonValue(int iMuon);
 	int IPsign(int iMuon);
+	int IPsign(int iMuon, int iPV);
 	float GetJetProbb(int iJet);
 	float CountEventsWithFit(TH1 *hist, TString process);
+	int GetBestPV(int isvt, TLorentzVector t);
+	float GetSignedDxy(int iMuon, int iPV);
+
 
 protected:
 
