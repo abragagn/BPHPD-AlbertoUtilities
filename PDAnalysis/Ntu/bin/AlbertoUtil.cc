@@ -550,7 +550,7 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
 int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 {
 	int ssPV = -1;
-	float bestPointing = -1;
+	float bestCos = -1;
 
 	TVector3 vSsBp(t.Px(),t.Py(),t.Pz());
 	TVector3 vSVT( svtX->at(isvt), svtY->at(isvt), svtZ->at(isvt) );
@@ -562,10 +562,10 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 		TVector3 vPV(pvtX->at( i ), pvtY->at( i ), pvtZ->at( i ) );
 		TVector3 vPointing;
 		vPointing = vSVT - vPV;
-		float pointingAngle = vPointing.Angle(vSsBp);
+		float cos = vPointing.Unit() * vSsBp.Unit();
 
-		if(TMath::Cos(pointingAngle) > bestPointing ){
-			bestPointing = TMath::Cos(pointingAngle);
+		if(cos > bestCos ){
+			bestCos = cos;
 			ssPV = trkPVtx->at(i);
 		}
 
