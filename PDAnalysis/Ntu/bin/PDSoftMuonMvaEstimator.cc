@@ -197,13 +197,11 @@ float PDSoftMuonMvaEstimator::computeMvaBarrel(int iMuon)
 
     //VARIABLE EXTRACTION
     computeMvaVariables(iMuon);
-
     //PRESELECTION
     if(!MuonPassedPreselection(iMuon))
     {
         return -2;
     }
-
     return readerBarrel.EvaluateMVA(methodNameBarrel_);
 
 }
@@ -242,7 +240,6 @@ float PDSoftMuonMvaEstimator::computeMvaEndcap(int iMuon)
     {
         return -2;
     }
-
     return readerEndcap.EvaluateMVA(methodNameEndcap_);
 
 }
@@ -276,25 +273,26 @@ int PDSoftMuonMvaEstimator::IPsign_(int iMuon)
     if(iJet<0 && ipftkmu>=0) iJet=pfcJet->at(ipftkmu);
 
     if(iJet>=0){
-    IPsign = dSign(itkmu, itkmu, jetPx->at( iJet ), jetPy->at( iJet ));
+        IPsign = dSign(itkmu, jetPx->at( iJet ), jetPy->at( iJet ));
     }else{
-    int coneNtrk = 0;
-    float pxCone = 0, pyCone = 0;
+        int coneNtrk = 0;
+        float pxCone = 0, pyCone = 0;
 
-    for(int ipf = 0; ipf<nPF; ++ipf){
+        for(int ipf = 0; ipf<nPF; ++ipf){
 
-        if( deltaR(pfcEta->at(ipf), pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > 0.4 ) continue;
-        //if(std::find(signalTracks.begin(), signalTracks.end(), pfcTrk->at(ipf)) != signalTracks.end()) continue;
-        if(pfcTrk->at(ipf) == itkmu) continue;
-        if(pfcPt->at(ipf) < 0.2) continue;
-        if(abs(pfcEta->at(ipf)) > 2.5) continue;
-        //if( !(( trkQuality->at( itk ) >> 2 ) & 1) ) continue;
-        ++coneNtrk;
-        pxCone += pfcPt->at(ipf)*TMath::Cos(pfcPhi->at(ipf));
-        pyCone += pfcPt->at(ipf)*TMath::Sin(pfcPhi->at(ipf));
+            if( deltaR(pfcEta->at(ipf), pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > 0.4 ) continue;
+            //if(std::find(signalTracks.begin(), signalTracks.end(), pfcTrk->at(ipf)) != signalTracks.end()) continue;
+            if(pfcTrk->at(ipf) == itkmu) continue;
+            if(pfcPt->at(ipf) < 0.2) continue;
+            if(abs(pfcEta->at(ipf)) > 2.5) continue;
+            //if( !(( trkQuality->at( itk ) >> 2 ) & 1) ) continue;
+            ++coneNtrk;
+            pxCone += pfcPt->at(ipf)*TMath::Cos(pfcPhi->at(ipf));
+            pyCone += pfcPt->at(ipf)*TMath::Sin(pfcPhi->at(ipf));
 
-    }
-    if(coneNtrk>=2) IPsign = dSign(itkmu, pxCone, pyCone);
+        }
+
+        if(coneNtrk>=2) IPsign = dSign(itkmu, pxCone, pyCone);
     }
 
     return IPsign;
@@ -311,25 +309,25 @@ int PDSoftMuonMvaEstimator::IPsign_(int iMuon, int iPV)
     if(iJet<0 && ipftkmu>=0) iJet=pfcJet->at(ipftkmu);
 
     if(iJet>=0){
-    IPsign = dSign(itkmu, jetPx->at( iJet ), jetPy->at( iJet ), pvtX->at(iPV), pvtY->at(iPV));
+        IPsign = dSign(itkmu, jetPx->at( iJet ), jetPy->at( iJet ), pvtX->at(iPV), pvtY->at(iPV));
     }else{
-    int coneNtrk = 0;
-    float pxCone = 0, pyCone = 0;
+        int coneNtrk = 0;
+        float pxCone = 0, pyCone = 0;
 
-    for(int ipf = 0; ipf<nPF; ++ipf){
+        for(int ipf = 0; ipf<nPF; ++ipf){
 
-        if( deltaR(pfcEta->at(ipf), pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > 0.4 ) continue;
-        //if(std::find(signalTracks.begin(), signalTracks.end(), pfcTrk->at(ipf)) != signalTracks.end()) continue;
-        if(pfcTrk->at(ipf) == itkmu) continue;
-        if(pfcPt->at(ipf) < 0.2) continue;
-        if(abs(pfcEta->at(ipf)) > 2.5) continue;
-        //if( !(( trkQuality->at( itk ) >> 2 ) & 1) ) continue;
-        ++coneNtrk;
-        pxCone += pfcPt->at(ipf)*TMath::Cos(pfcPhi->at(ipf));
-        pyCone += pfcPt->at(ipf)*TMath::Sin(pfcPhi->at(ipf));
+            if( deltaR(pfcEta->at(ipf), pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > 0.4 ) continue;
+            //if(std::find(signalTracks.begin(), signalTracks.end(), pfcTrk->at(ipf)) != signalTracks.end()) continue;
+            if(pfcTrk->at(ipf) == itkmu) continue;
+            if(pfcPt->at(ipf) < 0.2) continue;
+            if(abs(pfcEta->at(ipf)) > 2.5) continue;
+            //if( !(( trkQuality->at( itk ) >> 2 ) & 1) ) continue;
+            ++coneNtrk;
+            pxCone += pfcPt->at(ipf)*TMath::Cos(pfcPhi->at(ipf));
+            pyCone += pfcPt->at(ipf)*TMath::Sin(pfcPhi->at(ipf));
 
-    }
-    if(coneNtrk>=2) IPsign = dSign(itkmu, pxCone, pyCone, pvtX->at(iPV), pvtY->at(iPV));
+        }
+        if(coneNtrk>=2) IPsign = dSign(itkmu, pxCone, pyCone, pvtX->at(iPV), pvtY->at(iPV));
     }
 
     return IPsign;
