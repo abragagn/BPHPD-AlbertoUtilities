@@ -608,6 +608,24 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
 
 	return t;
 }
+// =====================================================================================
+int AlbertoUtil::GetCandidate(TString process, bool useTightSel)
+{
+	if(process=="BsJPsiPhi"){
+		if(useTightSel){
+			return GetBestBstrangeTight();
+		}else{
+			return GetBestBstrange();
+		}
+	}
 
+	if(process=="BuJPsiK"){
+		if(useTightSel){
+			return GetBestBupTight();
+		}else{
+			return GetBestBup();
+		}
+	}	
+}
 
 	

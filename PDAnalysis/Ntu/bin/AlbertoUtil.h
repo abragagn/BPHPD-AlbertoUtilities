@@ -107,7 +107,7 @@ public:
 	int GetBestPV(int isvt, TLorentzVector t);
 	float GetSignedDxy(int iMuon, int iPV);
 	TLorentzVector GetTLorentzVecFromJpsiX(int iSvt);
-
+	int GetCandidate(TString process, bool useTightSel);
 
 
 protected:
