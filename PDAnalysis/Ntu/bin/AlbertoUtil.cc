@@ -566,7 +566,7 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 
 		if(cos > bestCos ){
 			bestCos = cos;
-			ssPV = trkPVtx->at(i);
+			ssPV = i;
 		}
 
 	}
@@ -583,3 +583,31 @@ float AlbertoUtil::GetSignedDxy(int iMuon, int iPV)
 	return dxy*sign;
 
 }
+// =====================================================================================
+TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
+{
+	int iJPsi = (subVtxFromSV(iSvt)).at(0);
+	vector <int> tkJpsi = tracksFromSV(iJPsi) ;
+	vector <int> tkSsB = tracksFromSV(iSvt);
+
+	TLorentzVector t(0,0,0,0);
+
+	for( unsigned int i=0; i<tkSsB.size(); ++i ){
+
+		int j = tkSsB[i];
+
+		float m = MassK;
+
+		if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MassMu;
+
+		TLorentzVector a ;
+		a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m ) ;
+		t += a ;
+
+	}
+
+	return t;
+}
+
+
+	

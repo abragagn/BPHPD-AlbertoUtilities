@@ -106,6 +106,8 @@ public:
 	float CountEventsWithFit(TH1 *hist, TString process);
 	int GetBestPV(int isvt, TLorentzVector t);
 	float GetSignedDxy(int iMuon, int iPV);
+	TLorentzVector GetTLorentzVecFromJpsiX(int iSvt);
+
 
 
 protected:
