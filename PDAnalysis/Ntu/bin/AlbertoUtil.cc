@@ -629,5 +629,9 @@ int AlbertoUtil::GetCandidate(TString process, bool useTightSel)
 
     return -1;
 }
-
+// =====================================================================================
+float AlbertoUtil::dZ(int itk, int iPV)
+{
+    return PDAnalyzerUtil::dZ(itk, pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV));
+}
     

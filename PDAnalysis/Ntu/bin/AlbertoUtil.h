@@ -108,6 +108,7 @@ public:
     float GetSignedDxy(int iMuon, int iPV);
     TLorentzVector GetTLorentzVecFromJpsiX(int iSvt);
     int GetCandidate(TString process, bool useTightSel);
+    float dZ(int itk, int iPV);
 
 
 protected:
