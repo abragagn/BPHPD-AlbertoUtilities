@@ -625,7 +625,9 @@ int AlbertoUtil::GetCandidate(TString process, bool useTightSel)
 		}else{
 			return GetBestBup();
 		}
-	}	
+	}
+
+	return -1;
 }
 
 	
