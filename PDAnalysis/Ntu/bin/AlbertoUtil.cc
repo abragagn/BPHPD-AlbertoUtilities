@@ -577,7 +577,7 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 float AlbertoUtil::GetSignedDxy(int iMuon, int iPV)
 {
 
-    int dxy = dXY( muonTrack( iMuon, PDEnumString::muInner ), pvtX->at(iPV), pvtY->at(iPV) );
+    float dxy = dXY( muonTrack( iMuon, PDEnumString::muInner ), pvtX->at(iPV), pvtY->at(iPV) );
     int sign = IPsign(iMuon, iPV);
 
     return dxy*sign;

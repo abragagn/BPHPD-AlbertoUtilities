@@ -37,8 +37,8 @@ PDAnalyzer::PDAnalyzer() {
     setUserParameter( "maxEtaMuon", "2.4" );
     setUserParameter( "outputFile", "ntu.root" );
 
-    setUserParameter( "mvaBarrel", "DNNGlobalBarrel2016wIPwIso" ); 
-    setUserParameter( "mvaEndcap", "DNNGlobalEndcap2016wIPwIso" ); 
+    setUserParameter( "mvaBarrel", "DNNGlobalBarrel2016woIPwIso" ); 
+    setUserParameter( "mvaEndcap", "DNNGlobalEndcap2016woIPwIso" ); 
 
     setUserParameter( "ptCut", "40.0" ); //needed for paolo's code for unknow reasons
 
@@ -82,8 +82,8 @@ void PDAnalyzer::beginJob() {
     bool useKerasAsMVA= true;
     
     if(!useKerasAsMVA){
-        mvaBarrel = "BDTGlobalBarrel2016wIPwIso";
-        mvaEndcap = "BDTGlobalEndcap2016wIPwIso";
+        mvaBarrel = "BDTGlobalBarrel2016woIPwIso";
+        mvaEndcap = "BDTGlobalEndcap2016woIPwIso";
     }
 
     TString year = "2016";
