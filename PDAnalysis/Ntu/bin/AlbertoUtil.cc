@@ -10,43 +10,52 @@ AlbertoUtil::~AlbertoUtil() {}
 // =====================================================================================
 bool AlbertoUtil::IsB( unsigned int genindex ) 
 {
+
     unsigned int genCode = abs( genId->at(genindex) );
     for( unsigned int i=0; i<ARRAY_SIZE(listLundBmesons); ++i ) if( genCode == listLundBmesons[i] ) return true;
     for( unsigned int i=0; i<ARRAY_SIZE(listLundBbaryons); ++i ) if( genCode == listLundBbaryons[i] ) return true;
     return false;
+
 }
 
 // =================================================================================================
 bool AlbertoUtil::IsBottomium(unsigned int genindex)
 {
+
     unsigned int genCode = abs( genId->at(genindex) );
     for( unsigned int i=0; i<ARRAY_SIZE(listLundBottonium); ++i ) if( genCode == listLundBottonium[i] ) return true;
     return false;
+
 }
 
 // =====================================================================================
 bool AlbertoUtil::IsC( unsigned int genindex ) 
 {
+
     unsigned int genCode = abs( genId->at(genindex) );
     for( unsigned int i=0; i<ARRAY_SIZE(listLundCmesons); ++i ) if( genCode == listLundCmesons[i] ) return true;
     for( unsigned int i=0; i<ARRAY_SIZE(listLundCbaryons); ++i ) if( genCode == listLundCbaryons[i] ) return true;
     return false;
+
 }
 
 // =================================================================================================
-bool AlbertoUtil::IsCharmonium( unsigned int genindex )
+bool AlbertoUtil::IsCharmonium(unsigned int genindex)
 {
     unsigned int genCode = abs( genId->at(genindex) );
     for( unsigned int i=0; i<ARRAY_SIZE(listLundCharmonium); ++i ) if( genCode == listLundCharmonium[i] ) return true;
     return false;
+
 }
 
 // =====================================================================================
 bool AlbertoUtil::IsLongLived( unsigned int genindex ) 
 {
+
     unsigned int genCode = abs( genId->at(genindex) );
     for( unsigned int i=0; i<ARRAY_SIZE(LongLivedList); ++i ) if( genCode == LongLivedList[i] ) return true;
     return false;
+
 }
 
 // =====================================================================================
@@ -72,8 +81,8 @@ int AlbertoUtil::GetClosestGen( float eta, float phi, float pt )
 }
 
 // =====================================================================================
-int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector <int> *GenList ) 
-{
+int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector <int> *GenList ) {
+
     double drb = 0.4;
     double dpb = 0.4; 
     int best = -1;
@@ -116,6 +125,7 @@ int AlbertoUtil::WhichMuon(int trk)
 // =====================================================================================
 float AlbertoUtil::GetCT( unsigned int genIndex ) 
 {
+
     const vector <int>& aD = allDaughters(genIndex);
     if( aD.size() == 0 ) return -1 ;
 
@@ -133,6 +143,7 @@ float AlbertoUtil::GetCT( unsigned int genIndex )
 
     float ct = sqrt( dx*dx+dy*dy+dz*dz )/pGen.Beta()/pGen.Gamma();
     return ct;
+ 
 }
 
 // ========================================================================================
@@ -405,6 +416,7 @@ unsigned short int AlbertoUtil::TagMixStatus( unsigned int genindex )
     if( aM.size()>0 && genId->at(aM[0]) == -Code ) return 1;
 
     return 0;
+ 
 }
 
 // ========================================================================================
@@ -422,15 +434,18 @@ float AlbertoUtil::GetMuoPFiso (int iMuon)
 // ========================================================================================
 bool AlbertoUtil::isMvaMuon(int iMuon, float wpB, float wpE)
 {
+
     if((abs(muoEta->at( iMuon ))<1.2)&&(computeMvaBarrel(iMuon)>=wpB)) return true;
     if((abs(muoEta->at( iMuon ))>=1.2)&&(computeMvaEndcap(iMuon)>=wpE)) return true;
 
     return false;
+
 }
 
 // =====================================================================================
 float AlbertoUtil::GetJetCharge(int iJet, float kappa)
 {
+
     float QJet = 0;
     float ptJet = 0;
 
@@ -452,16 +467,19 @@ float AlbertoUtil::GetJetCharge(int iJet, float kappa)
     QJet /= ptJet;
 
     return QJet; 
+
 }
 
 // =====================================================================================
 int AlbertoUtil::IPsign(int iMuon)
 {
+
     return IPsign_(iMuon);
 }
 // =====================================================================================
 int AlbertoUtil::IPsign(int iMuon, int iPV)
 {
+
     return IPsign_(iMuon, iPV);
 }
 // =====================================================================================
@@ -483,8 +501,8 @@ float AlbertoUtil::GetJetProbb(int iJet)
     return jetdfprob;
 }
 // =====================================================================================
-float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
-{
+float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
+
     float mean=MassBs;
     if(process=="BsJPsiPhi")   mean=MassBs;
     if(process=="BuJPsiK")     mean=MassBp;
@@ -526,6 +544,7 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
     nEvt/=hist->GetBinWidth(0);
 
     return nEvt;
+
 }
 // =====================================================================================
 int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
@@ -557,8 +576,12 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 // =====================================================================================
 float AlbertoUtil::GetSignedDxy(int iMuon, int iPV)
 {
+
     float dxy = dXY( muonTrack( iMuon, PDEnumString::muInner ), pvtX->at(iPV), pvtY->at(iPV) );
-    return dxy*IPsign(iMuon, iPV);
+    int sign = IPsign(iMuon, iPV);
+
+    return abs(dxy)*sign;
+
 }
 // =====================================================================================
 TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)

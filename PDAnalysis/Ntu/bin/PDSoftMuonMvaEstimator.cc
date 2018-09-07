@@ -248,15 +248,15 @@ float PDSoftMuonMvaEstimator::computeMvaEndcap(int iMuon)
 bool PDSoftMuonMvaEstimator::MuonPassedPreselection(int iMuon)
 {
 
-    if ( muoChi2LM->at( iMuon ) > 5000 ) return false;
-    if ( muoChi2LP->at( iMuon ) > 2000 ) return false;
-    if ( muoGlbTrackTailProb->at( iMuon ) > 5000 ) return false;
-    if ( muoTrkKink->at( iMuon ) > 900 ) return false;
-    if ( muoGlbKinkFinderLOG->at( iMuon ) > 50 ) return false;
-    if ( muoTimeAtIpInOutErr->at( iMuon ) > 4 ) return false;
-    if ( muoOuterChi2->at( iMuon ) > 1000 ) return false;
-    if ( muoInnerChi2->at( iMuon ) > 10 ) return false;
-    if ( muoTrkRelChi2->at( iMuon ) > 3 ) return false;
+    if ( muoChi2LM->at( iMuon ) > 5000 ) {return false;}
+    if ( muoChi2LP->at( iMuon ) > 2000 ) {return false;}
+    if ( muoGlbTrackTailProb->at( iMuon ) > 5000 ) {return false;}
+    if ( muoTrkKink->at( iMuon ) > 900 ) {return false;}
+    if ( muoGlbKinkFinderLOG->at( iMuon ) > 50 ) {return false;}
+    if ( muoTimeAtIpInOutErr->at( iMuon ) > 4 ) {return false;}
+    if ( muoOuterChi2->at( iMuon ) > 1000 ) {return false;}
+    if ( muoInnerChi2->at( iMuon ) > 10 ) {return false;}
+    if ( muoTrkRelChi2->at( iMuon ) > 3 ) {return false;}
 
     return true;
 }
