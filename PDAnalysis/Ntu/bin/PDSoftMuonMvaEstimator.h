@@ -22,7 +22,7 @@ public:
     PDSoftMuonMvaEstimator();
     ~PDSoftMuonMvaEstimator();
 
-    void setupReader(TString methodName);
+    void setupReader(TString methodName, TString path);
     float computeMva(int iMuon);
     bool MuonPassedPreselection(int iMuon);
     int IPsign_(int iMuon);
@@ -30,8 +30,7 @@ public:
 
 private:
     void computeMvaVariables(int iMuon);
-
-    void methodSetup(TString methodName);
+    void methodSetup(TString methodName, TString path);
     TString methodNameFromWeightName(TString weightname);
     bool useIp(TString methodName);
     bool useIso(TString methodName);

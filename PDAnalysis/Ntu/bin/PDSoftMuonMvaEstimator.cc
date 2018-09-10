@@ -53,10 +53,10 @@ PDSoftMuonMvaEstimator::PDSoftMuonMvaEstimator():
 PDSoftMuonMvaEstimator::~PDSoftMuonMvaEstimator() {}
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::setupReader(TString methodName)
+void PDSoftMuonMvaEstimator::setupReader(TString methodName, TString path = "/lustre/cmswork/abragagn/weights/")
 {
 
-    methodSetup(methodName);
+    methodSetup(methodName, path);
 
     reader_.AddVariable( "muoPt", &muoPt_ );
     reader_.AddVariable( "abs(muoEta)", &absMuoEta_ );
@@ -294,7 +294,7 @@ TString PDSoftMuonMvaEstimator::methodNameFromWeightName(TString weightsName)
 }
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::methodSetup(TString methodName)
+void PDSoftMuonMvaEstimator::methodSetup(TString methodName, TString path path)
 {
 
     TString year = "";
@@ -313,8 +313,8 @@ void PDSoftMuonMvaEstimator::methodSetup(TString methodName)
 
     if(methodName.Contains("Barrel") || methodName.Contains("Endcap")) name.Remove(name.Length() - 6, 6);
 
-    weightFileBarrel_ = "/lustre/cmswork/abragagn/weights/" + year + "/" + "TMVAClassification_" + name + "Barrel" + year + var + ".weights.xml";
-    weightFileEndcap_ = "/lustre/cmswork/abragagn/weights/" + year + "/" + "TMVAClassification_" + name + "Endcap" + year + var + ".weights.xml";
+    weightFileBarrel_ = path + year + "/" + "TMVAClassification_" + name + "Barrel" + year + var + ".weights.xml";
+    weightFileEndcap_ = path + year + "/" + "TMVAClassification_" + name + "Endcap" + year + var + ".weights.xml";
 
     methodNameBarrel_ = methodNameFromWeightName(weightFileBarrel_);
     methodNameEndcap_ = methodNameFromWeightName(weightFileEndcap_);
