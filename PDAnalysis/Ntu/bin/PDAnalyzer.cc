@@ -15,8 +15,8 @@
 #include "TFile.h"
 
 // additional features
-#include "PDSecondNtupleWriter.h"                               // second ntuple
-//#include "DataSetFilter.cc"                                           // dataset filter
+#include "PDSecondNtupleWriter.h"   // second ntuple
+//#include "DataSetFilter.cc"       // dataset filter
 #include "PDMuonVar.cc"
 #include "PDSoftMuonMvaEstimator.cc"
 #include "AlbertoUtil.cc"
@@ -37,8 +37,7 @@ PDAnalyzer::PDAnalyzer() {
     setUserParameter( "maxEtaMuon", "2.4" );
     setUserParameter( "outputFile", "ntu.root" );
 
-    setUserParameter( "mvaBarrel", "DNNGlobalBarrel2016woIPwIso" ); 
-    setUserParameter( "mvaEndcap", "DNNGlobalEndcap2016woIPwIso" ); 
+    setUserParameter( "mvaMethod", "DNNGlobal2016woIPwIso" ); 
 
     setUserParameter( "ptCut", "40.0" ); //needed for paolo's code for unknow reasons
 
@@ -63,8 +62,7 @@ void PDAnalyzer::beginJob() {
     getUserParameter( "minPtMuon", minPtMuon );
     getUserParameter( "maxEtaMuon", maxEtaMuon );
 
-    getUserParameter( "mvaBarrel", mvaBarrel );
-    getUserParameter( "mvaEndcap", mvaEndcap );
+    getUserParameter( "mvaMethod", mvaMethod );
 
     getUserParameter( "ptCut", ptCut ); //needed for paolo's code for unknow reasons
 
@@ -78,26 +76,7 @@ void PDAnalyzer::beginJob() {
     tWriter = new PDSecondNtupleWriter;
     tWriter->open( getUserParameter("outputFile"), "RECREATE" ); // second ntuple
 
-
-    bool useKerasAsMVA= true;
-    
-    if(!useKerasAsMVA){
-        mvaBarrel = "BDTGlobalBarrel2016woIPwIso";
-        mvaEndcap = "BDTGlobalEndcap2016woIPwIso";
-    }
-
-    TString year = "2016";
-
-    if(mvaBarrel.Contains("2016")) year = "2016";
-    if(mvaBarrel.Contains("2017")) year = "2017";
-    if(mvaBarrel.Contains("2018")) year = "2018";
-
-    weightFileBarrel = "/lustre/cmswork/abragagn/weights/" + year + "/" + "TMVAClassification_" + mvaBarrel + ".weights.xml";
-    weightFileEndcap = "/lustre/cmswork/abragagn/weights/" + year + "/" + "TMVAClassification_" + mvaEndcap + ".weights.xml";
-
-    setupReaderBarrel( weightFileBarrel );
-    setupReaderEndcap( weightFileEndcap );
-
+    setupReader( mvaMethod );
 
     return;
 
@@ -210,7 +189,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 
         (tWriter->muoPFiso)->push_back(GetMuoPFiso(iMuon));
 
-        (tWriter->muoSoftMvaValue)->push_back( GetMvaMuonValue(iMuon) ); 
+        (tWriter->muoSoftMvaValue)->push_back( computeMva(iMuon) ); 
 
         (tWriter->muoLund)->push_back( muoLund );
         (tWriter->muoAncestor)->push_back( muoAncestor ); 

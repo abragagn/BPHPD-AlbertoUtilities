@@ -14,18 +14,17 @@
 //      BDTs trained with global muons with pT>2 GeV and abs(eta)<2.4 and basic quality cuts
 //
 //
-//      ---How to use the discriminator (example for barrel, endcap is the same)---
+//      ---How to use the discriminator ---
 //
-//      0. Change isoFlag_ and ipFlag_ with the corresponding function if you want to veto these variables
-//      1. Initialize the discriminator in PDAnalyzer::beginJob with 'void PDSoftMuonMvaEstimator::setupReaderBarrel(std::string weightFileBarrel)'
-//          -You can find the weights in /lustre/cmswork/abragagn/weights/
+//      0. You can find the weights in /lustre/cmswork/abragagn/weights/
+//      1. Initialize the discriminator in PDAnalyzer::beginJob with 'void PDSoftMuonMvaEstimator::setupReaderBarrel(TString methodName)'
+//          -methodName should be in the form of prefix + year + variable flags (w = with, wo = without. The order is "Ip" followed by "Iso")
+//              --e.g "DNNGlobal2016woIPwIso", but even "DNNGlobalBarrel2016woIPwIso" is accepted
 //      2. In PDAnalyzer::analyze compute the needed muon variables for each event with 'void computeMuonVar() 
-//          and fill the jetCartesian coordinates vectors convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz);
-//      3. Compute the Mva response with 'float PDSoftMuonMvaEstimator::computeMvaBarrel(int iMuon)'
-//          -Make sure to feed muons with the right pseudorapidity range otherwise you'll get invalid response
-//      4. For endcap is the same, change every name accordingly
-//          -one barrel ID and one endcap ID can be initialize at the same time
-//          4.1 The function 'float AlbertoUtil::getMvaMuonValue(int iMuon)' takes care automatically of the pseudorapidity range
+//          and fill the Cartesian coordinates vectors of muons, tracks, jet and pfcs
+//          e.g convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz);
+//      3. Compute the Mva response with 'float PDSoftMuonMvaEstimator::computeMva(int iMuon)'
+//          -- Remember that Barrel and Encap use completely different methods
 //
 //
 //
@@ -33,8 +32,7 @@
 //      ---Possible output values---
 //
 //      -1 = the muon is not a global muon
-//      -2 = the muon do not pass basic preselection
-//      -3 = the muon is not in the pseudorapidity range of the discriminator
+//      -2 = the muon do not pass preselection
 //      [0, 1] = mva discriminator response
 //
 //
@@ -47,8 +45,7 @@
 #include "AlbertoUtil.h"
 
 PDSoftMuonMvaEstimator::PDSoftMuonMvaEstimator():
-    readerBarrel("!Color:Silent"),
-    readerEndcap("!Color:Silent")
+    reader_("!Color:Silent")
 {
     TMVA::PyMethodBase::PyInitialize();
 }
@@ -56,68 +53,50 @@ PDSoftMuonMvaEstimator::PDSoftMuonMvaEstimator():
 PDSoftMuonMvaEstimator::~PDSoftMuonMvaEstimator() {}
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::setupReader(TMVA::Reader &reader, TString weightFile, TString methodName)
+void PDSoftMuonMvaEstimator::setupReader(TString methodName)
 {
 
-    reader.AddVariable( "muoPt", &muoPt_ );
-    reader.AddVariable( "abs(muoEta)", &absMuoEta_ );
-    reader.AddVariable( "muoSegmComp", &muoSegmComp_ );
-    reader.AddVariable( "muoChi2LM", &muoChi2LM_ );
-    reader.AddVariable( "muoChi2LP", &muoChi2LP_ );
-    reader.AddVariable( "muoGlbTrackTailProb", &muoGlbTrackTailProb_ );
-    reader.AddVariable( "muoIValFrac", &muoIValFrac_ );
-    reader.AddVariable( "muoLWH", &muoLWH_ );
-    reader.AddVariable( "muoTrkKink", &muoTrkKink_ );
-    reader.AddVariable( "muoGlbKinkFinderLOG", &muoGlbKinkFinderLOG_ );
-    reader.AddVariable( "muoTimeAtIpInOutErr", &muoTimeAtIpInOutErr_ );
-    reader.AddVariable( "muoOuterChi2", &muoOuterChi2_ );
-    reader.AddVariable( "muoInnerChi2", &muoInnerChi2_ );
-    reader.AddVariable( "muoTrkRelChi2", &muoTrkRelChi2_ );
-    reader.AddVariable( "muoVMuonHitComb", &muoVMuonHitComb_ );
-    reader.AddVariable( "muoGlbDeltaEtaPhi", &muoGlbDeltaEtaPhi_ );
-    reader.AddVariable( "muoStaRelChi2", &muoStaRelChi2_ );
-    reader.AddVariable( "muoTimeAtIpInOut", &muoTimeAtIpInOut_ );
-    reader.AddVariable( "muoValPixHits", &muoValPixHits_ );
-    reader.AddVariable( "muoNTrkVHits", &muoNTrkVHits_ );
-    reader.AddVariable( "muoGNchi2", &muoGNchi2_ );
-    reader.AddVariable( "muoVMuHits", &muoVMuHits_ );
-    reader.AddVariable( "muoNumMatches", &muoNumMatches_ );
-    reader.AddVariable( "muoQprod", &muoQprod_ );
-    if(useIp(methodName)){
-        reader.AddVariable( "trkDxy/trkExy", &trkDxy_ );
-        reader.AddVariable( "trkDz/trkEz", &trkDz_ );
+    methodSetup(methodName);
+
+    reader_.AddVariable( "muoPt", &muoPt_ );
+    reader_.AddVariable( "abs(muoEta)", &absMuoEta_ );
+    reader_.AddVariable( "muoSegmComp", &muoSegmComp_ );
+    reader_.AddVariable( "muoChi2LM", &muoChi2LM_ );
+    reader_.AddVariable( "muoChi2LP", &muoChi2LP_ );
+    reader_.AddVariable( "muoGlbTrackTailProb", &muoGlbTrackTailProb_ );
+    reader_.AddVariable( "muoIValFrac", &muoIValFrac_ );
+    reader_.AddVariable( "muoLWH", &muoLWH_ );
+    reader_.AddVariable( "muoTrkKink", &muoTrkKink_ );
+    reader_.AddVariable( "muoGlbKinkFinderLOG", &muoGlbKinkFinderLOG_ );
+    reader_.AddVariable( "muoTimeAtIpInOutErr", &muoTimeAtIpInOutErr_ );
+    reader_.AddVariable( "muoOuterChi2", &muoOuterChi2_ );
+    reader_.AddVariable( "muoInnerChi2", &muoInnerChi2_ );
+    reader_.AddVariable( "muoTrkRelChi2", &muoTrkRelChi2_ );
+    reader_.AddVariable( "muoVMuonHitComb", &muoVMuonHitComb_ );
+    reader_.AddVariable( "muoGlbDeltaEtaPhi", &muoGlbDeltaEtaPhi_ );
+    reader_.AddVariable( "muoStaRelChi2", &muoStaRelChi2_ );
+    reader_.AddVariable( "muoTimeAtIpInOut", &muoTimeAtIpInOut_ );
+    reader_.AddVariable( "muoValPixHits", &muoValPixHits_ );
+    reader_.AddVariable( "muoNTrkVHits", &muoNTrkVHits_ );
+    reader_.AddVariable( "muoGNchi2", &muoGNchi2_ );
+    reader_.AddVariable( "muoVMuHits", &muoVMuHits_ );
+    reader_.AddVariable( "muoNumMatches", &muoNumMatches_ );
+    reader_.AddVariable( "muoQprod", &muoQprod_ );
+    if(useIp(methodNameBarrel_)){
+        reader_.AddVariable( "trkDxy/trkExy", &trkDxy_ );
+        reader_.AddVariable( "trkDz/trkEz", &trkDz_ );
     }
-    if(useIso(methodName)) reader.AddVariable( "muoPFiso", &muoPFiso_ );
+    if(useIso(methodNameBarrel_)) reader_.AddVariable( "muoPFiso", &muoPFiso_ );
 
-    reader.AddSpectator( "muoEvt", &DUMMY_ );
+    reader_.AddSpectator( "muoEvt", &DUMMY_ );
 
-    reader.BookMVA( methodName, weightFile );
-
-    return;
-
-}
-
-// =====================================================================================
-void PDSoftMuonMvaEstimator::setupReaderBarrel(TString weightFileBarrel)
-{
-
-    methodNameBarrel_ = methodNameFromWeightName(weightFileBarrel) ;
-    setupReader(readerBarrel, weightFileBarrel, methodNameBarrel_);
+    reader_.BookMVA( methodNameBarrel_, weightFileBarrel_ );
+    reader_.BookMVA( methodNameEndcap_, weightFileEndcap_ );
 
     return;
 
 }
 
-// =====================================================================================
-void PDSoftMuonMvaEstimator::setupReaderEndcap(TString weightFileEndcap)
-{
-
-    methodNameEndcap_ = methodNameFromWeightName(weightFileEndcap) ;
-    setupReader(readerEndcap, weightFileEndcap, methodNameEndcap_);
-
-    return;
-
-}
 
 // =====================================================================================
 void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon){
@@ -170,7 +149,7 @@ void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon){
 
 
 // =====================================================================================
-float PDSoftMuonMvaEstimator::computeMvaBarrel(int iMuon)
+float PDSoftMuonMvaEstimator::computeMva(int iMuon)
 {   
 
     if( !( muoType->at(iMuon) & PDEnumString::global ) )
@@ -190,11 +169,6 @@ float PDSoftMuonMvaEstimator::computeMvaBarrel(int iMuon)
         return -2;
     }
 
-    if( abs(muoEta->at(iMuon))>=1.2)
-    {
-        return -3;
-    }
-
     //VARIABLE EXTRACTION
     computeMvaVariables(iMuon);
     //PRESELECTION
@@ -202,45 +176,8 @@ float PDSoftMuonMvaEstimator::computeMvaBarrel(int iMuon)
     {
         return -2;
     }
-    return readerBarrel.EvaluateMVA(methodNameBarrel_);
 
-}
-
-// =====================================================================================
-float PDSoftMuonMvaEstimator::computeMvaEndcap(int iMuon)
-{   
-
-    if( !( muoType->at(iMuon) & PDEnumString::global ) )
-    {
-        return -1;
-    }
-
-    int itkmu = muonTrack( iMuon, PDEnumString::muInner );
-
-    if( itkmu < 0 )
-    {
-        return -1;
-    }
-
-    if( !(( trkQuality->at( itkmu ) >> 2 ) & 1) )
-    {
-        return -2;
-    }
-
-    if( abs(muoEta->at(iMuon))<1.2)
-    {
-        return -3;
-    }
-
-    //VARIABLE EXTRACTION
-    computeMvaVariables(iMuon);
-
-    //PRESELECTION
-    if(!MuonPassedPreselection(iMuon))
-    {
-        return -2;
-    }
-    return readerEndcap.EvaluateMVA(methodNameEndcap_);
+    return (abs(muoEta->at( iMuon ))<1.2) ? reader_.EvaluateMVA(methodNameBarrel_) : reader_.EvaluateMVA(methodNameEndcap_); 
 
 }
 
@@ -297,6 +234,7 @@ int PDSoftMuonMvaEstimator::IPsign_(int iMuon)
 
     return IPsign;
 }
+
 // =====================================================================================
 int PDSoftMuonMvaEstimator::IPsign_(int iMuon, int iPV)
 {
@@ -332,6 +270,7 @@ int PDSoftMuonMvaEstimator::IPsign_(int iMuon, int iPV)
 
     return IPsign;
 }
+
 // =====================================================================================
 bool PDSoftMuonMvaEstimator::useIp(TString methodName)
 {
@@ -343,6 +282,7 @@ bool PDSoftMuonMvaEstimator::useIso(TString methodName)
 {
     return !methodName.Contains("woIso");
 }
+
 // =====================================================================================
 TString PDSoftMuonMvaEstimator::methodNameFromWeightName(TString weightsName)
 {
@@ -351,4 +291,34 @@ TString PDSoftMuonMvaEstimator::methodNameFromWeightName(TString weightsName)
     int length = weightsName.Index(".weights") - start;
     TString name( weightsName(start, length) );
     return name;
+}
+
+// =====================================================================================
+void PDSoftMuonMvaEstimator::methodSetup(TString methodName)
+{
+
+    TString year = "";
+    TString var = "";
+
+    if(methodName.Contains("2016")) year = "2016";
+    if(methodName.Contains("2017")) year = "2017";
+    if(methodName.Contains("2018")) year = "2018";
+
+    if(useIp(methodName)) var += "wIp"; 
+        else var += "woIp";
+    if(useIso(methodName)) var += "wIso"; 
+        else var += "woIso";
+
+    TString name( methodName( 0, methodName.Index(year) ) );
+
+    if(methodName.Contains("Barrel") || methodName.Contains("Endcap")) name.Remove(name.Length() - 6, 6);
+
+    weightFileBarrel_ = "/lustre/cmswork/abragagn/weights/" + year + "/" + "TMVAClassification_" + name + "Barrel" + year + var + ".weights.xml";
+    weightFileEndcap_ = "/lustre/cmswork/abragagn/weights/" + year + "/" + "TMVAClassification_" + name + "Endcap" + year + var + ".weights.xml";
+
+    methodNameBarrel_ = methodNameFromWeightName(weightFileBarrel_);
+    methodNameEndcap_ = methodNameFromWeightName(weightFileEndcap_);
+
+    return;
+
 }

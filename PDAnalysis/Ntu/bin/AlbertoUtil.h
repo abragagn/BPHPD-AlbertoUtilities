@@ -65,9 +65,6 @@ public:
     float BuMassRange[2] = {5.0, 6.0};
     float BdMassRange[2] = {5.0, 6.0};
 
-    TString weightFileBarrel = "/lustre/cmswork/abragagn/weights/2016/TMVAClassification_DNNGlobalBarrel2016wIPwIso.weights.xml";
-    TString weightFileEndcap = "/lustre/cmswork/abragagn/weights/2016/TMVAClassification_DNNGlobalEndcap2016wIPwIso.weights.xml";
-
     void SetMassRangeJPsi(float newValue){ MassRangeJPsi = newValue; }
     void SetBsMassRange(float lower, float upper) { BsMassRange[0] = lower; BsMassRange[1] = upper; }
     void SetBpMassRange(float lower, float upper) { BuMassRange[0] = lower; BuMassRange[1] = upper; }
@@ -99,7 +96,6 @@ public:
     float GetMuoPFiso (int iMuon);
     float GetJetCharge(int iJet, float kappa);
     bool isMvaMuon(int iMuon, float wpB, float wpE);
-    float GetMvaMuonValue(int iMuon);
     int IPsign(int iMuon);
     int IPsign(int iMuon, int iPV);
     float GetJetProbb(int iJet);

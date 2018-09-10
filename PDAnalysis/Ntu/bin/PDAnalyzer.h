@@ -65,8 +65,7 @@ class PDAnalyzer:   public virtual PDAnalyzerUtil
     bool verbose;
     TString outputFile;
     float minPtMuon, maxEtaMuon;
-
-    TString mvaBarrel, mvaEndcap;
+    TString mvaMethod;
 
     int nselMu;
 

@@ -435,8 +435,8 @@ float AlbertoUtil::GetMuoPFiso (int iMuon)
 bool AlbertoUtil::isMvaMuon(int iMuon, float wpB, float wpE)
 {
 
-    if((abs(muoEta->at( iMuon ))<1.2)&&(computeMvaBarrel(iMuon)>=wpB)) return true;
-    if((abs(muoEta->at( iMuon ))>=1.2)&&(computeMvaEndcap(iMuon)>=wpE)) return true;
+    if((abs(muoEta->at( iMuon ))<1.2)&&(computeMva(iMuon)>=wpB)) return true;
+    if((abs(muoEta->at( iMuon ))>=1.2)&&(computeMva(iMuon)>=wpE)) return true;
 
     return false;
 
@@ -481,11 +481,6 @@ int AlbertoUtil::IPsign(int iMuon, int iPV)
 {
 
     return IPsign_(iMuon, iPV);
-}
-// =====================================================================================
-float AlbertoUtil::GetMvaMuonValue(int iMuon)
-{ 
-    return (abs(muoEta->at( iMuon ))<1.2) ? computeMvaBarrel(iMuon) : computeMvaEndcap(iMuon); 
 }
 
 // =====================================================================================
@@ -634,4 +629,4 @@ float AlbertoUtil::dZ(int itk, int iPV)
 {
     return PDAnalyzerUtil::dZ(itk, pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV));
 }
-    
+
