@@ -323,8 +323,8 @@ int PDSoftMuonMvaEstimator::IPsign_(int iMuon, int iPV)
             if(abs(pfcEta->at(ipf)) > 2.5) continue;
             //if( !(( trkQuality->at( itk ) >> 2 ) & 1) ) continue;
             ++coneNtrk;
-            pxCone += pfcPt->at(ipf)*TMath::Cos(pfcPhi->at(ipf));
-            pyCone += pfcPt->at(ipf)*TMath::Sin(pfcPhi->at(ipf));
+            pxCone += pfcPx->at(ipf);
+            pyCone += pfcPy->at(ipf);
 
         }
         if(coneNtrk>=2) IPsign = dSign(itkmu, pxCone, pyCone, pvtX->at(iPV), pvtY->at(iPV));

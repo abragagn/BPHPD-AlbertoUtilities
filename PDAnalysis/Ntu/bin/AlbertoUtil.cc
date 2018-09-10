@@ -108,7 +108,7 @@ int AlbertoUtil::GetAncestor( unsigned int iGen, vector <int> *GenList )
     const vector <int>* aM = &allMothers(iGen);
     while( aM->size()>0 ){ 
        int a = aM->at(0);
-       for( unsigned int i=0; i<GenList->size(); ++i ) if( GenList->at(i) == a ) return i;
+       for( unsigned int i=0; i<GenList->size(); ++i ) if( GenList->at(i) == a ) return GenList->at(i);
        aM = &allMothers( aM->at(0) );
     }
     return -1;
