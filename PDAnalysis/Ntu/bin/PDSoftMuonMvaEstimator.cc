@@ -305,7 +305,7 @@ void PDSoftMuonMvaEstimator::methodSetup(TString methodName, TString path)
     if(methodName.Contains("2018")) year = "2018";
 
     if(useIp(methodName)) var += "wIP"; 
-        else var += "woIp";
+        else var += "woIP";
     if(useIso(methodName)) var += "wIso"; 
         else var += "woIso";
 
