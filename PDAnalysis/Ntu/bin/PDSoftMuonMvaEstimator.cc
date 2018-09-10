@@ -18,7 +18,7 @@
 //
 //      0. You can find the weights in /lustre/cmswork/abragagn/weights/
 //      1. Initialize the discriminator in PDAnalyzer::beginJob with 'void PDSoftMuonMvaEstimator::setupReaderBarrel(TString methodName)'
-//          -methodName should be in the form of prefix + year + variable flags (w = with, wo = without. The order is "Ip" followed by "Iso")
+//          -methodName should be in the form of prefix + year + variable flags (w = with, wo = without. The order is "IP" followed by "Iso")
 //              --e.g "DNNGlobal2016woIPwIso", but even "DNNGlobalBarrel2016woIPwIso" is accepted
 //      2. In PDAnalyzer::analyze compute the needed muon variables for each event with 'void computeMuonVar() 
 //          and fill the Cartesian coordinates vectors of muons, tracks, jet and pfcs
@@ -304,7 +304,7 @@ void PDSoftMuonMvaEstimator::methodSetup(TString methodName, TString path)
     if(methodName.Contains("2017")) year = "2017";
     if(methodName.Contains("2018")) year = "2018";
 
-    if(useIp(methodName)) var += "wIp"; 
+    if(useIp(methodName)) var += "wIP"; 
         else var += "woIp";
     if(useIso(methodName)) var += "wIso"; 
         else var += "woIso";
