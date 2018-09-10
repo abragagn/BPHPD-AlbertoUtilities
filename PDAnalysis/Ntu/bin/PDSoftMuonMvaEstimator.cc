@@ -294,7 +294,7 @@ TString PDSoftMuonMvaEstimator::methodNameFromWeightName(TString weightsName)
 }
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::methodSetup(TString methodName, TString path path)
+void PDSoftMuonMvaEstimator::methodSetup(TString methodName, TString path)
 {
 
     TString year = "";
