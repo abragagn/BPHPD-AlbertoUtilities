@@ -134,7 +134,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
     convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz);
     convSpheCart(muoPt, muoEta, muoPhi, muoPx, muoPy, muoPz);
     convSpheCart(trkPt, trkEta, trkPhi, trkPx, trkPy, trkPz);
-    convSpheCart(pfcPt, pfckta, pfckhi, pfcPx, pfcPy, pfcPz);
+    convSpheCart(pfcPt, pfcEta, pfcPhi, pfcPx, pfcPy, pfcPz);
 
     // flag to be set "true" or "false" for events accepted or rejected
 
