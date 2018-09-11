@@ -105,6 +105,9 @@ public:
     TLorentzVector GetTLorentzVecFromJpsiX(int iSvt);
     int GetCandidate(TString process, bool useTightSel);
     float dZ(int itk, int iPV);
+    void printMotherChain(int iGen);
+    void printDaughterTree(int iGen, const std::string & pre);
+    bool hasDaughter(int iGen);
 
 
 protected:

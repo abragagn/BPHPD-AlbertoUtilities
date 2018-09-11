@@ -630,3 +630,56 @@ float AlbertoUtil::dZ(int itk, int iPV)
     return PDAnalyzerUtil::dZ(itk, pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV));
 }
 
+// =================================================================================================
+void AlbertoUtil::printMotherChain(int iGen)
+{
+    cout<<genId->at(iGen)<<" << ";
+    const vector <int>& vM = allMothers(iGen);
+    unsigned int nmot = vM.size();
+    if(nmot>1) for(unsigned int im=0; im<nmot; ++im) if(genId->at(vM[im])!=21) cout<<genId->at(vM[im])<<" ";
+    if(nmot==1) printMotherChain(vM[0]);
+    return;
+}
+// =================================================================================================
+void AlbertoUtil::printDaughterTree(int iGen, const string & pre)
+{
+    cout<<genId->at(iGen)<<endl;
+
+    const vector <int>& vD = allDaughters(iGen);
+    unsigned int ndau = vD.size();
+    if(ndau == 0) return;
+
+    bool lastLevel = true;
+    for(unsigned int id =0; id<ndau; ++id){
+        if ( hasDaughter( vD[id] ) ) {
+            lastLevel = false;
+            break;
+        }
+    }
+
+    if( lastLevel ){
+        cout << pre << "+-> ";
+        for( unsigned int id=0; id<ndau; ++id ) {
+            int d = vD[id];
+            cout<< genId->at( d ) <<" ";
+        }
+        cout << endl;
+        return;
+    }
+
+  for( unsigned int id=0; id<ndau; ++id ) {
+    int d = vD[id];
+    cout << pre << "+-> ";
+    string prepre( pre );
+    if ( id == ndau - 1 ) prepre += "    ";
+    else prepre += "|   ";
+    printDaughterTree( d, prepre );
+  }
+}
+
+// =================================================================================================
+bool AlbertoUtil::hasDaughter(int iGen)
+{
+    const vector <int>& vD = allDaughters(iGen);
+    return vD.size()>1 ? true : false;
+}

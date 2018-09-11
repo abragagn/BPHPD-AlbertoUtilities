@@ -1,6 +1,6 @@
 <use   name="NtuAnalysis/Common"/>
 <use   name="CommonTools/Statistics"/>
-<use 	 name="root_pymva"/>
+<use   name="rootpymva"/>
 <use   name="roottmva"/>
 <export>
   <use   name="NtuAnalysis/Common"/>

@@ -23,7 +23,9 @@
 
 using namespace std;
 
-//pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2016Lists/BsToJpsiPhi_BMuonFilter_AOD_DCAP.list hist.root -v outputFile ntu.root -v histoMode RECREATE -v use_gen t -n 10000
+/*
+pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2016Lists/BsToJpsiPhi_BMuonFilter_2016_DCAP.list hist.root -v histoMode RECREATE -v use_gen t -n 100000
+*/
 
 PDAnalyzer::PDAnalyzer() {
 
@@ -189,7 +191,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 
         (tWriter->muoPFiso)->push_back(GetMuoPFiso(iMuon));
 
-        (tWriter->muoSoftMvaValue)->push_back( computeMva(iMuon) ); 
+        (tWriter->muoSoftMvaValue)->push_back( computeMva(iMuon) );
 
         (tWriter->muoLund)->push_back( muoLund );
         (tWriter->muoAncestor)->push_back( muoAncestor ); 
