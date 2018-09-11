@@ -18,7 +18,7 @@ class AlbertoUtil:  public virtual PDAnalyzerUtil
 public:
 
     AlbertoUtil();
-    ~AlbertoUtil();
+    virtual ~AlbertoUtil();
 
     const float MassJPsi = 3.097;
     const float MassMu = 0.1057;
