@@ -255,17 +255,15 @@ int PDSoftMuonMvaEstimator::IPsign_(int iMuon, int iPV)
         for(int ipf = 0; ipf<nPF; ++ipf){
 
             if( deltaR(pfcEta->at(ipf), pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > 0.4 ) continue;
-            //if(std::find(signalTracks.begin(), signalTracks.end(), pfcTrk->at(ipf)) != signalTracks.end()) continue;
-            if(pfcTrk->at(ipf) == itkmu) continue;
             if(pfcPt->at(ipf) < 0.2) continue;
             if(abs(pfcEta->at(ipf)) > 2.5) continue;
-            //if( !(( trkQuality->at( itk ) >> 2 ) & 1) ) continue;
+
             ++coneNtrk;
             pxCone += pfcPx->at(ipf);
             pyCone += pfcPy->at(ipf);
 
         }
-        if(coneNtrk>=2) IPsign = dSign(itkmu, pxCone, pyCone, pvtX->at(iPV), pvtY->at(iPV));
+        if(coneNtrk>2) IPsign = dSign(itkmu, pxCone, pyCone, pvtX->at(iPV), pvtY->at(iPV));
     }
 
     return IPsign;
