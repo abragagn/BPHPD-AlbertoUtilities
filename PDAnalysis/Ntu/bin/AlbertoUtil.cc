@@ -87,15 +87,15 @@ int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector
     double dpb = 0.4; 
     int best = -1;
     
-    for(std::vector<int>::iterator it = GenList->begin(); it != GenList->end(); ++it){
+    for(int it:GenList){
 
-       float dr = deltaR(eta, phi, genEta->at(*it), genPhi->at(*it));
-       float dpt = abs(genPt->at(*it) - pt)/genPt->at(*it);
+       float dr = deltaR(eta, phi, genEta->at(it), genPhi->at(it));
+       float dpt = abs(genPt->at(it) - pt)/genPt->at(it);
 
        if( dr > drb ) continue;
        if( dpt > dpb) continue;
 
-       best = *it;
+       best = it;
        drb = dr;
     } 
 
@@ -451,15 +451,15 @@ float AlbertoUtil::GetJetCharge(int iJet, float kappa)
 
     vector <int> list = pfCandFromJet( iJet );
 
-    for(std::vector<int>::iterator it = list.begin(); it != list.end(); ++it){
+    for(int it:list){
 
-       float pt = pfcPt->at(*it);
-       float eta = pfcEta->at(*it);
+       float pt = pfcPt->at(it);
+       float eta = pfcEta->at(it);
 
        if(pt<0.2) continue;
        if(abs(eta)>2.5) continue;
 
-       QJet += pfcCharge->at(*it) * pow(pt, kappa);
+       QJet += pfcCharge->at(it) * pow(pt, kappa);
        ptJet += pow(pt, kappa);
 
     }
