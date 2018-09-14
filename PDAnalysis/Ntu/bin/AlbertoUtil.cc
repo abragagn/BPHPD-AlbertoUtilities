@@ -498,6 +498,8 @@ float AlbertoUtil::GetJetProbb(int iJet)
 // =====================================================================================
 float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
 
+    ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls( 10000 );
+
     float mean=MassBs;
     if(process=="BsJPsiPhi")   mean=MassBs;
     if(process=="BuJPsiK")     mean=MassBp;
@@ -506,15 +508,15 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
 
     float sigma = 0.015;
 
-    TString sgnDef = "[1]*exp(-0.5*((x-[0])/[4])**2)";
-    sgnDef +=       "+[2]*exp(-0.5*((x-[0])/[5])**2)";
-    sgnDef +=       "+[3]*exp(-0.5*((x-[0])/[6])**2)";
-    TString bkgDef = "[7]*exp([8]*x)";
+    TString sgnDef = "[1]*TMath::Gaus(x, [0], [4], true)";
+    sgnDef +=       "+[2]*TMath::Gaus(x, [0], [5], true)";
+    sgnDef +=       "+[3]*TMath::Gaus(x, [0], [6], true)";
+    TString bkgDef = "[7]+[8]*TMath::Erfc([9]*(x-[10]))";
     TString funcDef = sgnDef + "+" + bkgDef;
 
-    TF1 *func = new TF1("func", funcDef, 5.25, 5.5);
+    TF1 *func = new TF1("func", funcDef, min_, max_);
 
-    func->FixParameter(0, mean);
+    func->SetParameter(0, mean);
 
     func->SetParameter(1, 1);
     func->SetParameter(2, 1);
@@ -524,38 +526,35 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
     func->SetParameter(5, sigma);
     func->SetParameter(6, sigma);
 
-    func->SetParameter(7, 1);
-    func->SetParameter(8, -1);
+    func->SetParameter(7, hist->GetBinContent(nBins_-1));
+    func->SetParameter(8, 1);
+    func->SetParameter(9, 20);
+    func->SetParameter(10, 5.10);
 
     func->SetParLimits(0, mean-sigma, mean+sigma);
 
-    func->SetParLimits(1, 0, 1e9);
-    func->SetParLimits(2, 0, 1e9);
-    func->SetParLimits(3, 0, 1e9);
+    func->SetParLimits(1, 0, hist->GetEntries());
+    func->SetParLimits(2, 0, hist->GetEntries());
+    func->SetParLimits(3, 0, hist->GetEntries());
 
-    func->SetParLimits(4, sigma/3, sigma*3);
-    func->SetParLimits(5, sigma/3, sigma*3);
-    func->SetParLimits(6, sigma/3, sigma*3);
+    func->SetParLimits(4, 0, sigma*3);
+    func->SetParLimits(5, 0, sigma*3);
+    func->SetParLimits(6, 0, sigma*3);
 
-    func->SetParLimits(7, 0, 1e9);
-    func->SetParLimits(8, -1e9, 0);
+    func->SetParLimits(7, 0, hist->GetBinContent(nBins_-1)*1.5);
+    func->SetParLimits(8, 0, hist->GetBinContent(nBins_-1));
+    func->SetParLimits(9, 10, 1e3);
+    func->SetParLimits(10, 5.0, mean);
+
+
     hist->Fit("func","MRLQ");
 
     TF1 *fit = hist->GetFunction("func");
 
-    double a[3] = {
-        fit->GetParameter(1),
-        fit->GetParameter(2),
-        fit->GetParameter(3)
-    };
+    float nEvt = fit->GetParameter(1);
+    nEvt += fit->GetParameter(2);
+    nEvt += fit->GetParameter(3);
 
-    double s[3] = {
-        fit->GetParameter(4),
-        fit->GetParameter(5),
-        fit->GetParameter(6)
-    };
-
-    float nEvt = TMath::Sqrt(2*TMath::Pi())*(a[0]*s[0]+a[1]*s[1]+a[2]*s[2]);
     nEvt/=hist->GetBinWidth(0);
 
     return nEvt;
