@@ -514,7 +514,7 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
     TString bkgDef = "[7]+[8]*TMath::Erfc([9]*(x-[10]))";
     TString funcDef = sgnDef + "+" + bkgDef;
 
-    TF1 *func = new TF1("func", funcDef, min_, max_);
+    TF1 *func = new TF1("func", funcDef, hist->GetBinLowEdge(1), hist->GetBinLowEdge(hist->GetNbinsX()));
 
     func->SetParameter(0, mean);
 
@@ -526,7 +526,7 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
     func->SetParameter(5, sigma);
     func->SetParameter(6, sigma);
 
-    func->SetParameter(7, hist->GetBinContent(nBins_-1));
+    func->SetParameter(7, hist->GetBinContent(hist->GetNbinsX() -1));
     func->SetParameter(8, 1);
     func->SetParameter(9, 20);
     func->SetParameter(10, 5.10);
@@ -537,12 +537,12 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
     func->SetParLimits(2, 0, hist->GetEntries());
     func->SetParLimits(3, 0, hist->GetEntries());
 
-    func->SetParLimits(4, 0, sigma*3);
-    func->SetParLimits(5, 0, sigma*3);
-    func->SetParLimits(6, 0, sigma*3);
+    func->SetParLimits(4, 0, sigma*2);
+    func->SetParLimits(5, 0, sigma*2);
+    func->SetParLimits(6, 0, sigma*2);
 
-    func->SetParLimits(7, 0, hist->GetBinContent(nBins_-1)*1.5);
-    func->SetParLimits(8, 0, hist->GetBinContent(nBins_-1));
+    func->SetParLimits(7, 0, hist->GetBinContent(hist->GetNbinsX()-1)*1.5);
+    func->SetParLimits(8, 0, hist->GetBinContent(hist->GetNbinsX()-1));
     func->SetParLimits(9, 10, 1e3);
     func->SetParLimits(10, 5.0, mean);
 

@@ -28,6 +28,11 @@ public:
     int IPsign_(int iMuon);
     int IPsign_(int iMuon, int iPV);
 
+protected:
+    
+    TString methodNameBarrel_, methodNameEndcap_;
+    TString weightFileBarrel_, weightFileEndcap_;
+
 private:
     void computeMvaVariables(int iMuon);
     void methodSetup(TString methodName, TString path);
@@ -36,9 +41,6 @@ private:
     bool useIso(TString methodName);
 
     TMVA::Reader reader_;
-
-    TString methodNameBarrel_, methodNameEndcap_;
-    TString weightFileBarrel_, weightFileEndcap_;
 
     // MVA Variable
     float muoPt_;

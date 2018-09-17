@@ -10,6 +10,7 @@
 #include "PDSoftMuonMvaEstimator.h"
 #include "TF1.h"
 #include "TLorentzVector.h"
+#include "Math/MinimizerOptions.h"
 
 class AlbertoUtil:  public virtual PDAnalyzerUtil
 ,                                       public virtual PDSoftMuonMvaEstimator
