@@ -234,8 +234,8 @@ bool AlbertoUtil::IsTightPhi(int iPhi)
         if(fabs(trkEta->at(j)) > 2.5) return false;
         int Hits = trkHitPattern->at(j);
         int knpst = ( int(Hits) / 100 ) % 10000;
-        int kntrk = kpnpst % 100;
-        if (kmntrk<4) continue;
+        int kntrk = knpst % 100;
+        if (kntrk<4) continue;
     }
     return true;
 }
