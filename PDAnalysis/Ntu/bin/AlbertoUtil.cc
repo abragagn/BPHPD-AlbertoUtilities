@@ -257,9 +257,7 @@ int AlbertoUtil::GetBestBstrangeTight()
         if(!IsTightJPsi(iJPsi)) continue;
 
         //PHI
-        if(trkPt->at(tkPhi[0]) < 0.7) continue;
-        if(trkPt->at(tkPhi[1]) < 0.7) continue;
-        if(fabs(svtMass->at(iPhi) - MassPhi) > 0.01 ) continue;
+        if(!IsTightPhi(iPhi)) continue;
 
         //BS
         if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
