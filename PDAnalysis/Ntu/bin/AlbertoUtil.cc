@@ -232,10 +232,13 @@ bool AlbertoUtil::IsTightPhi(int iPhi)
         int j = tkPhi[i];
         if(trkPt->at(j) < 0.7) return false;
         if(fabs(trkEta->at(j)) > 2.5) return false;
+        int Hits = trkHitPattern->at(j);
+        int knpst = ( int(Hits) / 100 ) % 10000;
+        int kntrk = kpnpst % 100;
+        if (kmntrk<4) continue;
     }
     return true;
 }
-
 
 // ========================================================================================
 int AlbertoUtil::GetBestBstrangeTight()
