@@ -209,12 +209,12 @@ bool AlbertoUtil::IsTightJPsi(int iJPsi)
     TLorentzVector tJPsi(0,0,0,0);
 
     for( unsigned int i=0; i<tkJpsi.size(); ++i ){
-       int j = tkJpsi[i];
-       if(trkPt->at(j) < 4.0) return false;
-       if(fabs(trkEta->at(j)) > 2.2) return false;
-       TLorentzVector a;
-       a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), MassMu );
-       tJPsi += a;
+        int j = tkJpsi[i];
+        if(trkPt->at(j) < 4.0) return false;
+        if(fabs(trkEta->at(j)) > 2.2) return false;
+        TLorentzVector a;
+        a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), MassMu );
+        tJPsi += a;
     }
 
     if(tJPsi.Pt() < 8.0) return false;
@@ -223,52 +223,66 @@ bool AlbertoUtil::IsTightJPsi(int iJPsi)
 }
 
 // ========================================================================================
+bool AlbertoUtil::IsTightPhi(int iPhi)
+{
+    if(fabs(svtMass->at(iPhi) - MassPhi) > 0.01 ) return false;
+    
+    vector <int> tkPhi = tracksFromSV(iPhi);
+    for( unsigned int i=0; i<tkPhi.size(); ++i ){
+        int j = tkPhi[i];
+        if(trkPt->at(j) < 0.7) return false;
+        if(fabs(trkEta->at(j)) > 2.5) return false;
+    }
+    return true;
+}
+
+
+// ========================================================================================
 int AlbertoUtil::GetBestBstrangeTight()
 {
     int index = -1;
     float bestChi2 = 1e9;
     for( unsigned short int iB=0; iB<nSVertices; ++iB ){
 
-       if((svtType->at(iB)!=PDEnumString::svtBsJPsiPhi) ) continue;
-       if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
+        if((svtType->at(iB)!=PDEnumString::svtBsJPsiPhi) ) continue;
 
-       if((svtDist2D->at(iB)/svtSigma2D->at(iB)) < 3) continue;
-       if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.10 ) continue;
+        int iJPsi = (subVtxFromSV(iB)).at(0);
+        int iPhi = (subVtxFromSV(iB)).at(1);
 
-       int iJPsi = (subVtxFromSV(iB)).at(0);
-       if(!IsTightJPsi(iJPsi)) continue;
+        vector <int> tkSsB = tracksFromSV(iB);
+        vector <int> tkJpsi = tracksFromSV(iJPsi);
+        vector <int> tkPhi = tracksFromSV(iPhi);
 
-       int iPhi = (subVtxFromSV(iB)).at(1);
+        //JPSI
+        if(!IsTightJPsi(iJPsi)) continue;
 
-       vector <int> tkSsB = tracksFromSV(iB);
-       vector <int> tkJpsi = tracksFromSV(iJPsi);
-       vector <int> tkPhi = tracksFromSV(iPhi);
+        //PHI
+        if(trkPt->at(tkPhi[0]) < 0.7) continue;
+        if(trkPt->at(tkPhi[1]) < 0.7) continue;
+        if(fabs(svtMass->at(iPhi) - MassPhi) > 0.01 ) continue;
 
-       if(trkPt->at(tkPhi[0]) < 0.7) continue;
-       if(trkPt->at(tkPhi[1]) < 0.7) continue;
-       if(fabs(svtMass->at(iPhi) - MassPhi) > 0.01 ) continue;
+        //BS
+        if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
+        if((svtDist2D->at(iB)/svtSigma2D->at(iB)) < 3) continue;
+        if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.10 ) continue;
 
-       TLorentzVector tB(0,0,0,0);
+        TLorentzVector tB(0,0,0,0);
 
-       for( unsigned int i=0; i<tkSsB.size(); ++i ){
+        for( unsigned int i=0; i<tkSsB.size(); ++i ){
+            int j = tkSsB[i];
+            float m = MassK;
+            if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MassMu;
+            TLorentzVector a;
+            a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
+            tB += a;
+        }
 
-         int j = tkSsB[i];
+        if(tB.Pt() < 10.0) continue;
 
-         float m = MassK;
+        if( svtChi2->at(iB)>bestChi2 ) continue;
 
-         if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MassMu;
-
-         TLorentzVector a;
-         a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
-         tB += a;
-
-       }
-
-       if(tB.Pt() < 10.0) continue;
-
-       if( svtChi2->at(iB)>bestChi2 ) continue;
-       index = iB;
-       bestChi2 = svtChi2->at(iB);
+        index = iB;
+        bestChi2 = svtChi2->at(iB);
 
     }
     return index;

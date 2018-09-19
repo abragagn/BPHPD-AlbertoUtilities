@@ -90,6 +90,7 @@ public:
     int GetBestBdownTight();
     int GetBestBupTight();
     bool IsTightJPsi(int iJPsi);
+    bool IsTightPhi(int iPhi);
     int GetBestJpsi();
     
     float GetInvMass(int i1, int i2, float mass1, float mass2);
