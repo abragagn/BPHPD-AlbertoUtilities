@@ -11,6 +11,9 @@
 #include "TF1.h"
 #include "TLorentzVector.h"
 #include "Math/MinimizerOptions.h"
+#include "TMatrixF.h"
+#include "TVectorF.h"
+
 
 class AlbertoUtil:  public virtual PDAnalyzerUtil
 ,                                       public virtual PDSoftMuonMvaEstimator
@@ -110,6 +113,8 @@ public:
     void printMotherChain(int iGen);
     void printDaughterTree(int iGen, const std::string & pre);
     bool hasDaughter(int iGen);
+    float GetL2D(int iSVT, int iPV, TLorentzVector t);
+    float GetL3D(int iSVT, int iPV, TLorentzVector t);
 
 
 protected:

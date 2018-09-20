@@ -513,14 +513,14 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
 
     func->SetParLimits(0, mean-sigma, mean+sigma);
 
-    func->SetParLimits(1, 0, hist->GetEntries());
-    func->SetParLimits(2, 0, hist->GetEntries());
-    func->SetParLimits(3, 0, hist->GetEntries());
+    func->SetParLimits(1, 0, hist->GetEntries()/2);
+    func->SetParLimits(2, 0, hist->GetEntries()/2);
+    func->SetParLimits(3, 0, hist->GetEntries()/2);
 
-    func->SetParLimits(4, 0, sigma*2);
-    func->SetParLimits(5, 0, sigma*2);
-    func->SetParLimits(6, 0, sigma*2);
-
+    func->SetParLimits(4, sigma/2, sigma*2);
+    func->SetParLimits(5, sigma/2, sigma*2);
+    func->SetParLimits(6, sigma/2, sigma*2);
+    
     func->SetParLimits(7, 0, hist->GetBinContent(hist->GetNbinsX()-1)*1.5);
     func->SetParLimits(8, 0, hist->GetBinContent(hist->GetNbinsX()-1));
     func->SetParLimits(9, 10, 1e3);
@@ -672,4 +672,28 @@ bool AlbertoUtil::hasDaughter(int iGen)
 {
     const vector <int>& vD = allDaughters(iGen);
     return vD.size()>1 ? true : false;
+}
+// =================================================================================================
+float AlbertoUtil::GetL2D(int iSVT, int iPV, TLorentzVector t)
+{
+
+    TVector3 vSVT( svtX->at(iSVT), svtY->at(iSVT), 0. );
+    TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), 0. );
+    TVector3 vBs( t.Px(), t.Py(), 0. );
+    TVector3 vPointing;
+    vPointing = vSVT - vPV;
+
+    return t.M()/t.Pt() * vPointing.Dot(vBs)/vBs.Mag();
+}
+
+// =================================================================================================
+float AlbertoUtil::GetL3D(int iSVT, int iPV, TLorentzVector t)
+{
+    TVector3 vSVT( svtX->at(iSVT), svtY->at(iSVT), svtZ->at(iSVT) );
+    TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV) );
+    TVector3 vBs( t.Px(), t.Py(), t.Pz() );
+    TVector3 vPointing;
+    vPointing = vSVT - vPV;
+
+    return t.M()/t.Pt() * vPointing.Dot(vBs)/vBs.Mag();
 }
