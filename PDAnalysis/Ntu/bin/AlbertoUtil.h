@@ -29,8 +29,8 @@ public:
     const float MassK = 0.4937;
     const float MassKx = 0.8917;
     const float MassBs = 5.3663;
-    const float MassBp = 5.2793;
-    const float MassB0 = 5.2796;
+    const float MassBu = 5.2793;
+    const float MassBd = 5.2796;
     const float MassKs = 0.4977;
     const float MassPi = 0.1396;
     const float MassPhi = 1.019;
@@ -71,7 +71,7 @@ public:
 
     void SetMassRangeJPsi(float newValue){ MassRangeJPsi = newValue; }
     void SetBsMassRange(float lower, float upper) { BsMassRange[0] = lower; BsMassRange[1] = upper; }
-    void SetBpMassRange(float lower, float upper) { BuMassRange[0] = lower; BuMassRange[1] = upper; }
+    void SetBuMassRange(float lower, float upper) { BuMassRange[0] = lower; BuMassRange[1] = upper; }
     void SetBdMassRange(float lower, float upper) { BdMassRange[0] = lower; BdMassRange[1] = upper; }
 
     bool IsLongLived( unsigned int i );

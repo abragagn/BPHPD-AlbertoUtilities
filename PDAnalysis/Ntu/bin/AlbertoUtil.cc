@@ -521,9 +521,9 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
 
     float mean=MassBs;
     if(process=="BsJPsiPhi")   mean=MassBs;
-    if(process=="BuJPsiK")     mean=MassBp;
-    if(process=="BdJPsiKx")    mean=MassB0;
-    if(process=="BdKxMuMu")    mean=MassB0;
+    if(process=="BuJPsiK")     mean=MassBu;
+    if(process=="BdJPsiKx")    mean=MassBd;
+    if(process=="BdKxMuMu")    mean=MassBd;
 
     float sigma = 0.015;
 
@@ -585,7 +585,7 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
     int ssPV = -1;
     float bestCos = -1;
 
-    TVector3 vSsBp(t.Px(),t.Py(),t.Pz());
+    TVector3 vB(t.Px(),t.Py(),t.Pz());
     TVector3 vSVT( svtX->at(isvt), svtY->at(isvt), svtZ->at(isvt) );
 
     for( int i=0; i<nPVertices; ++i ){
@@ -595,7 +595,7 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
        TVector3 vPV(pvtX->at( i ), pvtY->at( i ), pvtZ->at( i ) );
        TVector3 vPointing;
        vPointing = vSVT - vPV;
-       float cos = vPointing.Unit() * vSsBp.Unit();
+       float cos = vPointing.Unit() * vB.Unit();
 
        if(cos > bestCos ){
          bestCos = cos;
