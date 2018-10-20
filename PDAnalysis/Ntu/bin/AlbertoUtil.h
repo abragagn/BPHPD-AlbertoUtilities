@@ -97,7 +97,7 @@ public:
     int GetBestJpsi();
     
     float GetInvMass(int i1, int i2, float mass1, float mass2);
-    unsigned short int TagMixStatus( unsigned int genIndex );
+    int TagMixStatus( unsigned int genIndex );
     float GetMuoPFiso (int iMuon);
     float GetJetCharge(int iJet, float kappa);
     bool isMvaMuon(int iMuon, float wpB, float wpE);

@@ -390,7 +390,7 @@ int AlbertoUtil::GetBestJpsi()
 {
     int index = -1;
     float bestChi2 = 1e9;
-    for( unsigned short int i=0; i<nSVertices; ++i ){
+    for( int i=0; i<nSVertices; ++i ){
 
        if((svtType->at(i)!=PDEnumString::svtJPsi) ) continue;
        if( abs(svtMass->at(i)-MassJPsi) > MassRangeJPsi) continue;
@@ -423,7 +423,7 @@ float AlbertoUtil::GetInvMass(int i1, int i2, float mass1, float mass2)
 }
 
 // =====================================================================================
-unsigned short int AlbertoUtil::TagMixStatus( uint genindex )
+int AlbertoUtil::TagMixStatus( uint genindex )
 {
     int Code = genId->at( genindex );
 
