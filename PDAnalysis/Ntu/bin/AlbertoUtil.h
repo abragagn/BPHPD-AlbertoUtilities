@@ -84,7 +84,7 @@ public:
     int GetClosestGenLongLivedB( float eta, float phi, float pt, std::vector <int> *GenList );
     int GetAncestor( unsigned int iGen, std::vector <int> *GenList );
     int WhichMuon(int trk);
-    float GetCT( unsigned int genIndex );
+    float GetGenCT( unsigned int genIndex );
 
     int GetBestBstrange();
     int GetBestBdown();
@@ -113,6 +113,10 @@ public:
     void printMotherChain(int iGen);
     void printDaughterTree(int iGen, const std::string & pre);
     bool hasDaughter(int iGen);
+    float GetCt2D(TLorentzVector t, int iSV);
+    float GetCt2D(TLorentzVector t, int iSV, int iPV);
+    float GetCt3D(TLorentzVector t, int iSV);
+    float GetCt3D(TLorentzVector t, int iSV, int iPV);
 
 protected:
 

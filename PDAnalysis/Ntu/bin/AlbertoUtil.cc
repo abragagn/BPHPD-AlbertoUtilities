@@ -123,7 +123,7 @@ int AlbertoUtil::WhichMuon(int trk)
     return -1;
 }
 // =====================================================================================
-float AlbertoUtil::GetCT( unsigned int genIndex ) 
+float AlbertoUtil::GetGenCT( unsigned int genIndex ) 
 {
 
     const vector <int>& aD = allDaughters(genIndex);
@@ -590,7 +590,7 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 
     for( int i=0; i<nPVertices; ++i ){
 
-       if(fabs(svtZ->at(isvt) - pvtZ->at( i )) > 1.0 ) continue;
+       if(fabs(svtZ->at(isvt) - pvtZ->at( i )) > 0.5 ) continue;
 
        TVector3 vPV(pvtX->at( i ), pvtY->at( i ), pvtZ->at( i ) );
        TVector3 vPointing;
@@ -720,4 +720,59 @@ bool AlbertoUtil::hasDaughter(int iGen)
 {
     const vector <int>& vD = allDaughters(iGen);
     return vD.size()>1 ? true : false;
+}
+// =================================================================================================
+float AlbertoUtil::GetCt2D(TLorentzVector t, int iSV)
+{
+
+  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
+  TVector3 vPV( bsX, bsY, 0. );
+  
+  TVector3 vPointing = vSVT - vPV;
+  TVector3 vBs = t.Vect();
+
+  return ct = MassBs/t.Pt() * (vPointing * vBs.Unit());
+
+}
+
+// =================================================================================================
+float AlbertoUtil::GetCt2D(TLorentzVector t, int iSV, int iPV)
+{
+
+  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
+  TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), 0. );
+  
+  TVector3 vPointing = vSVT - vPV;
+  TVector3 vBs = t.Vect();
+
+  return ct = MassBs/t.Pt() * (vPointing * vBs.Unit());
+  
+}
+
+// =================================================================================================
+float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV)
+{
+
+  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
+  TVector3 vPV( bsX, bsY, bsZ );
+  
+  TVector3 vPointing = vSVT - vPV;
+  TVector3 vBs = t.Vect();
+
+  return ct3D = MassBs/t.P() * vPointing.Dot(vBs)/vBs.Mag();
+
+}
+
+// =================================================================================================
+float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
+{
+
+  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
+  TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV) );
+  
+  TVector3 vPointing = vSVT - vPV;
+  TVector3 vBs = t.Vect();
+
+  return ct3D = MassBs/t.P() * vPointing.Dot(vBs)/vBs.Mag();
+
 }
