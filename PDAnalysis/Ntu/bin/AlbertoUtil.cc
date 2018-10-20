@@ -8,52 +8,52 @@ AlbertoUtil::~AlbertoUtil() {}
 
 
 // =====================================================================================
-bool AlbertoUtil::IsB( unsigned int genindex ) 
+bool AlbertoUtil::IsB( uint genindex ) 
 {
 
-    unsigned int genCode = abs( genId->at(genindex) );
-    for( unsigned int i=0; i<ARRAY_SIZE(listLundBmesons); ++i ) if( genCode == listLundBmesons[i] ) return true;
-    for( unsigned int i=0; i<ARRAY_SIZE(listLundBbaryons); ++i ) if( genCode == listLundBbaryons[i] ) return true;
+    uint genCode = abs( genId->at(genindex) );
+    for( uint i=0; i<ARRAY_SIZE(listLundBmesons); ++i ) if( genCode == listLundBmesons[i] ) return true;
+    for( uint i=0; i<ARRAY_SIZE(listLundBbaryons); ++i ) if( genCode == listLundBbaryons[i] ) return true;
     return false;
 
 }
 
 // =================================================================================================
-bool AlbertoUtil::IsBottomium(unsigned int genindex)
+bool AlbertoUtil::IsBottomium(uint genindex)
 {
 
-    unsigned int genCode = abs( genId->at(genindex) );
-    for( unsigned int i=0; i<ARRAY_SIZE(listLundBottonium); ++i ) if( genCode == listLundBottonium[i] ) return true;
+    uint genCode = abs( genId->at(genindex) );
+    for( uint i=0; i<ARRAY_SIZE(listLundBottonium); ++i ) if( genCode == listLundBottonium[i] ) return true;
     return false;
 
 }
 
 // =====================================================================================
-bool AlbertoUtil::IsC( unsigned int genindex ) 
+bool AlbertoUtil::IsC( uint genindex ) 
 {
 
-    unsigned int genCode = abs( genId->at(genindex) );
-    for( unsigned int i=0; i<ARRAY_SIZE(listLundCmesons); ++i ) if( genCode == listLundCmesons[i] ) return true;
-    for( unsigned int i=0; i<ARRAY_SIZE(listLundCbaryons); ++i ) if( genCode == listLundCbaryons[i] ) return true;
+    uint genCode = abs( genId->at(genindex) );
+    for( uint i=0; i<ARRAY_SIZE(listLundCmesons); ++i ) if( genCode == listLundCmesons[i] ) return true;
+    for( uint i=0; i<ARRAY_SIZE(listLundCbaryons); ++i ) if( genCode == listLundCbaryons[i] ) return true;
     return false;
 
 }
 
 // =================================================================================================
-bool AlbertoUtil::IsCharmonium(unsigned int genindex)
+bool AlbertoUtil::IsCharmonium(uint genindex)
 {
-    unsigned int genCode = abs( genId->at(genindex) );
-    for( unsigned int i=0; i<ARRAY_SIZE(listLundCharmonium); ++i ) if( genCode == listLundCharmonium[i] ) return true;
+    uint genCode = abs( genId->at(genindex) );
+    for( uint i=0; i<ARRAY_SIZE(listLundCharmonium); ++i ) if( genCode == listLundCharmonium[i] ) return true;
     return false;
 
 }
 
 // =====================================================================================
-bool AlbertoUtil::IsLongLived( unsigned int genindex ) 
+bool AlbertoUtil::IsLongLived( uint genindex ) 
 {
 
-    unsigned int genCode = abs( genId->at(genindex) );
-    for( unsigned int i=0; i<ARRAY_SIZE(LongLivedList); ++i ) if( genCode == LongLivedList[i] ) return true;
+    uint genCode = abs( genId->at(genindex) );
+    for( uint i=0; i<ARRAY_SIZE(LongLivedList); ++i ) if( genCode == LongLivedList[i] ) return true;
     return false;
 
 }
@@ -65,7 +65,7 @@ int AlbertoUtil::GetClosestGen( float eta, float phi, float pt )
     double dpb = 0.3; 
     int best = -1;
     
-    for( unsigned int i=0; i< genId->size(); ++i ){
+    for( uint i=0; i< genId->size(); ++i ){
        if( !IsLongLived(i) ) continue;
        float dr = deltaR(eta, phi, genEta->at(i), genPhi->at(i));
        float dpt = abs(genPt->at(i) - pt)/genPt->at(i);
@@ -103,12 +103,12 @@ int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector
 }
 
 // =====================================================================================
-int AlbertoUtil::GetAncestor( unsigned int iGen, vector <int> *GenList ) 
+int AlbertoUtil::GetAncestor( uint iGen, vector <int> *GenList ) 
 {
     const vector <int>* aM = &allMothers(iGen);
     while( aM->size()>0 ){ 
        int a = aM->at(0);
-       for( unsigned int i=0; i<GenList->size(); ++i ) if( GenList->at(i) == a ) return GenList->at(i);
+       for( uint i=0; i<GenList->size(); ++i ) if( GenList->at(i) == a ) return GenList->at(i);
        aM = &allMothers( aM->at(0) );
     }
     return -1;
@@ -123,13 +123,13 @@ int AlbertoUtil::WhichMuon(int trk)
     return -1;
 }
 // =====================================================================================
-float AlbertoUtil::GetGenCT( unsigned int genIndex ) 
+float AlbertoUtil::GetGenCT( uint genIndex ) 
 {
 
     const vector <int>& aD = allDaughters(genIndex);
     if( aD.size() == 0 ) return -1 ;
 
-    unsigned int mthIndex = aD[0];
+    uint mthIndex = aD[0];
 
     if( genId->at( genIndex ) == - genId->at(genMother->at(genIndex)) ) mthIndex = genMother->at(genIndex ); 
  
@@ -150,7 +150,7 @@ int AlbertoUtil::GetBestBstrange()
 {
     int index = -1;
     float bestChi2 = 1e9;
-    for( unsigned short int iB=0; iB<nSVertices; ++iB ){
+    for( int iB=0; iB<nSVertices; ++iB ){
 
        if((svtType->at(iB)!=PDEnumString::svtBsJPsiPhi) ) continue;
        if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
@@ -168,7 +168,7 @@ int AlbertoUtil::GetBestBup()
 {
     int index = -1;
     float bestChi2 = 1e9;
-    for( unsigned short int iB=0; iB<nSVertices; ++iB ){
+    for( int iB=0; iB<nSVertices; ++iB ){
 
        if((svtType->at(iB)!=PDEnumString::svtBuJPsiK) ) continue;
        if( svtMass->at(iB)<BuMassRange[0] || svtMass->at(iB)>BuMassRange[1] ) continue;
@@ -186,7 +186,7 @@ int AlbertoUtil::GetBestBdown()
 {
     int index = -1;
     float bestChi2 = 1e9;
-    for( unsigned short int iB=0; iB<nSVertices; ++iB ){
+    for( int iB=0; iB<nSVertices; ++iB ){
 
        if((svtType->at(iB)!=PDEnumString::svtBdJPsiKx) ) continue;
        if( svtMass->at(iB)<BdMassRange[0] || svtMass->at(iB)>BdMassRange[1] ) continue;
@@ -207,7 +207,7 @@ bool AlbertoUtil::IsTightJPsi(int iJPsi)
     vector <int> tkJpsi = tracksFromSV(iJPsi);
     TLorentzVector tJPsi(0,0,0,0);
 
-    for( unsigned int i=0; i<tkJpsi.size(); ++i ){
+    for( uint i=0; i<tkJpsi.size(); ++i ){
         int j = tkJpsi[i];
         if(trkPt->at(j) < 4.0) return false;
         if(fabs(trkEta->at(j)) > 2.2) return false;
@@ -227,7 +227,7 @@ bool AlbertoUtil::IsTightPhi(int iPhi)
     if(fabs(svtMass->at(iPhi) - MassPhi) > 0.01 ) return false;
     
     vector <int> tkPhi = tracksFromSV(iPhi);
-    for( unsigned int i=0; i<tkPhi.size(); ++i ){
+    for( uint i=0; i<tkPhi.size(); ++i ){
         int j = tkPhi[i];
         if(trkPt->at(j) < 0.7) return false;
         if(fabs(trkEta->at(j)) > 2.5) return false;
@@ -248,7 +248,7 @@ int AlbertoUtil::GetBestBstrangeTight()
 {
     int index = -1;
     float bestChi2 = 1e9;
-    for( unsigned short int iB=0; iB<nSVertices; ++iB ){
+    for( int iB=0; iB<nSVertices; ++iB ){
 
         if((svtType->at(iB)!=PDEnumString::svtBsJPsiPhi) ) continue;
 
@@ -272,7 +272,7 @@ int AlbertoUtil::GetBestBstrangeTight()
 
         TLorentzVector tB(0,0,0,0);
 
-        for( unsigned int i=0; i<tkSsB.size(); ++i ){
+        for( uint i=0; i<tkSsB.size(); ++i ){
             int j = tkSsB[i];
             float m = MassK;
             if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MassMu;
@@ -297,7 +297,7 @@ int AlbertoUtil::GetBestBupTight()
 {
     int index = -1;
     float bestChi2 = 1e9;
-    for( unsigned short int iB=0; iB<nSVertices; ++iB ){
+    for( int iB=0; iB<nSVertices; ++iB ){
 
        if((svtType->at(iB)!=PDEnumString::svtBuJPsiK) ) continue;
        if( svtMass->at(iB)<BuMassRange[0] || svtMass->at(iB)>BuMassRange[1] ) continue;
@@ -314,7 +314,7 @@ int AlbertoUtil::GetBestBupTight()
        TLorentzVector tB(0,0,0,0);
        float KaonPt = 0;
 
-       for( unsigned int i=0; i<tkSsB.size(); ++i ){
+       for( uint i=0; i<tkSsB.size(); ++i ){
 
          int j = tkSsB[i];
 
@@ -344,7 +344,7 @@ int AlbertoUtil::GetBestBdownTight()
 {
     int index = -1;
     float bestChi2 = 1e9;
-    for( unsigned short int iB=0; iB<nSVertices; ++iB ){
+    for( int iB=0; iB<nSVertices; ++iB ){
 
        if((svtType->at(iB)!=PDEnumString::svtBdJPsiKx) ) continue;
        if( svtMass->at(iB)<BdMassRange[0] || svtMass->at(iB)>BdMassRange[1] ) continue;
@@ -361,7 +361,7 @@ int AlbertoUtil::GetBestBdownTight()
 
        TLorentzVector tB(0,0,0,0);
 
-       for( unsigned int i=0; i<tkSsB.size(); ++i ){
+       for( uint i=0; i<tkSsB.size(); ++i ){
 
          int j = tkSsB[i];
 
@@ -423,7 +423,7 @@ float AlbertoUtil::GetInvMass(int i1, int i2, float mass1, float mass2)
 }
 
 // =====================================================================================
-unsigned short int AlbertoUtil::TagMixStatus( unsigned int genindex )
+unsigned short int AlbertoUtil::TagMixStatus( uint genindex )
 {
     int Code = genId->at( genindex );
 
@@ -624,7 +624,7 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
 
     TLorentzVector t(0,0,0,0);
 
-    for( unsigned int i=0; i<tkSsB.size(); ++i ){
+    for( uint i=0; i<tkSsB.size(); ++i ){
 
        int j = tkSsB[i];
 
@@ -672,8 +672,8 @@ void AlbertoUtil::printMotherChain(int iGen)
 {
     cout<<genId->at(iGen)<<" << ";
     const vector <int>& vM = allMothers(iGen);
-    unsigned int nmot = vM.size();
-    if(nmot>1) for(unsigned int im=0; im<nmot; ++im) if(genId->at(vM[im])!=21) cout<<genId->at(vM[im])<<" ";
+    uint nmot = vM.size();
+    if(nmot>1) for(uint im=0; im<nmot; ++im) if(genId->at(vM[im])!=21) cout<<genId->at(vM[im])<<" ";
     if(nmot==1) printMotherChain(vM[0]);
     return;
 }
@@ -683,11 +683,11 @@ void AlbertoUtil::printDaughterTree(int iGen, const string & pre)
     cout<<genId->at(iGen)<<endl;
 
     const vector <int>& vD = allDaughters(iGen);
-    unsigned int ndau = vD.size();
+    uint ndau = vD.size();
     if(ndau == 0) return;
 
     bool lastLevel = true;
-    for(unsigned int id =0; id<ndau; ++id){
+    for(uint id =0; id<ndau; ++id){
         if ( hasDaughter( vD[id] ) ) {
             lastLevel = false;
             break;
@@ -696,7 +696,7 @@ void AlbertoUtil::printDaughterTree(int iGen, const string & pre)
 
     if( lastLevel ){
         cout << pre << "+-> ";
-        for( unsigned int id=0; id<ndau; ++id ) {
+        for( uint id=0; id<ndau; ++id ) {
             int d = vD[id];
             cout<< genId->at( d ) <<" ";
         }
@@ -704,7 +704,7 @@ void AlbertoUtil::printDaughterTree(int iGen, const string & pre)
         return;
     }
 
-  for( unsigned int id=0; id<ndau; ++id ) {
+  for( uint id=0; id<ndau; ++id ) {
     int d = vD[id];
     cout << pre << "+-> ";
     string prepre( pre );
