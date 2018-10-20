@@ -762,7 +762,7 @@ float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
 
 }
 // =================================================================================================
-float AlbertoUtil::GetCt2DSigma(TLorentzVector t, int iSV)
+/*float AlbertoUtil::GetCt2DSigma(TLorentzVector t, int iSV)
 {
 
   TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
@@ -793,7 +793,7 @@ float AlbertoUtil::GetCt2DSigma(TLorentzVector t, int iSV)
   return MassBs/t.Pt() * sqrt(covTot.Similarity(diff2D)) / sqrt(diff2D.Norm2Sqr()); 
    
 }
-
+*/
 // =================================================================================================
 float AlbertoUtil::GetCt2DSigma(TLorentzVector t, int iSV, int iPV)
 {
