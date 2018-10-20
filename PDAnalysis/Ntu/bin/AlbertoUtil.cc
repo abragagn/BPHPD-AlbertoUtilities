@@ -776,3 +776,150 @@ float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
   return ct3D = MassBs/t.P() * vPointing.Dot(vBs)/vBs.Mag();
 
 }
+// =================================================================================================
+float AlbertoUtil::GetCt2DSigma(TLorentzVector t, int iSV)
+{
+
+  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
+  TVector3 vPV( bsX, bsY, 0. );
+  
+  TVector3 vPointing = vSVT - vPV;
+  TVector3 vBs = t.Vect();
+
+  float ct = MassBs/t.Pt() * (vPointing * vBs.Unit());
+
+  TMatrixF covSV(3,3);
+  float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
+                      svtSxy->at(iSV),svtSyy->at(iSV),svtSyz->at(iSV), 
+                      svtSxz->at(iSV),svtSyz->at(iSV),svtSzz->at(iSV)};
+  covSV.SetMatrixArray(covSVArray);
+
+  TMatrixF covPV(3,3);
+  float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
+                      pvtSxy->at(iPV),pvtSyy->at(iPV),pvtSyz->at(iPV), 
+                      pvtSxz->at(iPV),pvtSyz->at(iPV),pvtSzz->at(iPV)};
+  covPV.SetMatrixArray(covPVArray);
+
+  TMatrixF covTot= covSV+covPV;
+
+  float distArray2D[]={float(vPointing.X()),float(vPointing.Y()),0.};
+  TVectorF diff2D(3,distArray2D);
+
+  float LxyErr=-999;
+
+  if (diff2D.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
+
+  return MassBs/t.Pt() * sqrt(covTot.Similarity(diff2D)) / sqrt(diff2D.Norm2Sqr()); 
+   
+}
+
+// =================================================================================================
+float AlbertoUtil::GetCt2DSigma(TLorentzVector t, int iSV, int iPV)
+{
+
+  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
+  TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), 0. );
+  
+  TVector3 vPointing = vSVT - vPV;
+  TVector3 vBs = t.Vect();
+
+  float ct = MassBs/t.Pt() * (vPointing * vBs.Unit());
+
+  TMatrixF covSV(3,3);
+  float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
+                      svtSxy->at(iSV),svtSyy->at(iSV),svtSyz->at(iSV), 
+                      svtSxz->at(iSV),svtSyz->at(iSV),svtSzz->at(iSV)};
+  covSV.SetMatrixArray(covSVArray);
+
+  TMatrixF covPV(3,3);
+  float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
+                      pvtSxy->at(iPV),pvtSyy->at(iPV),pvtSyz->at(iPV), 
+                      pvtSxz->at(iPV),pvtSyz->at(iPV),pvtSzz->at(iPV)};
+  covPV.SetMatrixArray(covPVArray);
+
+  TMatrixF covTot= covSV+covPV;
+
+  float distArray2D[]={float(vPointing.X()),float(vPointing.Y()),0.};
+  TVectorF diff2D(3,distArray2D);
+
+  float LxyErr=-999;
+
+  if (diff2D.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
+
+  return MassBs/t.Pt() * sqrt(covTot.Similarity(diff2D)) / sqrt(diff2D.Norm2Sqr()); 
+   
+}
+
+// =================================================================================================
+float AlbertoUtil::GetCt3DSigma(TLorentzVector t, int iSV)
+{
+
+  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
+  TVector3 vPV( bsX, bsY, bsZ );
+  
+  TVector3 vPointing = vSVT - vPV;
+  TVector3 vBs = t.Vect();
+
+  float ct3D = MassBs/t.P() * vPointing.Dot(vBs)/vBs.Mag();
+
+  TMatrixF covSV(3,3);
+  float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
+                      svtSxy->at(iSV),svtSyy->at(iSV),svtSyz->at(iSV), 
+                      svtSxz->at(iSV),svtSyz->at(iSV),svtSzz->at(iSV)};
+  covSV.SetMatrixArray(covSVArray);
+
+  TMatrixF covPV(3,3);
+  float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
+                      pvtSxy->at(iPV),pvtSyy->at(iPV),pvtSyz->at(iPV), 
+                      pvtSxz->at(iPV),pvtSyz->at(iPV),pvtSzz->at(iPV)};
+  covPV.SetMatrixArray(covPVArray);
+
+  TMatrixF covTot= covSV+covPV;
+
+  float distArray[]={float(vPointing.X()),float(vPointing.Y()),float(vPointing.Z())};
+  TVectorF diff(3,distArray);
+
+  float Lxy3DErr=-999;
+
+  if (diff.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
+ 
+  return MassBs/t.P() * sqrt(covTot.Similarity(diff)) / sqrt(diff.Norm2Sqr()); 
+
+}
+
+// =================================================================================================
+float AlbertoUtil::GetCt3DSigma(TLorentzVector t, int iSV, int iPV)
+{
+
+  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
+  TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV) );
+  
+  TVector3 vPointing = vSVT - vPV;
+  TVector3 vBs = t.Vect();
+
+  float ct3D = MassBs/t.P() * vPointing.Dot(vBs)/vBs.Mag();
+
+  TMatrixF covSV(3,3);
+  float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
+                      svtSxy->at(iSV),svtSyy->at(iSV),svtSyz->at(iSV), 
+                      svtSxz->at(iSV),svtSyz->at(iSV),svtSzz->at(iSV)};
+  covSV.SetMatrixArray(covSVArray);
+
+  TMatrixF covPV(3,3);
+  float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
+                      pvtSxy->at(iPV),pvtSyy->at(iPV),pvtSyz->at(iPV), 
+                      pvtSxz->at(iPV),pvtSyz->at(iPV),pvtSzz->at(iPV)};
+  covPV.SetMatrixArray(covPVArray);
+
+  TMatrixF covTot= covSV+covPV;
+
+  float distArray[]={float(vPointing.X()),float(vPointing.Y()),float(vPointing.Z())};
+  TVectorF diff(3,distArray);
+
+  float Lxy3DErr=-999;
+
+  if ( diff.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
+ 
+  return MassBs/t.P() * sqrt(covTot.Similarity(diff)) / sqrt(diff.Norm2Sqr()); 
+
+}

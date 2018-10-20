@@ -113,10 +113,17 @@ public:
     void printMotherChain(int iGen);
     void printDaughterTree(int iGen, const std::string & pre);
     bool hasDaughter(int iGen);
+
     float GetCt2D(TLorentzVector t, int iSV);
     float GetCt2D(TLorentzVector t, int iSV, int iPV);
     float GetCt3D(TLorentzVector t, int iSV);
     float GetCt3D(TLorentzVector t, int iSV, int iPV);
+
+    float GetCt2DSigma(TLorentzVector t, int iSV);
+    float GetCt2DSigma(TLorentzVector t, int iSV, int iPV);
+    float GetCt3DSigma(TLorentzVector t, int iSV);
+    float GetCt3DSigma(TLorentzVector t, int iSV, int iPV);
+
 
 protected:
 
