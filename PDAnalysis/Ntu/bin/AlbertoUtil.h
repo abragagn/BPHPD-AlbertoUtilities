@@ -89,7 +89,7 @@ public:
     int GetBestBstrange();
     int GetBestBdown();
     int GetBestBup();
-    int GetBestBstrangeTight();
+    int GetBestBstrangeTight(float ctCut);
     int GetBestBdownTight();
     int GetBestBupTight();
     bool IsTightJPsi(int iJPsi);

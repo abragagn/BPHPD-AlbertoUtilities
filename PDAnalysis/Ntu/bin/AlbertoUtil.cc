@@ -244,7 +244,7 @@ bool AlbertoUtil::IsTightPhi(int iPhi)
 
 
 // ========================================================================================
-int AlbertoUtil::GetBestBstrangeTight()
+int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02)
 {
     int index = -1;
     float bestChi2 = 1e9;
@@ -267,7 +267,6 @@ int AlbertoUtil::GetBestBstrangeTight()
 
         //BS
         if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
-        if((svtDist2D->at(iB)/svtSigma2D->at(iB)) < 3) continue;
         if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.10 ) continue;
 
         TLorentzVector tB(0,0,0,0);
@@ -282,9 +281,12 @@ int AlbertoUtil::GetBestBstrangeTight()
         }
 
         if(tB.Pt() < 10.0) continue;
+        int PV = GetBestPV(iB, tB);
+        if(PV<0) continue;
+        if(GetCt2D(tB, iB) < ctCut) continue;
+        if(GetCt2DSigma(tB, iB, PV) < 3) continue;
 
         if( svtChi2->at(iB)>bestChi2 ) continue;
-
         index = iB;
         bestChi2 = svtChi2->at(iB);
 
@@ -299,41 +301,41 @@ int AlbertoUtil::GetBestBupTight()
     float bestChi2 = 1e9;
     for( int iB=0; iB<nSVertices; ++iB ){
 
-       if((svtType->at(iB)!=PDEnumString::svtBuJPsiK) ) continue;
-       if( svtMass->at(iB)<BuMassRange[0] || svtMass->at(iB)>BuMassRange[1] ) continue;
+        if((svtType->at(iB)!=PDEnumString::svtBuJPsiK) ) continue;
+        if( svtMass->at(iB)<BuMassRange[0] || svtMass->at(iB)>BuMassRange[1] ) continue;
 
-       if((svtDist2D->at(iB)/svtSigma2D->at(iB)) < 3) continue;
-       if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.10 ) continue;
+        if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.10 ) continue;
 
-       int iJPsi = (subVtxFromSV(iB)).at(0);
-       if(!IsTightJPsi(iJPsi)) continue;
+        int iJPsi = (subVtxFromSV(iB)).at(0);
+        if(!IsTightJPsi(iJPsi)) continue;
 
-       vector <int> tkJpsi = tracksFromSV(iJPsi);
-       vector <int> tkSsB = tracksFromSV(iB);
+        vector <int> tkJpsi = tracksFromSV(iJPsi);
+        vector <int> tkSsB = tracksFromSV(iB);
 
-       TLorentzVector tB(0,0,0,0);
-       float KaonPt = 0;
+        TLorentzVector tB(0,0,0,0);
+        float KaonPt = 0;
 
-       for( uint i=0; i<tkSsB.size(); ++i ){
+        for( uint i=0; i<tkSsB.size(); ++i ){
 
-         int j = tkSsB[i];
-
-         float m = MassK;
-
-         if( j == tkJpsi[0] || j == tkJpsi[1] ){ m = MassMu; }else{ KaonPt = trkPt->at(j); }
-
-         TLorentzVector a;
-         a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
-         tB += a;
+            int j = tkSsB[i];
+            float m = MassK;
+            if( j == tkJpsi[0] || j == tkJpsi[1] ){ m = MassMu; }else{ KaonPt = trkPt->at(j); }
+            TLorentzVector a;
+            a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
+            tB += a;
 
        }
 
-       if(tB.Pt() < 10.0) continue;
-       if(KaonPt < 1.6) continue;
+        if(tB.Pt() < 10.0) continue;
+        if(KaonPt < 1.6) continue;
+        int PV = GetBestPV(iB, tB);
+        if(PV<0) continue;
+        if(GetCt2DSigma(tB, iB, PV) < 3) continue;
 
-       if( svtChi2->at(iB)>bestChi2 ) continue;
-       index = iB;
-       bestChi2 = svtChi2->at(iB);
+
+        if( svtChi2->at(iB)>bestChi2 ) continue;
+        index = iB;
+        bestChi2 = svtChi2->at(iB);
 
     }
     return index;
@@ -346,40 +348,42 @@ int AlbertoUtil::GetBestBdownTight()
     float bestChi2 = 1e9;
     for( int iB=0; iB<nSVertices; ++iB ){
 
-       if((svtType->at(iB)!=PDEnumString::svtBdJPsiKx) ) continue;
-       if( svtMass->at(iB)<BdMassRange[0] || svtMass->at(iB)>BdMassRange[1] ) continue;
+        if((svtType->at(iB)!=PDEnumString::svtBdJPsiKx) ) continue;
+        if( svtMass->at(iB)<BdMassRange[0] || svtMass->at(iB)>BdMassRange[1] ) continue;
 
-       if((svtDist2D->at(iB)/svtSigma2D->at(iB)) < 3) continue;
-       if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.10 ) continue;
+        if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.10 ) continue;
 
-       int iJPsi = (subVtxFromSV(iB)).at(0);
-       if(!IsTightJPsi(iJPsi)) continue;
-       if(fabs(svtMass->at(iJPsi) - MassJPsi) > 0.10 ) continue;
+        int iJPsi = (subVtxFromSV(iB)).at(0);
+        if(!IsTightJPsi(iJPsi)) continue;
+        if(fabs(svtMass->at(iJPsi) - MassJPsi) > 0.10 ) continue;
 
-       vector <int> tkJpsi = tracksFromSV(iJPsi);
-       vector <int> tkSsB = tracksFromSV(iB);
+        vector <int> tkJpsi = tracksFromSV(iJPsi);
+        vector <int> tkSsB = tracksFromSV(iB);
 
-       TLorentzVector tB(0,0,0,0);
+        TLorentzVector tB(0,0,0,0);
 
-       for( uint i=0; i<tkSsB.size(); ++i ){
+        for( uint i=0; i<tkSsB.size(); ++i ){
 
-         int j = tkSsB[i];
+            int j = tkSsB[i];
 
-         float m = MassKx;
+            float m = MassKx;
 
-         if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MassMu;
+            if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MassMu;
 
-         TLorentzVector a;
-         a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
-         tB += a;
+            TLorentzVector a;
+            a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
+            tB += a;
 
-       }
+        }
 
-       if(tB.Pt() < 10.0) continue;
+        if(tB.Pt() < 10.0) continue;
+        int PV = GetBestPV(iB, tB);
+        if(PV<0) continue;
+        if(GetCt2DSigma(tB, iB, PV) < 3) continue;
 
-       if( svtChi2->at(iB)>bestChi2 ) continue;
-       index = iB;
-       bestChi2 = svtChi2->at(iB);
+        if( svtChi2->at(iB)>bestChi2 ) continue;
+        index = iB;
+        bestChi2 = svtChi2->at(iB);
 
     }
     return index;
@@ -392,12 +396,12 @@ int AlbertoUtil::GetBestJpsi()
     float bestChi2 = 1e9;
     for( int i=0; i<nSVertices; ++i ){
 
-       if((svtType->at(i)!=PDEnumString::svtJPsi) ) continue;
-       if( abs(svtMass->at(i)-MassJPsi) > MassRangeJPsi) continue;
+        if((svtType->at(i)!=PDEnumString::svtJPsi) ) continue;
+        if( abs(svtMass->at(i)-MassJPsi) > MassRangeJPsi) continue;
 
-       if( svtChi2->at(i)>bestChi2 ) continue;
-       index = i;
-       bestChi2 = svtChi2->at(i);
+        if( svtChi2->at(i)>bestChi2 ) continue;
+        index = i;
+        bestChi2 = svtChi2->at(i);
 
     }
     return index;
