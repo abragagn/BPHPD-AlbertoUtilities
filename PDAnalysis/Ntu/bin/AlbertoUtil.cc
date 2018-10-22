@@ -625,21 +625,15 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
     int iJPsi = (subVtxFromSV(iSvt)).at(0);
     vector <int> tkJpsi = tracksFromSV(iJPsi) ;
     vector <int> tkSsB = tracksFromSV(iSvt);
-
     TLorentzVector t(0,0,0,0);
 
     for( uint i=0; i<tkSsB.size(); ++i ){
-
-       int j = tkSsB[i];
-
-       float m = MassK;
-
-       if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MassMu;
-
-       TLorentzVector a ;
-       a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m ) ;
-       t += a ;
-
+        int j = tkSsB.at(i);
+        float m = MassK;
+        if( (j==tkJpsi.at(0)) || (j==tkJpsi.at(1)) ) m = MassMu;
+        TLorentzVector a;
+        a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
+        tB += a;
     }
 
     return t;
