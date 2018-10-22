@@ -633,7 +633,7 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
         if( (j==tkJpsi.at(0)) || (j==tkJpsi.at(1)) ) m = MassMu;
         TLorentzVector a;
         a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
-        tB += a;
+        t += a;
     }
 
     return t;
