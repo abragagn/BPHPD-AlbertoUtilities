@@ -216,7 +216,7 @@ bool AlbertoUtil::IsTightJPsi(int iJPsi)
         tJPsi += a;
     }
 
-    if(tJPsi.Pt() < 8.0) return false;
+    if(tJPsi.Pt() < 7.0) return false;
 
     return true;
 }
@@ -248,6 +248,8 @@ int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02, float ctSigmaCut = 3.)
 {
     int index = -1;
     float bestChi2 = 1e9;
+    SetBsMassRange(5.2, 5.65);
+
     for( int iB=0; iB<nSVertices; ++iB ){
 
         if((svtType->at(iB)!=PDEnumString::svtBsJPsiPhi) ) continue;
@@ -267,7 +269,7 @@ int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02, float ctSigmaCut = 3.)
 
         //BS
         if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
-        if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.10 ) continue;
+        if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.02 ) continue;
 
         TLorentzVector tB(0,0,0,0);
 
@@ -280,7 +282,8 @@ int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02, float ctSigmaCut = 3.)
             tB += a;
         }
 
-        if(tB.Pt() < 10.0) continue;
+        if(tB.Pt() < 8.0) continue;
+        if(fabs(tB.Eta()) > 2.4) continue;
         int PV = GetBestPV(iB, tB);
         if(PV<0) continue;
         if(GetCt2D(tB, iB) < ctCut) continue;
@@ -326,7 +329,7 @@ int AlbertoUtil::GetBestBupTight()
 
        }
 
-        if(tB.Pt() < 10.0) continue;
+        if(tB.Pt() < 8.0) continue;
         if(KaonPt < 1.6) continue;
         int PV = GetBestPV(iB, tB);
         if(PV<0) continue;
@@ -376,7 +379,7 @@ int AlbertoUtil::GetBestBdownTight()
 
         }
 
-        if(tB.Pt() < 10.0) continue;
+        if(tB.Pt() < 8.0) continue;
         int PV = GetBestPV(iB, tB);
         if(PV<0) continue;
         if(GetCt2D(tB, iB, PV)/GetCt2DErr(tB, iB, PV) < 3.) continue;
