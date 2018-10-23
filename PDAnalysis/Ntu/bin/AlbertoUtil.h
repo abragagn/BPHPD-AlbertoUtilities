@@ -89,7 +89,7 @@ public:
     int GetBestBstrange();
     int GetBestBdown();
     int GetBestBup();
-    int GetBestBstrangeTight(float ctCut);
+    int GetBestBstrangeTight(float ctCut, float ctSigmaCut);
     int GetBestBdownTight();
     int GetBestBupTight();
     bool IsTightJPsi(int iJPsi);
@@ -118,9 +118,9 @@ public:
     float GetCt2D(TLorentzVector t, int iSV, int iPV);
     float GetCt3D(TLorentzVector t, int iSV, int iPV);
 
-    float GetCt2DSigma(TLorentzVector t, int iSV);
-    float GetCt2DSigma(TLorentzVector t, int iSV, int iPV);
-    float GetCt3DSigma(TLorentzVector t, int iSV, int iPV);
+    float GetCt2DErr(TLorentzVector t, int iSV);
+    float GetCt2DErr(TLorentzVector t, int iSV, int iPV);
+    float GetCt3DErr(TLorentzVector t, int iSV, int iPV);
 
 
 protected:

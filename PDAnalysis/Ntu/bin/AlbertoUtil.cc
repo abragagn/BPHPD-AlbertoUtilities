@@ -244,7 +244,7 @@ bool AlbertoUtil::IsTightPhi(int iPhi)
 
 
 // ========================================================================================
-int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02)
+int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02, float ctSigmaCut = 3.)
 {
     int index = -1;
     float bestChi2 = 1e9;
@@ -284,7 +284,7 @@ int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02)
         int PV = GetBestPV(iB, tB);
         if(PV<0) continue;
         if(GetCt2D(tB, iB) < ctCut) continue;
-        if(GetCt2DSigma(tB, iB, PV) < 3) continue;
+        if(GetCt2D(tB, iB, PV)/GetCt2DErr(tB, iB, PV) < ctSigmaCut) continue;
 
         if( svtChi2->at(iB)>bestChi2 ) continue;
         index = iB;
@@ -330,7 +330,7 @@ int AlbertoUtil::GetBestBupTight()
         if(KaonPt < 1.6) continue;
         int PV = GetBestPV(iB, tB);
         if(PV<0) continue;
-        if(GetCt2DSigma(tB, iB, PV) < 3) continue;
+        if(GetCt2D(tB, iB, PV)/GetCt2DErr(tB, iB, PV) < 3.) continue;
 
 
         if( svtChi2->at(iB)>bestChi2 ) continue;
@@ -379,7 +379,7 @@ int AlbertoUtil::GetBestBdownTight()
         if(tB.Pt() < 10.0) continue;
         int PV = GetBestPV(iB, tB);
         if(PV<0) continue;
-        if(GetCt2DSigma(tB, iB, PV) < 3) continue;
+        if(GetCt2D(tB, iB, PV)/GetCt2DErr(tB, iB, PV) < 3.) continue;
 
         if( svtChi2->at(iB)>bestChi2 ) continue;
         index = iB;
@@ -760,7 +760,7 @@ float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
 
 }
 // =================================================================================================
-/*float AlbertoUtil::GetCt2DSigma(TLorentzVector t, int iSV)
+/*float AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV)
 {
 
   TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
@@ -793,7 +793,7 @@ float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
 }
 */
 // =================================================================================================
-float AlbertoUtil::GetCt2DSigma(TLorentzVector t, int iSV, int iPV)
+float AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV, int iPV)
 {
 
   TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
@@ -827,7 +827,7 @@ float AlbertoUtil::GetCt2DSigma(TLorentzVector t, int iSV, int iPV)
 
 
 // =================================================================================================
-float AlbertoUtil::GetCt3DSigma(TLorentzVector t, int iSV, int iPV)
+float AlbertoUtil::GetCt3DErr(TLorentzVector t, int iSV, int iPV)
 {
 
   TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
