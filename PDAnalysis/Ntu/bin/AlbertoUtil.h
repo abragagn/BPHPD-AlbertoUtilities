@@ -88,13 +88,14 @@ public:
 
     int GetBestBstrange();
     int GetBestBdown();
-    int GetBestBup();
+    int GetBestBup(float ctCut, float ctSigmaCut);
     int GetBestBstrangeTight(float ctCut, float ctSigmaCut);
     int GetBestBdownTight();
     int GetBestBupTight();
     bool IsTightJPsi(int iJPsi);
     bool IsTightPhi(int iPhi);
     int GetBestJpsi();
+    int GetCandidate(TString process, bool useTightSel, float ctCut, float ctSigmaCut);
     
     float GetInvMass(int i1, int i2, float mass1, float mass2);
     int TagMixStatus( unsigned int genIndex );
@@ -108,7 +109,6 @@ public:
     int GetBestPV(int isvt, TLorentzVector t);
     float GetSignedDxy(int iMuon, int iPV);
     TLorentzVector GetTLorentzVecFromJpsiX(int iSvt);
-    int GetCandidate(TString process, bool useTightSel);
     float dZ(int itk, int iPV);
     void printMotherChain(int iGen);
     void printDaughterTree(int iGen, const std::string & pre);

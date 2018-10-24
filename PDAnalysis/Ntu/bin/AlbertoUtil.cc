@@ -298,7 +298,7 @@ int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02, float ctSigmaCut = 3.)
 }
 
 // ========================================================================================
-int AlbertoUtil::GetBestBupTight()
+int AlbertoUtil::GetBestBupTight(float ctCut = 0.02, float ctSigmaCut = 3.)
 {
     int index = -1;
     float bestChi2 = 1e9;
@@ -333,8 +333,8 @@ int AlbertoUtil::GetBestBupTight()
         if(KaonPt < 1.6) continue;
         int PV = GetBestPV(iB, tB);
         if(PV<0) continue;
-        if(GetCt2D(tB, iB, PV)/GetCt2DErr(tB, iB, PV) < 3.) continue;
-
+        if(GetCt2D(tB, iB) < ctCut) continue;
+        if(GetCt2D(tB, iB, PV)/GetCt2DErr(tB, iB, PV) < ctSigmaCut) continue;
 
         if( svtChi2->at(iB)>bestChi2 ) continue;
         index = iB;
@@ -642,11 +642,11 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
     return t;
 }
 // =====================================================================================
-int AlbertoUtil::GetCandidate(TString process, bool useTightSel)
+int AlbertoUtil::GetCandidate(TString process, bool useTightSel, float ctCut, float ctSigmaCut)
 {
     if(process=="BsJPsiPhi"){
        if(useTightSel){
-         return GetBestBstrangeTight();
+         return GetBestBstrangeTight(ctCut, ctSigmaCut);
        }else{
          return GetBestBstrange();
        }
@@ -654,7 +654,7 @@ int AlbertoUtil::GetCandidate(TString process, bool useTightSel)
 
     if(process=="BuJPsiK"){
        if(useTightSel){
-         return GetBestBupTight();
+         return GetBestBupTight(ctCut, ctSigmaCut);
        }else{
          return GetBestBup();
        }
