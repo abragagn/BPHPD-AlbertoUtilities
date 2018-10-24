@@ -642,23 +642,20 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
     return t;
 }
 // =====================================================================================
-int AlbertoUtil::GetCandidate(TString process, bool useTightSel, float ctCut, float ctSigmaCut)
+int AlbertoUtil::GetTightCandidate(TString process, float ctCut, float ctSigmaCut)
 {
-    if(process=="BsJPsiPhi"){
-       if(useTightSel){
-         return GetBestBstrangeTight(ctCut, ctSigmaCut);
-       }else{
-         return GetBestBstrange();
-       }
-    }
+    if(process=="BsJPsiPhi") return GetBestBstrangeTight(ctCut, ctSigmaCut);
 
-    if(process=="BuJPsiK"){
-       if(useTightSel){
-         return GetBestBupTight(ctCut, ctSigmaCut);
-       }else{
-         return GetBestBup();
-       }
-    }
+    if(process=="BuJPsiK") return GetBestBupTight(ctCut, ctSigmaCut);
+
+    return -1;
+}
+// =====================================================================================
+int AlbertoUtil::GetCandidate(TString process)
+{
+    if(process=="BsJPsiPhi") return GetBestBstrange();
+
+    if(process=="BuJPsiK") return GetBestBup();
 
     return -1;
 }

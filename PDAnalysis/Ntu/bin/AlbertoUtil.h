@@ -88,14 +88,15 @@ public:
 
     int GetBestBstrange();
     int GetBestBdown();
-    int GetBestBup(float ctCut, float ctSigmaCut);
+    int GetBestBup();
     int GetBestBstrangeTight(float ctCut, float ctSigmaCut);
     int GetBestBdownTight();
-    int GetBestBupTight();
+    int GetBestBupTight(float ctCut, float ctSigmaCut);
     bool IsTightJPsi(int iJPsi);
     bool IsTightPhi(int iPhi);
     int GetBestJpsi();
-    int GetCandidate(TString process, bool useTightSel, float ctCut, float ctSigmaCut);
+    int GetTightCandidate(TString process, float ctCut, float ctSigmaCut);
+    int GetCandidate(TString process);
     
     float GetInvMass(int i1, int i2, float mass1, float mass2);
     int TagMixStatus( unsigned int genIndex );
