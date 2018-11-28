@@ -58,40 +58,40 @@ void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName, TString
 
     methodSetup(methodName, path);
 
-    reader_.AddVariable( "muoPt", &muoPt_ );
-    reader_.AddVariable( "abs(muoEta)", &absMuoEta_ );
-    reader_.AddVariable( "muoSegmComp", &muoSegmComp_ );
-    reader_.AddVariable( "muoChi2LM", &muoChi2LM_ );
-    reader_.AddVariable( "muoChi2LP", &muoChi2LP_ );
-    reader_.AddVariable( "muoGlbTrackTailProb", &muoGlbTrackTailProb_ );
-    reader_.AddVariable( "muoIValFrac", &muoIValFrac_ );
-    reader_.AddVariable( "muoLWH", &muoLWH_ );
-    reader_.AddVariable( "muoTrkKink", &muoTrkKink_ );
-    reader_.AddVariable( "muoGlbKinkFinderLOG", &muoGlbKinkFinderLOG_ );
-    reader_.AddVariable( "muoTimeAtIpInOutErr", &muoTimeAtIpInOutErr_ );
-    reader_.AddVariable( "muoOuterChi2", &muoOuterChi2_ );
-    reader_.AddVariable( "muoInnerChi2", &muoInnerChi2_ );
-    reader_.AddVariable( "muoTrkRelChi2", &muoTrkRelChi2_ );
-    reader_.AddVariable( "muoVMuonHitComb", &muoVMuonHitComb_ );
-    reader_.AddVariable( "muoGlbDeltaEtaPhi", &muoGlbDeltaEtaPhi_ );
-    reader_.AddVariable( "muoStaRelChi2", &muoStaRelChi2_ );
-    reader_.AddVariable( "muoTimeAtIpInOut", &muoTimeAtIpInOut_ );
-    reader_.AddVariable( "muoValPixHits", &muoValPixHits_ );
-    reader_.AddVariable( "muoNTrkVHits", &muoNTrkVHits_ );
-    reader_.AddVariable( "muoGNchi2", &muoGNchi2_ );
-    reader_.AddVariable( "muoVMuHits", &muoVMuHits_ );
-    reader_.AddVariable( "muoNumMatches", &muoNumMatches_ );
-    reader_.AddVariable( "muoQprod", &muoQprod_ );
+    muonMvaIdReader_.AddVariable( "muoPt", &muoPt_ );
+    muonMvaIdReader_.AddVariable( "abs(muoEta)", &absMuoEta_ );
+    muonMvaIdReader_.AddVariable( "muoSegmComp", &muoSegmComp_ );
+    muonMvaIdReader_.AddVariable( "muoChi2LM", &muoChi2LM_ );
+    muonMvaIdReader_.AddVariable( "muoChi2LP", &muoChi2LP_ );
+    muonMvaIdReader_.AddVariable( "muoGlbTrackTailProb", &muoGlbTrackTailProb_ );
+    muonMvaIdReader_.AddVariable( "muoIValFrac", &muoIValFrac_ );
+    muonMvaIdReader_.AddVariable( "muoLWH", &muoLWH_ );
+    muonMvaIdReader_.AddVariable( "muoTrkKink", &muoTrkKink_ );
+    muonMvaIdReader_.AddVariable( "muoGlbKinkFinderLOG", &muoGlbKinkFinderLOG_ );
+    muonMvaIdReader_.AddVariable( "muoTimeAtIpInOutErr", &muoTimeAtIpInOutErr_ );
+    muonMvaIdReader_.AddVariable( "muoOuterChi2", &muoOuterChi2_ );
+    muonMvaIdReader_.AddVariable( "muoInnerChi2", &muoInnerChi2_ );
+    muonMvaIdReader_.AddVariable( "muoTrkRelChi2", &muoTrkRelChi2_ );
+    muonMvaIdReader_.AddVariable( "muoVMuonHitComb", &muoVMuonHitComb_ );
+    muonMvaIdReader_.AddVariable( "muoGlbDeltaEtaPhi", &muoGlbDeltaEtaPhi_ );
+    muonMvaIdReader_.AddVariable( "muoStaRelChi2", &muoStaRelChi2_ );
+    muonMvaIdReader_.AddVariable( "muoTimeAtIpInOut", &muoTimeAtIpInOut_ );
+    muonMvaIdReader_.AddVariable( "muoValPixHits", &muoValPixHits_ );
+    muonMvaIdReader_.AddVariable( "muoNTrkVHits", &muoNTrkVHits_ );
+    muonMvaIdReader_.AddVariable( "muoGNchi2", &muoGNchi2_ );
+    muonMvaIdReader_.AddVariable( "muoVMuHits", &muoVMuHits_ );
+    muonMvaIdReader_.AddVariable( "muoNumMatches", &muoNumMatches_ );
+    muonMvaIdReader_.AddVariable( "muoQprod", &muoQprod_ );
     if(useIp(methodNameBarrel_)){
-        reader_.AddVariable( "trkDxy/trkExy", &trkDxy_ );
-        reader_.AddVariable( "trkDz/trkEz", &trkDz_ );
+        muonMvaIdReader_.AddVariable( "trkDxy/trkExy", &trkDxy_ );
+        muonMvaIdReader_.AddVariable( "trkDz/trkEz", &trkDz_ );
     }
-    if(useIso(methodNameBarrel_)) reader_.AddVariable( "muoPFiso", &muoPFiso_ );
+    if(useIso(methodNameBarrel_)) muonMvaIdReader_.AddVariable( "muoPFiso", &muoPFiso_ );
 
-    reader_.AddSpectator( "muoEvt", &DUMMY_ );
+    muonMvaIdReader_.AddSpectator( "muoEvt", &DUMMY_ );
 
-    reader_.BookMVA( methodNameBarrel_, weightFileBarrel_ );
-    reader_.BookMVA( methodNameEndcap_, weightFileEndcap_ );
+    muonMvaIdReader_.BookMVA( methodNameBarrel_, weightFileBarrel_ );
+    muonMvaIdReader_.BookMVA( methodNameEndcap_, weightFileEndcap_ );
 
     return;
 
@@ -177,7 +177,7 @@ float PDSoftMuonMvaEstimator::computeMva(int iMuon)
         return -2;
     }
 
-    return (abs(muoEta->at( iMuon ))<1.2) ? reader_.EvaluateMVA(methodNameBarrel_) : reader_.EvaluateMVA(methodNameEndcap_); 
+    return (abs(muoEta->at( iMuon ))<1.2) ? muonMvaIdReader_.EvaluateMVA(methodNameBarrel_) : muonMvaIdReader_.EvaluateMVA(methodNameEndcap_); 
 
 }
 

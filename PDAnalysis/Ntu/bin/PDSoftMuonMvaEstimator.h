@@ -40,7 +40,7 @@ private:
     bool useIp(TString methodName);
     bool useIso(TString methodName);
 
-    TMVA::Reader reader_;
+    TMVA::Reader muonMvaIdReader_;
 
     // MVA Variable
     float muoPt_;
