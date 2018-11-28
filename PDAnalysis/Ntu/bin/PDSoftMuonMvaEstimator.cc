@@ -17,7 +17,7 @@
 //      ---How to use the discriminator ---
 //
 //      0. You can find the weights in /lustre/cmswork/abragagn/weights/
-//      1. Initialize the discriminator in PDAnalyzer::beginJob with 'void PDSoftMuonMvaEstimator::setupReaderBarrel(TString methodName)'
+//      1. Initialize the discriminator in PDAnalyzer::beginJob with 'void PDSoftMuonMvaEstimator::setupMuonMvaReader(TString methodName)'
 //          -methodName should be in the form of prefix + year + variable flags (w = with, wo = without. The order is "IP" followed by "Iso")
 //              --e.g "DNNGlobal2016woIPwIso", but even "DNNGlobalBarrel2016woIPwIso" is accepted
 //      2. In PDAnalyzer::analyze compute the needed muon variables for each event with 'void computeMuonVar() 
@@ -53,7 +53,7 @@ PDSoftMuonMvaEstimator::PDSoftMuonMvaEstimator():
 PDSoftMuonMvaEstimator::~PDSoftMuonMvaEstimator() {}
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::setupReader(TString methodName, TString path = "/lustre/cmswork/abragagn/weights/")
+void PDSoftMuonMvaEstimator::setupMuonMvaReader(TString methodName, TString path = "/lustre/cmswork/abragagn/weights/")
 {
 
     methodSetup(methodName, path);

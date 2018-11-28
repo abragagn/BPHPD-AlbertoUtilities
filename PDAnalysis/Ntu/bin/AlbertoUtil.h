@@ -16,8 +16,8 @@
 
 
 class AlbertoUtil:  public virtual PDAnalyzerUtil
-,                                       public virtual PDSoftMuonMvaEstimator
-,                                       public virtual PDGenHandler{
+,                   public virtual PDSoftMuonMvaEstimator
+,                   public virtual PDGenHandler{
 
 public:
 

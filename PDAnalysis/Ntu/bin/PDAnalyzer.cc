@@ -78,7 +78,7 @@ void PDAnalyzer::beginJob() {
     tWriter = new PDSecondNtupleWriter;
     tWriter->open( getUserParameter("outputFile"), "RECREATE" ); // second ntuple
 
-    setupReader( mvaMethod );
+    setupMuonMvaReader( mvaMethod );
 
     return;
 
