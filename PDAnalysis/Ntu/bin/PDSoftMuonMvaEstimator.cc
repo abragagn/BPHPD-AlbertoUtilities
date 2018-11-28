@@ -45,7 +45,7 @@
 #include "AlbertoUtil.h"
 
 PDSoftMuonMvaEstimator::PDSoftMuonMvaEstimator():
-    reader_("!Color:Silent")
+    muonMvaIdReader_("!Color:Silent")
 {
     TMVA::PyMethodBase::PyInitialize();
 }
