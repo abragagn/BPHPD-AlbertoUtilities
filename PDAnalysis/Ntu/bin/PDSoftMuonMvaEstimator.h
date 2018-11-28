@@ -22,7 +22,7 @@ public:
     PDSoftMuonMvaEstimator();
     ~PDSoftMuonMvaEstimator();
 
-    void setupMuonMvaReader(TString methodName, TString path);
+    void inizializeMuonMvaReader(TString methodName, TString path);
     float computeMva(int iMuon);
     bool MuonPassedPreselection(int iMuon);
     int IPsign_(int iMuon);
