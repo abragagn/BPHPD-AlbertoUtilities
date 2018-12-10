@@ -11,12 +11,12 @@
 
 //      BARREL <-> abs(muoEta)<1.2
 //      ENDCAP <-> abs(muoEta)>=1.2
-//      BDTs trained with global muons with pT>2 GeV and abs(eta)<2.4 and basic quality cuts
+//      Methods trained with global muons with pT>2 GeV and abs(eta)<2.4 and basic quality cuts
 //
 //
 //      ---How to use the discriminator ---
 //
-//      0. You can find the weights in /lustre/cmswork/abragagn/weights/
+//      0. You can find the weights in /lustre/cmswork/abragagn/mvaWeights/MvaMuonID/
 //      1. Initialize the discriminator in PDAnalyzer::beginJob with 'void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName)'
 //          -methodName should be in the form of prefix + year + variable flags (w = with, wo = without. The order is "IP" followed by "Iso")
 //              --e.g "DNNGlobal2016woIPwIso", but even "DNNGlobalBarrel2016woIPwIso" is accepted
@@ -53,7 +53,7 @@ PDSoftMuonMvaEstimator::PDSoftMuonMvaEstimator():
 PDSoftMuonMvaEstimator::~PDSoftMuonMvaEstimator() {}
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName, TString path = "/lustre/cmswork/abragagn/weights/")
+void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName, TString path = "/lustre/cmswork/abragagn/mvaWeights/MvaMuonID/")
 {
 
     methodSetup(methodName, path);
