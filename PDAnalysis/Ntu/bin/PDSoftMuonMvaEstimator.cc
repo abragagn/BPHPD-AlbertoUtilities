@@ -23,7 +23,7 @@
 //      2. In PDAnalyzer::analyze compute the needed muon variables for each event with 'void computeMuonVar() 
 //          and fill the Cartesian coordinates vectors of muons, tracks, jet and pfcs
 //          e.g convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz);
-//      3. Compute the Mva response with 'float PDSoftMuonMvaEstimator::computeMva(int iMuon)'
+//      3. Compute the Mva response with 'float PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)'
 //          -- Remember that Barrel and Encap use completely different methods
 //
 //
@@ -149,7 +149,7 @@ void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon){
 
 
 // =====================================================================================
-float PDSoftMuonMvaEstimator::computeMva(int iMuon)
+float PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)
 {   
 
     if( !( muoType->at(iMuon) & PDEnumString::global ) )
@@ -172,7 +172,7 @@ float PDSoftMuonMvaEstimator::computeMva(int iMuon)
     //VARIABLE EXTRACTION
     computeMvaVariables(iMuon);
     //PRESELECTION
-    if(!MuonPassedPreselection(iMuon))
+    if(!muonPassedPreselection(iMuon))
     {
         return -2;
     }
@@ -182,7 +182,7 @@ float PDSoftMuonMvaEstimator::computeMva(int iMuon)
 }
 
 // =====================================================================================
-bool PDSoftMuonMvaEstimator::MuonPassedPreselection(int iMuon)
+bool PDSoftMuonMvaEstimator::muonPassedPreselection(int iMuon)
 {
 
     if ( muoChi2LM->at( iMuon ) > 5000 ) {return false;}

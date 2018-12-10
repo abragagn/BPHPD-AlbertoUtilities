@@ -191,7 +191,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 
         (tWriter->muoPFiso)->push_back(GetMuoPFiso(iMuon));
 
-        (tWriter->muoSoftMvaValue)->push_back( computeMva(iMuon) );
+        (tWriter->muoSoftMvaValue)->push_back( computeMuonMva(iMuon) );
 
         (tWriter->muoLund)->push_back( muoLund );
         (tWriter->muoAncestor)->push_back( muoAncestor ); 
