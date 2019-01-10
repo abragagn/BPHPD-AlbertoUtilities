@@ -190,7 +190,6 @@ int AlbertoUtil::GetBestBdown()
 
        if((svtType->at(iB)!=PDEnumString::svtBdJPsiKx) ) continue;
        if( svtMass->at(iB)<BdMassRange[0] || svtMass->at(iB)>BdMassRange[1] ) continue;
-
        if( svtChi2->at(iB) > bestChi2 ) continue;
        index = iB;
        bestChi2 = svtChi2->at(iB);
@@ -209,14 +208,14 @@ bool AlbertoUtil::IsTightJPsi(int iJPsi)
 
     for( uint i=0; i<tkJpsi.size(); ++i ){
         int j = tkJpsi[i];
-        if(trkPt->at(j) < 4.0) return false;
-        if(fabs(trkEta->at(j)) > 2.2) return false;
+        if(trkPt->at(j) < bMuPtCut) return false;
+        if(fabs(trkEta->at(j)) > bMuEtaCut) return false;
         TLorentzVector a;
         a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), MassMu );
         tJPsi += a;
     }
 
-    if(tJPsi.Pt() < 7.0) return false;
+    //if(tJPsi.Pt() < 7.0) return false;
 
     return true;
 }
@@ -224,13 +223,13 @@ bool AlbertoUtil::IsTightJPsi(int iJPsi)
 // ========================================================================================
 bool AlbertoUtil::IsTightPhi(int iPhi)
 {
-    if(fabs(svtMass->at(iPhi) - MassPhi) > 0.01 ) return false;
+    if(fabs(svtMass->at(iPhi) - MassPhi) > 0.02 ) return false;
     
     vector <int> tkPhi = tracksFromSV(iPhi);
     for( uint i=0; i<tkPhi.size(); ++i ){
         int j = tkPhi[i];
-        if(trkPt->at(j) < 0.7) return false;
-        if(fabs(trkEta->at(j)) > 2.5) return false;
+        if(trkPt->at(j) < bKPtCut) return false;
+        if(fabs(trkEta->at(j)) > bKEtaCut) return false;
 
         int K_Hits = trkHitPattern->at(tkPhi[i]);
         K_Hits = ( int(K_Hits) / 100 ) % 10000;
@@ -238,16 +237,15 @@ bool AlbertoUtil::IsTightPhi(int iPhi)
         if(K_Hits<4 ) return false;
 
     }
-
     return true;
 }
 
 
 // ========================================================================================
-int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02, float ctSigmaCut = 3.)
+int AlbertoUtil::GetBestBstrangeTight()
 {
     int index = -1;
-    float bestChi2 = 1e9;
+    float best = 0.;
     SetBsMassRange(5.2, 5.65);
 
     for( int iB=0; iB<nSVertices; ++iB ){
@@ -267,10 +265,6 @@ int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02, float ctSigmaCut = 3.)
         //PHI
         if(!IsTightPhi(iPhi)) continue;
 
-        //BS
-        if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
-        if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.02 ) continue;
-
         TLorentzVector tB(0,0,0,0);
 
         for( uint i=0; i<tkSsB.size(); ++i ){
@@ -282,32 +276,32 @@ int AlbertoUtil::GetBestBstrangeTight(float ctCut = 0.02, float ctSigmaCut = 3.)
             tB += a;
         }
 
-        if(tB.Pt() < 8.0) continue;
-        if(fabs(tB.Eta()) > 2.4) continue;
+        //BS
+        float bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
+        if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
+        if( bVprob < bVprobCut ) continue;
+        if(tB.Pt() < bPtCut) continue;
+
         int PV = GetBestPV(iB, tB);
         if(PV<0) continue;
-        if(GetCt2D(tB, iB) < ctCut) continue;
-        if(GetCt2D(tB, iB, PV)/GetCt2DErr(tB, iB, PV) < ctSigmaCut) continue;
+        if(GetCt2D(tB, iB) < bCtCut) continue;
 
-        if( svtChi2->at(iB)>bestChi2 ) continue;
+        if( bVprob < best ) continue;
         index = iB;
-        bestChi2 = svtChi2->at(iB);
+        best = bVprob;
 
     }
     return index;
 }
 
 // ========================================================================================
-int AlbertoUtil::GetBestBupTight(float ctCut = 0.02, float ctSigmaCut = 3.)
+int AlbertoUtil::GetBestBupTight()
 {
     int index = -1;
-    float bestChi2 = 1e9;
+    float best = 0.;
     for( int iB=0; iB<nSVertices; ++iB ){
 
         if((svtType->at(iB)!=PDEnumString::svtBuJPsiK) ) continue;
-        if( svtMass->at(iB)<BuMassRange[0] || svtMass->at(iB)>BuMassRange[1] ) continue;
-
-        if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.10 ) continue;
 
         int iJPsi = (subVtxFromSV(iB)).at(0);
         if(!IsTightJPsi(iJPsi)) continue;
@@ -319,26 +313,27 @@ int AlbertoUtil::GetBestBupTight(float ctCut = 0.02, float ctSigmaCut = 3.)
         float KaonPt = 0;
 
         for( uint i=0; i<tkSsB.size(); ++i ){
-
             int j = tkSsB[i];
             float m = MassK;
             if( j == tkJpsi[0] || j == tkJpsi[1] ){ m = MassMu; }else{ KaonPt = trkPt->at(j); }
             TLorentzVector a;
             a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
             tB += a;
-
        }
 
-        if(tB.Pt() < 8.0) continue;
+       //Bu
+        float bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
+        if( svtMass->at(iB)<BuMassRange[0] || svtMass->at(iB)>BuMassRange[1] ) continue;
+        if( bVprob < bVprobCut ) continue;
+        if(tB.Pt() < bPtCut) continue;
         if(KaonPt < 1.6) continue;
         int PV = GetBestPV(iB, tB);
         if(PV<0) continue;
-        if(GetCt2D(tB, iB) < ctCut) continue;
-        if(GetCt2D(tB, iB, PV)/GetCt2DErr(tB, iB, PV) < ctSigmaCut) continue;
+        if(GetCt2D(tB, iB) < bCtCut) continue;
 
-        if( svtChi2->at(iB)>bestChi2 ) continue;
+        if( bVprob < best ) continue;
         index = iB;
-        bestChi2 = svtChi2->at(iB);
+        best = bVprob;
 
     }
     return index;
@@ -348,17 +343,13 @@ int AlbertoUtil::GetBestBupTight(float ctCut = 0.02, float ctSigmaCut = 3.)
 int AlbertoUtil::GetBestBdownTight()
 {
     int index = -1;
-    float bestChi2 = 1e9;
+    float best = 0.;
     for( int iB=0; iB<nSVertices; ++iB ){
 
         if((svtType->at(iB)!=PDEnumString::svtBdJPsiKx) ) continue;
-        if( svtMass->at(iB)<BdMassRange[0] || svtMass->at(iB)>BdMassRange[1] ) continue;
-
-        if( ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) ) < 0.10 ) continue;
 
         int iJPsi = (subVtxFromSV(iB)).at(0);
         if(!IsTightJPsi(iJPsi)) continue;
-        if(fabs(svtMass->at(iJPsi) - MassJPsi) > 0.10 ) continue;
 
         vector <int> tkJpsi = tracksFromSV(iJPsi);
         vector <int> tkSsB = tracksFromSV(iB);
@@ -366,28 +357,27 @@ int AlbertoUtil::GetBestBdownTight()
         TLorentzVector tB(0,0,0,0);
 
         for( uint i=0; i<tkSsB.size(); ++i ){
-
             int j = tkSsB[i];
-
             float m = MassKx;
-
             if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MassMu;
-
             TLorentzVector a;
             a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
             tB += a;
 
         }
 
-        if(tB.Pt() < 8.0) continue;
+        //Bd
+        float bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
+        if( svtMass->at(iB)<BdMassRange[0] || svtMass->at(iB)>BdMassRange[1] ) continue;
+        if( bVprob < bVprobCut ) continue;
+        if(tB.Pt() < bPtCut) continue;
         int PV = GetBestPV(iB, tB);
         if(PV<0) continue;
-        if(GetCt2D(tB, iB, PV)/GetCt2DErr(tB, iB, PV) < 3.) continue;
+        if(GetCt2D(tB, iB) < bCtCut) continue;
 
-        if( svtChi2->at(iB)>bestChi2 ) continue;
+        if( bVprob < best ) continue;
         index = iB;
-        bestChi2 = svtChi2->at(iB);
-
+        best = bVprob;
     }
     return index;
 }
@@ -642,11 +632,11 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
     return t;
 }
 // =====================================================================================
-int AlbertoUtil::GetTightCandidate(TString process, float ctCut, float ctSigmaCut)
+int AlbertoUtil::GetTightCandidate(TString process)
 {
-    if(process=="BsJPsiPhi") return GetBestBstrangeTight(ctCut, ctSigmaCut);
+    if(process=="BsJPsiPhi") return GetBestBstrangeTight();
 
-    if(process=="BuJPsiK") return GetBestBupTight(ctCut, ctSigmaCut);
+    if(process=="BuJPsiK") return GetBestBupTight();
 
     return -1;
 }

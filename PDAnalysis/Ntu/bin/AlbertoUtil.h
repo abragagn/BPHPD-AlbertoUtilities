@@ -69,6 +69,17 @@ public:
     float BuMassRange[2] = {5.0, 6.0};
     float BdMassRange[2] = {5.0, 6.0};
 
+    //B tight cuts
+    float bPtCut = 11;
+    float bCtCut = 0.007;
+    float bVprobCut = 0.001;
+    float bMuPtCut = 3.5;
+    float bMuEtaCut = 2.4;
+    float bKPtCut = 1.2;
+    float bKEtaCut = 2.5;
+
+    void SetCtCut(float newValue){ bCtCut = newValue; }
+
     void SetMassRangeJPsi(float newValue){ MassRangeJPsi = newValue; }
     void SetBsMassRange(float lower, float upper) { BsMassRange[0] = lower; BsMassRange[1] = upper; }
     void SetBuMassRange(float lower, float upper) { BuMassRange[0] = lower; BuMassRange[1] = upper; }
@@ -89,13 +100,13 @@ public:
     int GetBestBstrange();
     int GetBestBdown();
     int GetBestBup();
-    int GetBestBstrangeTight(float ctCut, float ctSigmaCut);
+    int GetBestBstrangeTight();
     int GetBestBdownTight();
-    int GetBestBupTight(float ctCut, float ctSigmaCut);
+    int GetBestBupTight();
     bool IsTightJPsi(int iJPsi);
     bool IsTightPhi(int iPhi);
     int GetBestJpsi();
-    int GetTightCandidate(TString process, float ctCut, float ctSigmaCut);
+    int GetTightCandidate(TString process);
     int GetCandidate(TString process);
     
     float GetInvMass(int i1, int i2, float mass1, float mass2);
