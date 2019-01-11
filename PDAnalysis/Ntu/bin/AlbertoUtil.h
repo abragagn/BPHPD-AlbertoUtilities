@@ -78,10 +78,13 @@ public:
     float bKPtCut = 1.2; //1.0
     float bKEtaCut = 2.5;
 
-    void SetBctCut(float newValue){ bCtCut = newValue; }
-    void SetBptCut(float newValue){ bPtCut = newValue; }
-    void SetBmuptCut(float newValue){ bMuPtCut = newValue; }
-    void SetBkptCut(float newValue){ bKPtCut = newValue; }
+    void SetBctCut(float newValue = 0.007){ bCtCut = newValue; }
+    void SetBptCut(float newValue = 10){ bPtCut = newValue; }
+    void SetBmuptCut(float newValue = 3.5){ bMuPtCut = newValue; }
+    void SetBkptCut(float newValue = 1.2){ bKPtCut = newValue; }
+
+    void SetJpsiMuCut();
+    void SetJpsiTrktrkCut();
 
     void SetMassRangeJPsi(float newValue){ MassRangeJPsi = newValue; }
     void SetBsMassRange(float lower, float upper) { BsMassRange[0] = lower; BsMassRange[1] = upper; }

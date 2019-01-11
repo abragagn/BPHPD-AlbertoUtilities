@@ -815,7 +815,6 @@ float AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV, int iPV)
    
 }
 
-
 // =================================================================================================
 float AlbertoUtil::GetCt3DErr(TLorentzVector t, int iSV, int iPV)
 {
@@ -847,4 +846,20 @@ float AlbertoUtil::GetCt3DErr(TLorentzVector t, int iSV, int iPV)
  
   return MassBs/t.P() * sqrt(covTot.Similarity(diff)) / sqrt(diff.Norm2Sqr()); 
 
+}
+// =================================================================================================
+void AlbertoUtil::SetJpsiMuCut()
+{
+    SetBctCut(0.007);
+    SetBptCut(11.);
+    SetBmuptCut(3.5);
+    SetBkptCut(1.2);
+}
+// =================================================================================================
+void AlbertoUtil::SetJpsiTrktrkCut()
+{
+    SetBctCut(0.02);
+    SetBptCut(10.);
+    SetBmuptCut(3.6);
+    SetBkptCut(1.0);
 }
