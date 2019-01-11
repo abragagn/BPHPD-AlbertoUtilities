@@ -69,16 +69,19 @@ public:
     float BuMassRange[2] = {5.0, 6.0};
     float BdMassRange[2] = {5.0, 6.0};
 
-    //B tight cuts
-    float bPtCut = 11;
-    float bCtCut = 0.007;
+    //B tight cuts JpsiMu hlt
+    float bPtCut = 11; //10
+    float bCtCut = 0.007; //0.02
     float bVprobCut = 0.001;
-    float bMuPtCut = 3.5;
+    float bMuPtCut = 3.5; //3.6
     float bMuEtaCut = 2.4;
-    float bKPtCut = 1.2;
+    float bKPtCut = 1.2; //1.0
     float bKEtaCut = 2.5;
 
-    void SetCtCut(float newValue){ bCtCut = newValue; }
+    void SetBctCut(float newValue){ bCtCut = newValue; }
+    void SetBptCut(float newValue){ bPtCut = newValue; }
+    void SetBmuptCut(float newValue){ bMuPtCut = newValue; }
+    void SetBkptCut(float newValue){ bKPtCut = newValue; }
 
     void SetMassRangeJPsi(float newValue){ MassRangeJPsi = newValue; }
     void SetBsMassRange(float lower, float upper) { BsMassRange[0] = lower; BsMassRange[1] = upper; }
