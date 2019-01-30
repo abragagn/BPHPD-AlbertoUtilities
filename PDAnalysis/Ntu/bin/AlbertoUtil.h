@@ -84,7 +84,7 @@ public:
     void SetBkptCut(float newValue = 1.2){ bKPtCut = newValue; }
 
     void SetJpsiMuCut();
-    void SetJpsiTrktrkCut();
+    void SetJpsiTrkTrkCut();
 
     void SetMassRangeJPsi(float newValue){ MassRangeJPsi = newValue; }
     void SetBsMassRange(float lower, float upper) { BsMassRange[0] = lower; BsMassRange[1] = upper; }

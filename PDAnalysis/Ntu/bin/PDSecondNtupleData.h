@@ -12,22 +12,6 @@ void Reset()  { autoReset(); }
 
     PDSecondNtupleData() {
 
-        muoPt           = new vector <float>; 
-        muoEta          = new vector <float>;
-        muoPhi          = new vector <float>;
-        trkDxy          = new vector <float>;
-        trkExy          = new vector <float>;
-        trkDz           = new vector <float>;
-        trkEz           = new vector <float>;
-
-        muoPFiso        = new vector <float>;
-
-        muoLund         = new vector <int>;
-        muoAncestor     = new vector <int>;
-
-        muoSoftMvaValue = new vector <float>;
-
-
 }
 virtual ~PDSecondNtupleData() {
 }
@@ -35,30 +19,16 @@ virtual ~PDSecondNtupleData() {
 void initTree() {
     treeName = "PDsecondTree";
 
-    setBranch( "muoPt", &muoPt , 8192, 99, &b_muoPt );
-    setBranch( "muoEta", &muoEta , 8192, 99, &b_muoEta );
-    setBranch( "muoPhi", &muoPhi , 8192, 99, &b_muoPhi );
-    setBranch( "trkDxy", &trkDxy , 8192, 99, &b_trkDxy );
-    setBranch( "trkExy", &trkExy , 8192, 99, &b_trkExy );
-    setBranch( "trkDz", &trkDz , 8192, 99, &b_trkDz );
-    setBranch( "trkEz", &trkEz , 8192, 99, &b_trkEz );
-
-    setBranch( "muoPFiso", &muoPFiso , 8192, 99, &b_muoPFiso );
-
-    setBranch( "muoLund", &muoLund , 8192, 99, &b_muoLund );
-    setBranch( "muoAncestor", &muoAncestor , 8192, 99, &b_muoAncestor );
-
-    setBranch( "muoSoftMvaValue", &muoSoftMvaValue , 8192, 99, &b_muoSoftMvaValue );
+    setBranch( "ssbMass", &ssbMass, "ssbMass/F", &b_ssbMass );
+    setBranch( "osMuonTag", &osMuonTag, "osMuonTag/I", &b_osMuonTag );
+    setBranch( "osMuonTagMistag", &osMuonTagMistag, "osMuonTagMistag/F", &b_osMuonTagMistag );
 
 }
 
-vector <int> *muoLund, *muoAncestor;
-vector <float> *muoSoftMvaValue;
-vector <float> *muoPt, *muoEta, *muoPhi, *trkDxy, *trkExy, *trkDz, *trkEz, *muoPFiso;
+vector <int> *osMuonTag;
+vector <float> *ssbMass, *osMuonTagMistag;
 
-TBranch *b_muoPt, *b_muoEta, *b_muoPhi, *b_trkDxy, *b_trkExy, *b_trkDz, *b_trkEz, *b_muoPFiso;
-TBranch *b_muoLund, *b_muoAncestor, *b_muoSoftMvaValue;
-
+TBranch *b_osMuonTag, *b_ssbMass, *b_osMuonTagMistag;
 private:
 
     PDSecondNtupleData         ( const PDSecondNtupleData& a );

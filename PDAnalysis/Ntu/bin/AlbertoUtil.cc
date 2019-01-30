@@ -223,7 +223,7 @@ bool AlbertoUtil::IsTightJPsi(int iJPsi)
 // ========================================================================================
 bool AlbertoUtil::IsTightPhi(int iPhi)
 {
-    if(fabs(svtMass->at(iPhi) - MassPhi) > 0.02 ) return false;
+    if(fabs(svtMass->at(iPhi) - MassPhi) > 0.01 ) return false;
     
     vector <int> tkPhi = tracksFromSV(iPhi);
     for( uint i=0; i<tkPhi.size(); ++i ){
@@ -527,40 +527,47 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
     sgnDef +=       "+[2]*TMath::Gaus(x, [0], [5], true)";
     sgnDef +=       "+[3]*TMath::Gaus(x, [0], [6], true)";
     TString bkgDef = "[7]+[8]*TMath::Erfc([9]*(x-[10]))";
+
+    if(hist->GetEntries()<=250) bkgDef = "[7]";
+
     TString funcDef = sgnDef + "+" + bkgDef;
 
     TF1 *func = new TF1("func", funcDef, hist->GetBinLowEdge(1), hist->GetBinLowEdge(hist->GetNbinsX()));
 
+    //SIGNAL
+    float limit = hist->GetEntries()*hist->GetBinWidth(1);
+
     func->SetParameter(0, mean);
-
-    func->SetParameter(1, 1);
-    func->SetParameter(2, 1);
-    func->SetParameter(3, 1);
-
+    func->SetParameter(1, limit/3);
+    func->SetParameter(2, limit/3);
+    func->SetParameter(3, limit/3);
     func->SetParameter(4, sigma);
     func->SetParameter(5, sigma);
     func->SetParameter(6, sigma);
-
-    func->SetParameter(7, hist->GetBinContent(hist->GetNbinsX() -1));
-    func->SetParameter(8, 1);
-    func->SetParameter(9, 20);
-    func->SetParameter(10, 5.10);
-
     func->SetParLimits(0, mean-sigma, mean+sigma);
+    func->SetParLimits(1, 0, limit);
+    func->SetParLimits(2, 0, limit);
+    func->SetParLimits(3, 0, limit);
+    func->SetParLimits(4, sigma/2, sigma*2);
+    func->SetParLimits(5, sigma/2, sigma*2);
+    func->SetParLimits(6, sigma/2, sigma*2);
 
-    func->SetParLimits(1, 0, hist->GetEntries());
-    func->SetParLimits(2, 0, hist->GetEntries());
-    func->SetParLimits(3, 0, hist->GetEntries());
+    //BKG
+    float bkgHeight = 0.;
+    int nBinsBkgEst = 7;
+    for(int i=0; i<nBinsBkgEst; i++)
+        bkgHeight += hist->GetBinContent(hist->GetNbinsX()-i);
+    bkgHeight /= nBinsBkgEst;
 
-    func->SetParLimits(4, 0, sigma*2);
-    func->SetParLimits(5, 0, sigma*2);
-    func->SetParLimits(6, 0, sigma*2);
-
-    func->SetParLimits(7, 0, hist->GetBinContent(hist->GetNbinsX()-1)*1.5);
-    func->SetParLimits(8, 0, hist->GetBinContent(hist->GetNbinsX()-1));
-    func->SetParLimits(9, 10, 1e3);
-    func->SetParLimits(10, 5.0, mean);
-
+    func->SetParameter(7, bkgHeight);
+    if(hist->GetEntries()>250){
+        func->SetParameter(8, hist->GetBinContent(1)/2);
+        func->SetParameter(9, 10);
+        func->SetParameter(10, 5);
+        func->SetParLimits(7, 0, bkgHeight*2);
+        func->SetParLimits(8, 0, hist->GetBinContent(1));
+    }
+    
 
     hist->Fit("func","MRLQ");
 
@@ -856,7 +863,7 @@ void AlbertoUtil::SetJpsiMuCut()
     SetBkptCut(1.2);
 }
 // =================================================================================================
-void AlbertoUtil::SetJpsiTrktrkCut()
+void AlbertoUtil::SetJpsiTrkTrkCut()
 {
     SetBctCut(0.02);
     SetBptCut(10.);

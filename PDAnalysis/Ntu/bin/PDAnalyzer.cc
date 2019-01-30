@@ -15,33 +15,38 @@
 #include "TFile.h"
 
 // additional features
-#include "PDSecondNtupleWriter.h"   // second ntuple
-//#include "DataSetFilter.cc"       // dataset filter
+#include "PDSecondNtupleWriter.h"
 #include "PDMuonVar.cc"
 #include "PDSoftMuonMvaEstimator.cc"
 #include "AlbertoUtil.cc"
+#include "OSMuonMvaTag.cc"
 
 using namespace std;
 
-/*
-pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2016Lists/BsToJpsiPhi_BMuonFilter_2016_DCAP.list hist.root -v histoMode RECREATE -v use_gen t -n 100000
+/* EXAMPLE OF USAGE
+pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2017Lists/BsToJpsiPhi_2017_DCAP.list hist.root -v outputFile ntu.root -v histoMode RECREATE -v use_gen t -v useHLT t -v writeVars f -n 2000000
 */
-
 PDAnalyzer::PDAnalyzer() {
 
     std::cout << "new PDAnalyzer" << std::endl;
 
-    // user parameters are set as names associated to a string, 
     // default values can be set in the analyzer class contructor
 
     setUserParameter( "verbose", "f" );
-    setUserParameter( "minPtMuon", "2." );
-    setUserParameter( "maxEtaMuon", "2.4" );
+
+    setUserParameter( "process", "BsJPsiPhi" );
+    setUserParameter( "useHLT", "false" );
+    setUserParameter( "writeVars", "true" );
+
     setUserParameter( "outputFile", "ntu.root" );
 
-    setUserParameter( "mvaMethod", "DNNGlobal2016woIPwIso" ); 
+    setUserParameter( "muonIdWpBarrel", "0.8910" ); 
+    setUserParameter( "muonIdWpEndcap", "0.8925" ); 
 
-    setUserParameter( "ptCut", "40.0" ); //needed for paolo's code for unknow reasons
+    setUserParameter( "muonMvaMethod",      "BDTMuonID2017woIPwIso" ); 
+    setUserParameter( "osMuonTagMvaMethod", "DNNOsMuonHLTJpsiMu_test241" ); 
+
+    setUserParameter( "ptCut", "40.0" ); //needed for paolo's code (no influence in the code whatsoever)
 
 }
 
@@ -61,24 +66,34 @@ void PDAnalyzer::beginJob() {
     // e.g. getUserParameter( "name", x )
 
     getUserParameter( "verbose", verbose );
-    getUserParameter( "minPtMuon", minPtMuon );
-    getUserParameter( "maxEtaMuon", maxEtaMuon );
 
-    getUserParameter( "mvaMethod", mvaMethod );
+    getUserParameter( "process", process );
+    getUserParameter( "useHLT", useHLT );
+    getUserParameter( "writeVars", writeVars );
 
-    getUserParameter( "ptCut", ptCut ); //needed for paolo's code for unknow reasons
+    getUserParameter( "outputFile", outputFile );
 
-// to skim the N-tuple "uncomment" the following lines
-// // dropBranch( "*tau*" ); // drop some branch if required
-// initWSkim( new TFile( "skim.root", "RECREATE" ) );
+    getUserParameter( "muonIdWpBarrel", muonIdWpBarrel ); 
+    getUserParameter( "muonIdWpEndcap", muonIdWpEndcap ); 
 
+    getUserParameter( "muonMvaMethod", muonMvaMethod );
+    getUserParameter( "osMuonTagMvaMethod", osMuonTagMvaMethod );
 
-// additional features
-//  DataSetFilter::beginJob();
-    tWriter = new PDSecondNtupleWriter;
+    getUserParameter( "ptCut", ptCut ); //needed for paolo's code (no influence in the code whatsoever)
+
+//  additional features
+    tWriter = new PDSecondNtupleWriter; // second ntuple
     tWriter->open( getUserParameter("outputFile"), "RECREATE" ); // second ntuple
 
-    setupMuonMvaReader( mvaMethod );
+    setOsMuonCuts(muonIdWpBarrel, muonIdWpEndcap, 1. ); //set wp for muonID and Dz cut
+
+    inizializeMuonMvaReader( muonMvaMethod );           //initialize mva muon id
+    inizializeOSMuonMvaTagReader( osMuonTagMvaMethod ); //inizialize mva os muon method
+    bool osInit = inizializeOSMuonMvaMistagMethods();   //read os muon method for per-event-mistag
+    if(!osInit) cout<<"METHOD NOT INIZIALIZATED. ABORT"<<endl;
+
+    if(process=="BsJPsiPhi") SetBsMassRange(5.20, 5.50);
+    if(process=="BuJPsiK") SetBuMassRange(5.1, 5.50);
 
     return;
 
@@ -91,12 +106,13 @@ void PDAnalyzer::book() {
     // it's automatically marked for saving on file; the option 
     // is uneffective when not using the full utility
 
-    autoSavedObject =
-    hmass_JPsi              = new TH1D( "hmass_JPsi", "hmass_JPsi", 400, 2.5, 3.5 ); 
+    float min = 5.0;
+    float max = 5.5;
+    float nbin = 250;
+
 
     autoSavedObject =
-    hmass_Bs                = new TH1D( "hmass_Bs", "hmass_Bs", 100, 5.25, 5.5 ); 
-
+    hmass_ssB       = new TH1D( "hmass_ssB", "hmass_ssB", nbin, min, max );
 
     return;
 
@@ -104,7 +120,7 @@ void PDAnalyzer::book() {
 
 
 void PDAnalyzer::reset() {
-// automatic reset
+
     autoReset();
     return;
 }
@@ -115,109 +131,97 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
     if ( verbose ) {
         cout << " +++++++++++++++++++++++++++ " << endl;
         cout << "entry: "
-                 << entry << " " << event_file << " " << event_tot << endl;
+             << entry << " " << event_file << " " << event_tot << endl;
         cout << "run: " << runNumber << " , "
-                 << "evt: " << eventNumber << endl;
+             << "evt: " << eventNumber << endl;
     }
     else {
-
         if ( (!(event_tot%10) && event_tot<100 ) || 
-     (!(event_tot %100) && event_tot<1000 ) || 
-     (!(event_tot %1000) && event_tot<10000 ) || 
-     (!(event_tot %10000) && event_tot<100000 ) || 
-     (!(event_tot %100000) && event_tot<1000000 ) || 
-     (!(event_tot %1000000) && event_tot<10000000 ) )
+        (!(event_tot %100) && event_tot<1000 ) || 
+        (!(event_tot %1000)&& event_tot<10000 ) || 
+        (!(event_tot %10000) && event_tot<100000 ) || 
+        (!(event_tot %100000) && event_tot<1000000 ) || 
+        (!(event_tot %1000000) && event_tot<10000000 ) )
             cout << " == at event " << event_file << " " << event_tot << endl;
     }
 
 // additional features
-    computeMuonVar();
+    computeMuonVar();   //compute muon variable for soft id
+    inizializeTagVariables(); //initialiaze some variable for tagging
     tWriter->Reset();
     convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz);
     convSpheCart(muoPt, muoEta, muoPhi, muoPx, muoPy, muoPz);
     convSpheCart(trkPt, trkEta, trkPhi, trkPx, trkPy, trkPz);
     convSpheCart(pfcPt, pfcEta, pfcPhi, pfcPx, pfcPy, pfcPz);
 
-    // flag to be set "true" or "false" for events accepted or rejected
-
-    nselMu=0;
-
- // generation information
-    vector <int> ListLongLivedB;
-        
-    for( unsigned int i=0 ; i<genId->size() ; i++ ){
-        unsigned int Code = abs(genId->at(i));
-        if( Code == 511 || Code == 521 || Code ==531 || Code == 541 || Code == 5122 || Code == 5132 || Code ==5232 ){
-            ListLongLivedB.push_back(i);
-            continue;
-        }
+    if( !((process=="BsJPsiPhi")||(process=="BuJPsiK")) ) {
+        cout<<"!$!#$@$% PROCESS NAME WRONG"<<endl;
+        return false;
     }
 
-    //search for muons
+//------------------------------------------------HLT---------------------------------------
 
-    for ( int iMuon = 0; iMuon < nMuons; ++iMuon ){
+    bool jpsimu = false;
+    bool jpsitktk = false;
+    bool jpsitk = false;
 
-        //SELECTION
+    if(hlt(PDEnumString::HLT_Dimuon0_Jpsi3p5_Muon2_v)||hlt(PDEnumString::HLT_Dimuon0_Jpsi_Muon_v)) jpsimu = true;
+    if(hlt(PDEnumString::HLT_DoubleMu4_JpsiTrkTrk_Displaced_v)) jpsitktk =  true;
+    if(hlt(PDEnumString::HLT_DoubleMu4_JpsiTrk_Displaced_v)) jpsitk = true;
 
-        if(muoPt->at( iMuon )<minPtMuon) continue;
-        if(abs(muoEta->at( iMuon ))>maxEtaMuon) continue;
+    if( !jpsimu ) return false; //currently only jpsimu is allowed
+    if( jpsimu ) SetJpsiMuCut();    //set analysis cut for jpsimu
+    if( !jpsimu ) SetJpsiTrkTrkCut();   //set analysis cut for jpsitktk
 
-        nselMu++;
+    if(useHLT && process=="BsJPsiPhi" && !(jpsimu || jpsitktk)) return false;
+    if(useHLT && process=="BuJPsiK" && !(jpsimu || jpsitk)) return false;
 
-        int itkmu = muonTrack( iMuon, PDEnumString::muInner );
-        if(itkmu < 0) continue;
+//------------------------------------------------SEARCH FOR SS---------------------------------------
 
-        // gen info
+    int iSsB = GetCandidate(process); //get best svt
+    if(iSsB<0) return false;
 
-        int genMuIndex=-1, muoLund=0, muoAncestor=-1;
+    bool isTight = false;
+    int iSsBtight = GetTightCandidate(process); //get best svt that pass analysis selection
+    if(iSsBtight>=0){
+        isTight = true;
+        iSsB = iSsBtight;
+    }else return false; //apply analysis selection to the event
 
-        genMuIndex = GetClosestGen( muoEta->at(iMuon), muoPhi->at(iMuon), muoPt->at(iMuon) );
+    int iSsPV = GetBestPV(iSsB, tB); //select PV
+    if(iSsPV < 0) return false;
 
-        if( genMuIndex >= 0 ) {
-            muoLund = genId->at(genMuIndex);
-            muoAncestor = GetAncestor( genMuIndex, &ListLongLivedB );
-        }
+    setSsForTag(iSsB, iSsPV); //set PV and SVT for tagging class
 
-        //TWRITER FILLING
+    hmass_ssB->Fill(svtMass->at(iSsB));
+    (tWriter->ssbMass) = svtMass->at(iSsB);
+    
+//-----------------------------------------TAG-----------------------------------------
 
-        (tWriter->muoPt)->push_back( muoPt->at( iMuon ) );
-        (tWriter->muoEta)->push_back( muoEta->at( iMuon ) );
-        (tWriter->muoPhi)->push_back( muoPhi->at(iMuon) );
+    int bestMuIndex = getOsMuon(); //get OS muon
+    int tagDecision = getOsMuonTag();   //get tag decision 
 
-        (tWriter->trkDxy)->push_back( abs(trkDxy->at(itkmu)) * IPsign(iMuon) );
-        (tWriter->trkDz)->push_back( trkDz->at(itkmu) );
-        (tWriter->trkExy)->push_back( trkExy->at(itkmu) );
-        (tWriter->trkEz)->push_back( trkEz->at(itkmu) );
-
-        (tWriter->muoPFiso)->push_back(GetMuoPFiso(iMuon));
-
-        (tWriter->muoSoftMvaValue)->push_back( computeMuonMva(iMuon) );
-
-        (tWriter->muoLund)->push_back( muoLund );
-        (tWriter->muoAncestor)->push_back( muoAncestor ); 
-
+    if( tagDecision == 0 ){
+        cout<<"no os muon founded"<<endl;
+        (tWriter->osMuonTag) = 0;
+        return true;
     }
 
-    if( (nselMu) == 0 ) return false;
+    pair<float,float> osMuonTagMistag = getOsMuonTagMistagProb(2); //.first =  mistag, .second =  error (still not implemented). Argument define what method to use
 
-    tWriter->fill();
+     (tWriter->osMuonTag) = tagDecision;
+     (tWriter->osMuonTagMistag) = osMuonTagMistag.first;
 
-
-// to skim the N-tuple "uncomment" the following line
-// if ( flag ) fillSkim();
+    cout<<"os muon founded with decision "<<tagDecision<<" and mistag "<<osMuonTagMistag.first<<endl;
 
     return true;
 
 }
 
-
 void PDAnalyzer::endJob() {
-// to skim the N-tuple "uncomment" the following line
-//  closeSkim();
 
 // additional features
-//  DataSetFilter::endJob();
-    tWriter->close();
+    tWriter->close();   // second ntuple
     return;
 }
 
@@ -233,21 +237,3 @@ void PDAnalyzer::save() {
 
     return;
 }
-
-
-// to plot some histogram immediately after the ntuple loop
-// "uncomment" the following lines
-/*
-void PDAnalyzer::plot() {
-    TCanvas* can = new TCanvas( "muoPt", "muoPt", 800, 600 );
-    can->cd();
-    can->Divide( 1, 2 );
-    can->cd( 1 );
-    hptmumax->Draw();
-    hptmu2nd->Draw();
-    return;
-}
-*/
-
-
-// ======MY FUNCTIONS===============================================================================

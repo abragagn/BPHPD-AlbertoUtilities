@@ -8,6 +8,7 @@
 #include "TopDecayClassifier.h"
 #include "PDSoftMuonMvaEstimator.h"
 #include "AlbertoUtil.h"
+#include "OSMuonMvaTag.h"
 
 // to skim the N-tuple "uncomment" the following line
 //#include "NtuTool/Common/interface/TreeFilter.h"
@@ -18,11 +19,12 @@ class PDSecondNtupleWriter;
 
 // to skim the N-tuple replace the the following line
 // with the "commented" ones
-class PDAnalyzer:   public virtual PDAnalyzerUtil
-,                   public virtual PDGenHandler
-,                   public virtual PDMuonVar
-,                   public virtual PDSoftMuonMvaEstimator
-,                   public virtual AlbertoUtil
+class PDAnalyzer: public virtual PDAnalyzerUtil
+,                 public virtual PDGenHandler
+,                 public virtual PDMuonVar
+,                 public virtual PDSoftMuonMvaEstimator
+,                 public virtual AlbertoUtil
+,                 public virtual OSMuonMvaTag
 
 // additional features
 //,                              public virtual DataSetFilter    // dataset filter
@@ -62,24 +64,29 @@ class PDAnalyzer:   public virtual PDAnalyzerUtil
 
     double ptCut; //needed for paolo's code for unknow reasons
 
-    bool verbose;
+    //PARAMETERS
+    bool verbose, useHLT, writeVars;
     TString outputFile;
-    float minPtMuon, maxEtaMuon;
-    TString mvaMethod;
+    float muonIdWpBarrel, muonIdWpEndcap;
+    TString process;
+    TString muonMvaMethod;
+    TString osMuonTagMvaMethod;
 
-    int nselMu;
+    //OTHER VARIABLES
 
-    TH1D* hmass_JPsi;
-    TH1D* hmass_Bs;
+    // HISTOGRAMS
+    TH1D *hmass_ssB;
 
+    //FUNCTIONS
 // additional features: second ntuple
-    PDSecondNtupleWriter* tWriter;                               // second ntuple
+    PDSecondNtupleWriter* tWriter;
+
 
  private:
 
 
     // dummy copy constructor and assignment
-    PDAnalyzer ( const PDAnalyzer& );
+    PDAnalyzer                   ( const PDAnalyzer& );
     PDAnalyzer& operator=( const PDAnalyzer& );
 
 };
