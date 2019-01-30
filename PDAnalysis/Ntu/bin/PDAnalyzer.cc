@@ -213,7 +213,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
      (tWriter->osMuonTag) = tagDecision;
      (tWriter->osMuonTagMistag) = osMuonTagMistag.first;
 
-    cout<<"os muon founded with decision "<<tagDecision<<" and mistag "<<osMuonTagMistag.first<<endl;
+    cout<<"os muon "<<bestMuIndex<<" founded with decision "<<tagDecision<<" and mistag "<<osMuonTagMistag.first<<endl;
 
     return true;
 
