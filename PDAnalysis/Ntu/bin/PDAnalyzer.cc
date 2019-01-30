@@ -176,17 +176,10 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
     if(useHLT && process=="BsJPsiPhi" && !(jpsimu || jpsitktk)) return false;
     if(useHLT && process=="BuJPsiK" && !(jpsimu || jpsitk)) return false;
 
-//------------------------------------------------SEARCH FOR SS---------------------------------------
+//------------------------------------------------Signal---------------------------------------
 
-    int iSsB = GetCandidate(process); //get best svt
+    int iSsB = GetTightCandidate(process); //get best svt with analysis selection
     if(iSsB<0) return false;
-
-    bool isTight = false;
-    int iSsBtight = GetTightCandidate(process); //get best svt that pass analysis selection
-    if(iSsBtight>=0){
-        isTight = true;
-        iSsB = iSsBtight;
-    }else return false; //apply analysis selection to the event
 
     TLorentzVector tB = GetTLorentzVecFromJpsiX(iSsB);
     int iSsPV = GetBestPV(iSsB, tB); //select PV
