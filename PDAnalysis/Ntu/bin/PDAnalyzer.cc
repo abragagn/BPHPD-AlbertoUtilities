@@ -210,8 +210,8 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 
     pair<float,float> osMuonTagMistag = getOsMuonTagMistagProb(2); //.first =  mistag, .second =  error (still not implemented). Argument define what method to use
 
-     (tWriter->osMuonTag) = tagDecision;
-     (tWriter->osMuonTagMistag) = osMuonTagMistag.first;
+    (tWriter->osMuonTag) = tagDecision;
+    (tWriter->osMuonTagMistag) = osMuonTagMistag.first;
 
     cout<<"os muon "<<bestMuIndex<<" founded with decision "<<tagDecision<<" and mistag "<<osMuonTagMistag.first<<endl;
 
