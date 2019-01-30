@@ -25,8 +25,8 @@ void initTree() {
 
 }
 
-vector <int> *osMuonTag;
-vector <float> *ssbMass, *osMuonTagMistag;
+vector <int> osMuonTag;
+vector <float> ssbMass, osMuonTagMistag;
 
 TBranch *b_osMuonTag, *b_ssbMass, *b_osMuonTagMistag;
 private:

@@ -188,6 +188,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
         iSsB = iSsBtight;
     }else return false; //apply analysis selection to the event
 
+    TLorentzVector tB = GetTLorentzVecFromJpsiX(iSsB);
     int iSsPV = GetBestPV(iSsB, tB); //select PV
     if(iSsPV < 0) return false;
 
