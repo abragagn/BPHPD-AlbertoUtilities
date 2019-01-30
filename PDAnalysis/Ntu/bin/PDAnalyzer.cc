@@ -24,7 +24,7 @@
 using namespace std;
 
 /* EXAMPLE OF USAGE
-pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2017Lists/BsToJpsiPhi_2017_DCAP.list hist.root -v outputFile ntu.root -v histoMode RECREATE -v use_gen t -v useHLT t -v writeVars f -n 2000000
+pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2017Lists/BsToJpsiPhi_2017_DCAP.list hist.root -v outputFile ntu.root -v histoMode RECREATE -v use_gen t -v useHLT t -n 2000000
 */
 PDAnalyzer::PDAnalyzer() {
 
@@ -36,7 +36,6 @@ PDAnalyzer::PDAnalyzer() {
 
     setUserParameter( "process", "BsJPsiPhi" );
     setUserParameter( "useHLT", "false" );
-    setUserParameter( "writeVars", "true" );
 
     setUserParameter( "outputFile", "ntu.root" );
 
@@ -69,7 +68,6 @@ void PDAnalyzer::beginJob() {
 
     getUserParameter( "process", process );
     getUserParameter( "useHLT", useHLT );
-    getUserParameter( "writeVars", writeVars );
 
     getUserParameter( "outputFile", outputFile );
 
