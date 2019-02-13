@@ -24,7 +24,7 @@
 using namespace std;
 
 /* EXAMPLE OF USAGE
-pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2017Lists/BsToJpsiPhi_2017_DCAP.list hist.root -v outputFile ntu.root -v histoMode RECREATE -v use_gen t -v useHLT t -n 2000000
+pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2017Lists/BsToJpsiPhi_2017_DCAP.list hist.root -v outputFile ntu.root -v histoMode RECREATE -v use_gen t -v useHLT t -n 10000
 */
 PDAnalyzer::PDAnalyzer() {
 
@@ -199,7 +199,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
         return true;
     }
 
-    pair<float,float> osMuonTagMistag = getOsMuonTagMistagProb(2); //.first =  mistag, .second =  error (still not implemented). Argument define what method to use
+    pair<float,float> osMuonTagMistag = getOsMuonTagMistagProb(2); //.first =  mistag, .second =  error (still not implemented). Argument define what method to use (0 = bin, 1 = fit, 2= kde ratio)
 
     (tWriter->osMuonTag) = tagDecision;
     (tWriter->osMuonTagMistag) = osMuonTagMistag.first;

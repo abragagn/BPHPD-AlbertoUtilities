@@ -125,9 +125,10 @@ public:
     float GetJetProbb(int iJet);
     float CountEventsWithFit(TH1 *hist, TString process);
     int GetBestPV(int isvt, TLorentzVector t);
-    float GetSignedDxy(int iMuon, int iPV);
+    float GetMuonSignedDxy(int iMuon, int iPV);
     TLorentzVector GetTLorentzVecFromJpsiX(int iSvt);
     float dZ(int itk, int iPV);
+    float dXYjet(int itk, int iPV, int iJet);
     void printMotherChain(int iGen);
     void printDaughterTree(int iGen, const std::string & pre);
     bool hasDaughter(int iGen);

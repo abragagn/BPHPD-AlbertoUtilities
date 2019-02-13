@@ -68,7 +68,7 @@ int AlbertoUtil::GetClosestGen( float eta, float phi, float pt )
     for( uint i=0; i< genId->size(); ++i ){
        if( !IsLongLived(i) ) continue;
        float dr = deltaR(eta, phi, genEta->at(i), genPhi->at(i));
-       float dpt = abs(genPt->at(i) - pt)/genPt->at(i);
+       float dpt = fabs(genPt->at(i) - pt)/genPt->at(i);
 
        if( dr > drb ) continue;
        if( dpt > dpb) continue;
@@ -90,7 +90,7 @@ int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector
     for(int it:*GenList){
 
        float dr = deltaR(eta, phi, genEta->at(it), genPhi->at(it));
-       float dpt = abs(genPt->at(it) - pt)/genPt->at(it);
+       float dpt = fabs(genPt->at(it) - pt)/genPt->at(it);
 
        if( dr > drb ) continue;
        if( dpt > dpb) continue;
@@ -390,7 +390,7 @@ int AlbertoUtil::GetBestJpsi()
     for( int i=0; i<nSVertices; ++i ){
 
         if((svtType->at(i)!=PDEnumString::svtJPsi) ) continue;
-        if( abs(svtMass->at(i)-MassJPsi) > MassRangeJPsi) continue;
+        if( fabs(svtMass->at(i)-MassJPsi) > MassRangeJPsi) continue;
 
         if( svtChi2->at(i)>bestChi2 ) continue;
         index = i;
@@ -450,8 +450,8 @@ float AlbertoUtil::GetMuoPFiso (int iMuon)
 bool AlbertoUtil::isMvaMuon(int iMuon, float wpB, float wpE)
 {
 
-    if((abs(muoEta->at( iMuon ))<1.2)&&(computeMuonMva(iMuon)>=wpB)) return true;
-    if((abs(muoEta->at( iMuon ))>=1.2)&&(computeMuonMva(iMuon)>=wpE)) return true;
+    if((fabs(muoEta->at( iMuon ))<1.2)&&(computeMuonMva(iMuon)>=wpB)) return true;
+    if((fabs(muoEta->at( iMuon ))>=1.2)&&(computeMuonMva(iMuon)>=wpE)) return true;
 
     return false;
 
@@ -472,7 +472,7 @@ float AlbertoUtil::GetJetCharge(int iJet, float kappa)
        float eta = pfcEta->at(it);
 
        if(pt<0.2) continue;
-       if(abs(eta)>2.5) continue;
+       if(fabs(eta)>2.5) continue;
 
        QJet += pfcCharge->at(it) * pow(pt, kappa);
        ptJet += pow(pt, kappa);
@@ -488,7 +488,6 @@ float AlbertoUtil::GetJetCharge(int iJet, float kappa)
 // =====================================================================================
 int AlbertoUtil::IPsign(int iMuon)
 {
-
     return IPsign_(iMuon);
 }
 // =====================================================================================
@@ -610,16 +609,6 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
     return ssPV;
 }
 // =====================================================================================
-float AlbertoUtil::GetSignedDxy(int iMuon, int iPV)
-{
-
-    float dxy = dXY( muonTrack( iMuon, PDEnumString::muInner ), pvtX->at(iPV), pvtY->at(iPV) );
-    int sign = IPsign(iMuon, iPV);
-
-    return abs(dxy)*sign;
-
-}
-// =====================================================================================
 TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
 {
     int iJPsi = (subVtxFromSV(iSvt)).at(0);
@@ -661,7 +650,18 @@ float AlbertoUtil::dZ(int itk, int iPV)
 {
     return PDAnalyzerUtil::dZ(itk, pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV));
 }
-
+// =====================================================================================
+float AlbertoUtil::dXYjet(int itk, int iPV, int iJet)
+{
+    return fabs(dXY( itk, pvtX->at(iPV), pvtY->at(iPV) ))*dSign( itk, iJet, pvtX->at(iPV), pvtY->at(iPV) );
+}
+// =====================================================================================
+float AlbertoUtil::GetMuonSignedDxy(int iMuon, int iPV)
+{
+    float dxy = dXY( muonTrack( iMuon, PDEnumString::muInner ), pvtX->at(iPV), pvtY->at(iPV) );
+    int sign = IPsign(iMuon, iPV);
+    return fabs(dxy)*sign;
+}
 // =================================================================================================
 void AlbertoUtil::printMotherChain(int iGen)
 {
