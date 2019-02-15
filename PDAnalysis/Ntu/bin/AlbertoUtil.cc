@@ -65,7 +65,7 @@ int AlbertoUtil::GetClosestGen( float eta, float phi, float pt )
     double dpb = 0.3; 
     int best = -1;
     
-    for( uint i=0; i< genId->size(); ++i ){
+    for( uint i=0; i<genId->size(); ++i ){
        if( !IsLongLived(i) ) continue;
        float dr = deltaR(eta, phi, genEta->at(i), genPhi->at(i));
        float dpt = fabs(genPt->at(i) - pt)/genPt->at(i);
@@ -79,6 +79,28 @@ int AlbertoUtil::GetClosestGen( float eta, float phi, float pt )
 
     return best;
 }
+// =====================================================================================
+int AlbertoUtil::GetOverlappedTrack( int trk, vector <int> *List )
+{
+    double drb = 0.1;
+    double dpb = 0.1; 
+    int best = -1;
+    
+    for(int it:*List){
+
+       float dr = deltaR(trkEta->at(trk), trkPhi->at(trk), trkEta->at(it), trkPhi->at(it));
+       float dpt = fabs(trkPt->at(it) - trkPt->at(trk))/trkPt->at(it);
+
+       if( dr > drb ) continue;
+       if( dpt > dpb) continue;
+
+       best = it;
+       drb = dr;
+    }
+
+    return best;
+}
+
 
 // =====================================================================================
 int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector <int> *GenList ) {
@@ -713,7 +735,7 @@ void AlbertoUtil::printDaughterTree(int iGen, const string & pre)
 bool AlbertoUtil::hasDaughter(int iGen)
 {
     const vector <int>& vD = allDaughters(iGen);
-    return vD.size()>1 ? true : false;
+    return vD.size()>0 ? true : false;
 }
 // =================================================================================================
 float AlbertoUtil::GetCt2D(TLorentzVector t, int iSV)

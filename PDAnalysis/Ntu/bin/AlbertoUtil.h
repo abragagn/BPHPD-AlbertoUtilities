@@ -99,6 +99,7 @@ public:
 
     int GetClosestGen( float eta, float phi, float pt );
     int GetClosestGenLongLivedB( float eta, float phi, float pt, std::vector <int> *GenList );
+    int GetOverlappedTrack( int trk, std::vector <int> *List );
     int GetAncestor( unsigned int iGen, std::vector <int> *GenList );
     int WhichMuon(int trk);
     float GetGenCT( unsigned int genIndex );
