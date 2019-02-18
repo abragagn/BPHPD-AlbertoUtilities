@@ -55,7 +55,6 @@ PDSoftMuonMvaEstimator::~PDSoftMuonMvaEstimator() {}
 // =====================================================================================
 void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName, TString path = "/lustre/cmswork/abragagn/mvaWeights/MvaMuonID/")
 {
-
     methodSetup(methodName, path);
 
     muonMvaIdReader_.AddVariable( "muoPt", &muoPt_ );
@@ -94,13 +93,12 @@ void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName, TString
     muonMvaIdReader_.BookMVA( methodNameEndcap_, weightFileEndcap_ );
 
     return;
-
 }
 
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon){
-
+void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon)
+{
     int itkmu = muonTrack( iMuon, PDEnumString::muInner );
 
     DUMMY_ = -1;
@@ -144,14 +142,12 @@ void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon){
     muoQprod_ = muoQprod->at(iMuon);
 
     return;
-
 }
 
 
 // =====================================================================================
 float PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)
 {   
-
     if( !( muoType->at(iMuon) & PDEnumString::global ) )
     {
         return -1;
@@ -177,14 +173,12 @@ float PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)
         return -2;
     }
 
-    return (abs(muoEta->at( iMuon ))<1.2) ? muonMvaIdReader_.EvaluateMVA(methodNameBarrel_) : muonMvaIdReader_.EvaluateMVA(methodNameEndcap_); 
-
+    return (abs(muoEta->at( iMuon ))<1.2) ? muonMvaIdReader_.EvaluateMVA(methodNameBarrel_) : muonMvaIdReader_.EvaluateMVA(methodNameEndcap_);
 }
 
 // =====================================================================================
 bool PDSoftMuonMvaEstimator::muonPassedPreselection(int iMuon)
 {
-
     if ( muoChi2LM->at( iMuon ) > 5000 ) {return false;}
     if ( muoChi2LP->at( iMuon ) > 2000 ) {return false;}
     if ( muoGlbTrackTailProb->at( iMuon ) > 5000 ) {return false;}
@@ -201,7 +195,6 @@ bool PDSoftMuonMvaEstimator::muonPassedPreselection(int iMuon)
 // =====================================================================================
 int PDSoftMuonMvaEstimator::IPsign_(int iMuon)
 {
-
     int itkmu = muonTrack( iMuon, PDEnumString::muInner );
     int ipftkmu = trkPFC->at(itkmu);
     int IPsign = ((double)rand() / (RAND_MAX)) < 0.5 ? -1 : +1; //random value +-1
@@ -238,7 +231,6 @@ int PDSoftMuonMvaEstimator::IPsign_(int iMuon)
 // =====================================================================================
 int PDSoftMuonMvaEstimator::IPsign_(int iMuon, int iPV)
 {
-
     int itkmu = muonTrack( iMuon, PDEnumString::muInner );
     int ipftkmu = trkPFC->at(itkmu);
     int IPsign = ((double)rand() / (RAND_MAX)) < 0.5 ? -1 : +1; //random value +-1
@@ -294,7 +286,6 @@ TString PDSoftMuonMvaEstimator::methodNameFromWeightName(TString weightsName)
 // =====================================================================================
 void PDSoftMuonMvaEstimator::methodSetup(TString methodName, TString path)
 {
-
     TString year = "";
     TString var = "";
 
@@ -318,5 +309,4 @@ void PDSoftMuonMvaEstimator::methodSetup(TString methodName, TString path)
     methodNameEndcap_ = methodNameFromWeightName(weightFileEndcap_);
 
     return;
-
 }
