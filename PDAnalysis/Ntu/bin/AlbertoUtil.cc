@@ -10,33 +10,27 @@ AlbertoUtil::~AlbertoUtil() {}
 // =====================================================================================
 bool AlbertoUtil::IsB( uint genindex ) 
 {
-
     uint genCode = abs( genId->at(genindex) );
     for( uint i=0; i<ARRAY_SIZE(listLundBmesons); ++i ) if( genCode == listLundBmesons[i] ) return true;
     for( uint i=0; i<ARRAY_SIZE(listLundBbaryons); ++i ) if( genCode == listLundBbaryons[i] ) return true;
     return false;
-
 }
 
 // =================================================================================================
 bool AlbertoUtil::IsBottomium(uint genindex)
 {
-
     uint genCode = abs( genId->at(genindex) );
     for( uint i=0; i<ARRAY_SIZE(listLundBottonium); ++i ) if( genCode == listLundBottonium[i] ) return true;
     return false;
-
 }
 
 // =====================================================================================
 bool AlbertoUtil::IsC( uint genindex ) 
 {
-
     uint genCode = abs( genId->at(genindex) );
     for( uint i=0; i<ARRAY_SIZE(listLundCmesons); ++i ) if( genCode == listLundCmesons[i] ) return true;
     for( uint i=0; i<ARRAY_SIZE(listLundCbaryons); ++i ) if( genCode == listLundCbaryons[i] ) return true;
     return false;
-
 }
 
 // =================================================================================================
@@ -45,17 +39,14 @@ bool AlbertoUtil::IsCharmonium(uint genindex)
     uint genCode = abs( genId->at(genindex) );
     for( uint i=0; i<ARRAY_SIZE(listLundCharmonium); ++i ) if( genCode == listLundCharmonium[i] ) return true;
     return false;
-
 }
 
 // =====================================================================================
 bool AlbertoUtil::IsLongLived( uint genindex ) 
 {
-
     uint genCode = abs( genId->at(genindex) );
     for( uint i=0; i<ARRAY_SIZE(LongLivedList); ++i ) if( genCode == LongLivedList[i] ) return true;
     return false;
-
 }
 
 // =====================================================================================
@@ -100,11 +91,23 @@ int AlbertoUtil::GetOverlappedTrack( int trk, vector <int> *List )
 
     return best;
 }
-
-
 // =====================================================================================
-int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector <int> *GenList ) {
+bool AlbertoUtil::AreOverlapped( float pt1, float eta1, float phi1, float pt2, float eta2, float phi2 )
+{
+    double drb = 0.1;
+    double dpb = 0.1; 
 
+    float dr = deltaR(eta1, phi1, eta2, phi2);
+    float dpt = fabs(pt1 - pt2)/pt1;
+
+    if( dr > drb ) return false;
+    if( dpt > dpb) return false;
+
+    return true;
+}
+// =====================================================================================
+int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector <int> *GenList ) 
+{
     double drb = 0.4;
     double dpb = 0.4; 
     int best = -1;
@@ -147,7 +150,6 @@ int AlbertoUtil::WhichMuon(int trk)
 // =====================================================================================
 float AlbertoUtil::GetGenCT( uint genIndex ) 
 {
-
     const vector <int>& aD = allDaughters(genIndex);
     if( aD.size() == 0 ) return -1 ;
 
@@ -164,7 +166,6 @@ float AlbertoUtil::GetGenCT( uint genIndex )
     float dz = genVz->at(genIndex)-genVz->at(mthIndex);
 
     return sqrt( dx*dx+dy*dy+dz*dz )/pGen.Beta()/pGen.Gamma();
- 
 }
 
 // ========================================================================================
@@ -459,7 +460,6 @@ int AlbertoUtil::TagMixStatus( uint genindex )
 // ========================================================================================
 float AlbertoUtil::GetMuoPFiso (int iMuon)
 {
-
     float PFIso = muoSumCPpt->at(iMuon)/muoPt->at(iMuon);
     float betaCorr = muoSumNHet->at(iMuon) + muoSumPHet->at(iMuon)-0.5*(muoSumPUpt->at(iMuon));
     betaCorr/=muoPt->at(iMuon);
@@ -471,25 +471,21 @@ float AlbertoUtil::GetMuoPFiso (int iMuon)
 // ========================================================================================
 bool AlbertoUtil::isMvaMuon(int iMuon, float wpB, float wpE)
 {
-
     if((fabs(muoEta->at( iMuon ))<1.2)&&(computeMuonMva(iMuon)>=wpB)) return true;
     if((fabs(muoEta->at( iMuon ))>=1.2)&&(computeMuonMva(iMuon)>=wpE)) return true;
 
     return false;
-
 }
 
 // =====================================================================================
 float AlbertoUtil::GetJetCharge(int iJet, float kappa)
 {
-
     float QJet = 0;
     float ptJet = 0;
 
     vector <int> list = pfCandFromJet( iJet );
 
     for(int it:list){
-
        float pt = pfcPt->at(it);
        float eta = pfcEta->at(it);
 
@@ -498,13 +494,22 @@ float AlbertoUtil::GetJetCharge(int iJet, float kappa)
 
        QJet += pfcCharge->at(it) * pow(pt, kappa);
        ptJet += pow(pt, kappa);
-
     }
 
     QJet /= ptJet;
 
     return QJet; 
-
+}
+// =====================================================================================
+float AlbertoUtil::GetListCharge(vector <int> *list, float kappa)
+{
+    float Q = 0;
+    float pt = 0;
+    for(int it:*list){
+       Q += trkCharge->at(it) * pow(trkPt->at(it), kappa);
+       pt += pow(trkPt->at(it), kappa);
+    }
+    return Q/pt; 
 }
 
 // =====================================================================================
@@ -532,8 +537,8 @@ float AlbertoUtil::GetJetProbb(int iJet)
     return jetdfprob;
 }
 // =====================================================================================
-float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
-
+float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
+{
     ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls( 10000 );
 
     float mean=MassBs;
@@ -601,7 +606,6 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process){
     nEvt/=hist->GetBinWidth(0);
 
     return nEvt;
-
 }
 // =====================================================================================
 int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
@@ -653,18 +657,14 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
 int AlbertoUtil::GetTightCandidate(TString process)
 {
     if(process=="BsJPsiPhi") return GetBestBstrangeTight();
-
     if(process=="BuJPsiK") return GetBestBupTight();
-
     return -1;
 }
 // =====================================================================================
 int AlbertoUtil::GetCandidate(TString process)
 {
     if(process=="BsJPsiPhi") return GetBestBstrange();
-
     if(process=="BuJPsiK") return GetBestBup();
-
     return -1;
 }
 // =====================================================================================
@@ -712,25 +712,60 @@ void AlbertoUtil::printDaughterTree(int iGen, const string & pre)
     }
 
     if( lastLevel ){
-        cout << pre << "+-> ";
+        cout<<pre<< "+-> ";
         for( uint id=0; id<ndau; ++id ) {
             int d = vD[id];
-            cout<< genId->at( d ) <<" ";
+            cout<<genId->at(d)<<" ";
         }
-        cout << endl;
+        cout<<endl;
         return;
     }
 
   for( uint id=0; id<ndau; ++id ) {
     int d = vD[id];
-    cout << pre << "+-> ";
-    string prepre( pre );
+    cout<<pre<< "+-> ";
+    string prepre(pre);
     if ( id == ndau - 1 ) prepre += "    ";
     else prepre += "|   ";
     printDaughterTree( d, prepre );
   }
 }
+// =================================================================================================
+void AlbertoUtil::printDaughterTreePt(int iGen, const string & pre)
+{
+    cout<<genId->at(iGen)<<" ["<<genPt->at(iGen)<<"]"<<endl;
 
+    const vector <int>& vD = allDaughters(iGen);
+    uint ndau = vD.size();
+    if(ndau == 0) return;
+
+    bool lastLevel = true;
+    for(uint id =0; id<ndau; ++id){
+        if ( hasDaughter( vD[id] ) ) {
+            lastLevel = false;
+            break;
+        }
+    }
+
+    if( lastLevel ){
+        cout<<pre<< "+-> ";
+        for( uint id=0; id<ndau; ++id ) {
+            int d = vD[id];
+            cout<<genId->at(d)<<" ["<<genPt->at(iGen)<<"] ";
+        }
+        cout<<endl;
+        return;
+    }
+
+  for( uint id=0; id<ndau; ++id ) {
+    int d = vD[id];
+    cout<<pre<< "+-> ";
+    string prepre(pre);
+    if ( id == ndau - 1 ) prepre += "    ";
+    else prepre += "|   ";
+    printDaughterTreePt( d, prepre );
+  }
+}
 // =================================================================================================
 bool AlbertoUtil::hasDaughter(int iGen)
 {
@@ -741,42 +776,37 @@ bool AlbertoUtil::hasDaughter(int iGen)
 float AlbertoUtil::GetCt2D(TLorentzVector t, int iSV)
 {
 
-  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
-  TVector3 vPV( bsX, bsY, 0. );
-  
-  TVector3 vPointing = vSVT - vPV;
-  TVector3 vBs = t.Vect();
+    TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
+    TVector3 vPV( bsX, bsY, 0. );
 
-  return MassBs/t.Pt() * (vPointing * vBs.Unit());
+    TVector3 vPointing = vSVT - vPV;
+    TVector3 vBs = t.Vect();
 
+    return MassBs/t.Pt() * (vPointing * vBs.Unit());
 }
 
 // =================================================================================================
 float AlbertoUtil::GetCt2D(TLorentzVector t, int iSV, int iPV)
 {
+    TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
+    TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), 0. );
 
-  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
-  TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), 0. );
-  
-  TVector3 vPointing = vSVT - vPV;
-  TVector3 vBs = t.Vect();
+    TVector3 vPointing = vSVT - vPV;
+    TVector3 vBs = t.Vect();
 
-  return MassBs/t.Pt() * (vPointing * vBs.Unit());
-  
+    return MassBs/t.Pt() * (vPointing * vBs.Unit());
 }
 
 // =================================================================================================
 float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
 {
+    TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
+    TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV) );
 
-  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
-  TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV) );
-  
-  TVector3 vPointing = vSVT - vPV;
-  TVector3 vBs = t.Vect();
+    TVector3 vPointing = vSVT - vPV;
+    TVector3 vBs = t.Vect();
 
-  return MassBs/t.P() * vPointing.Dot(vBs)/vBs.Mag();
-
+    return MassBs/t.P() * vPointing.Dot(vBs)/vBs.Mag();
 }
 // =================================================================================================
 /*float AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV)
@@ -814,67 +844,63 @@ float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
 // =================================================================================================
 float AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV, int iPV)
 {
+    TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
+    TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), 0. );
 
-  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
-  TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), 0. );
-  
-  TVector3 vPointing = vSVT - vPV;
-  TVector3 vBs = t.Vect();
+    TVector3 vPointing = vSVT - vPV;
+    TVector3 vBs = t.Vect();
 
-  TMatrixF covSV(3,3);
-  float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
+    TMatrixF covSV(3,3);
+    float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
                       svtSxy->at(iSV),svtSyy->at(iSV),svtSyz->at(iSV), 
                       svtSxz->at(iSV),svtSyz->at(iSV),svtSzz->at(iSV)};
-  covSV.SetMatrixArray(covSVArray);
+    covSV.SetMatrixArray(covSVArray);
 
-  TMatrixF covPV(3,3);
-  float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
+    TMatrixF covPV(3,3);
+    float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
                       pvtSxy->at(iPV),pvtSyy->at(iPV),pvtSyz->at(iPV), 
                       pvtSxz->at(iPV),pvtSyz->at(iPV),pvtSzz->at(iPV)};
-  covPV.SetMatrixArray(covPVArray);
+    covPV.SetMatrixArray(covPVArray);
 
-  TMatrixF covTot= covSV+covPV;
+    TMatrixF covTot= covSV+covPV;
 
-  float distArray2D[]={float(vPointing.X()),float(vPointing.Y()),0.};
-  TVectorF diff2D(3,distArray2D);
+    float distArray2D[]={float(vPointing.X()),float(vPointing.Y()),0.};
+    TVectorF diff2D(3,distArray2D);
 
-  if (diff2D.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
+    if (diff2D.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
 
-  return MassBs/t.Pt() * sqrt(covTot.Similarity(diff2D)) / sqrt(diff2D.Norm2Sqr()); 
-   
+    return MassBs/t.Pt() * sqrt(covTot.Similarity(diff2D)) / sqrt(diff2D.Norm2Sqr()); 
 }
 
 // =================================================================================================
 float AlbertoUtil::GetCt3DErr(TLorentzVector t, int iSV, int iPV)
 {
+    TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
+    TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV) );
 
-  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
-  TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV) );
-  
-  TVector3 vPointing = vSVT - vPV;
-  TVector3 vBs = t.Vect();
+    TVector3 vPointing = vSVT - vPV;
+    TVector3 vBs = t.Vect();
 
-  TMatrixF covSV(3,3);
-  float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
+    TMatrixF covSV(3,3);
+    float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
                       svtSxy->at(iSV),svtSyy->at(iSV),svtSyz->at(iSV), 
                       svtSxz->at(iSV),svtSyz->at(iSV),svtSzz->at(iSV)};
-  covSV.SetMatrixArray(covSVArray);
+    covSV.SetMatrixArray(covSVArray);
 
-  TMatrixF covPV(3,3);
-  float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
+    TMatrixF covPV(3,3);
+    float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
                       pvtSxy->at(iPV),pvtSyy->at(iPV),pvtSyz->at(iPV), 
                       pvtSxz->at(iPV),pvtSyz->at(iPV),pvtSzz->at(iPV)};
-  covPV.SetMatrixArray(covPVArray);
+    covPV.SetMatrixArray(covPVArray);
 
-  TMatrixF covTot= covSV+covPV;
+    TMatrixF covTot= covSV+covPV;
 
-  float distArray[]={float(vPointing.X()),float(vPointing.Y()),float(vPointing.Z())};
-  TVectorF diff(3,distArray);
+    float distArray[]={float(vPointing.X()),float(vPointing.Y()),float(vPointing.Z())};
+    TVectorF diff(3,distArray);
 
-  if ( diff.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
- 
-  return MassBs/t.P() * sqrt(covTot.Similarity(diff)) / sqrt(diff.Norm2Sqr()); 
+    if ( diff.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
 
+    return MassBs/t.P() * sqrt(covTot.Similarity(diff)) / sqrt(diff.Norm2Sqr()); 
 }
 // =================================================================================================
 void AlbertoUtil::SetJpsiMuCut()

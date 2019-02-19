@@ -100,6 +100,7 @@ public:
     int GetClosestGen( float eta, float phi, float pt );
     int GetClosestGenLongLivedB( float eta, float phi, float pt, std::vector <int> *GenList );
     int GetOverlappedTrack( int trk, std::vector <int> *List );
+    bool AreOverlapped( float pt1, float eta1, float phi1, float pt2, float eta2, float phi2 );
     int GetAncestor( unsigned int iGen, std::vector <int> *GenList );
     int WhichMuon(int trk);
     float GetGenCT( unsigned int genIndex );
@@ -120,6 +121,7 @@ public:
     int TagMixStatus( unsigned int genIndex );
     float GetMuoPFiso (int iMuon);
     float GetJetCharge(int iJet, float kappa);
+    float GetListCharge(std::vector <int> *list, float kappa);
     bool isMvaMuon(int iMuon, float wpB, float wpE);
     int IPsign(int iMuon);
     int IPsign(int iMuon, int iPV);
@@ -132,6 +134,7 @@ public:
     float dXYjet(int itk, int iPV, int iJet);
     void printMotherChain(int iGen);
     void printDaughterTree(int iGen, const std::string & pre);
+    void printDaughterTreePt(int iGen, const std::string & pre);
     bool hasDaughter(int iGen);
 
     float GetCt2D(TLorentzVector t, int iSV);
