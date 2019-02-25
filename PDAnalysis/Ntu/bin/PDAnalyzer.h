@@ -30,9 +30,9 @@ class PDAnalyzer: public virtual PDAnalyzerUtil
 //,                              public virtual DataSetFilter    // dataset filter
 // to skim the N-tuple "uncomment" the following line
 //,                              public virtual TreeFilter
- {
+{
 
- public:
+public:
 
     PDAnalyzer();
     virtual ~PDAnalyzer();
@@ -60,7 +60,7 @@ class PDAnalyzer: public virtual PDAnalyzerUtil
     virtual void save();     // save the histograms on a ROOT file
 
 
- protected:
+protected:
 
     double ptCut; //needed for paolo's code for unknow reasons
 
