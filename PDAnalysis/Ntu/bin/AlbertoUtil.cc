@@ -469,11 +469,9 @@ float AlbertoUtil::GetMuoPFiso (int iMuon)
 }
 
 // ========================================================================================
-bool AlbertoUtil::isMvaMuon(int iMuon, float wpB, float wpE)
+bool AlbertoUtil::isMvaMuon(int iMuon, float wp)
 {
-    if((fabs(muoEta->at( iMuon ))<1.2)&&(computeMuonMva(iMuon)>=wpB)) return true;
-    if((fabs(muoEta->at( iMuon ))>=1.2)&&(computeMuonMva(iMuon)>=wpE)) return true;
-
+    if(computeMuonMva(iMuon)>=wp) return true;
     return false;
 }
 

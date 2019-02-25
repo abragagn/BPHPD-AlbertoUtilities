@@ -67,7 +67,7 @@ protected:
     //PARAMETERS
     bool verbose, useHLT;
     TString outputFile;
-    float muonIdWpBarrel, muonIdWpEndcap;
+    float muonIdWp;
     TString process;
     TString muonMvaMethod;
     TString osMuonTagMvaMethod;

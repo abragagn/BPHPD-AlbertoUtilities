@@ -8,25 +8,19 @@
 //      -Add PDMuonVar and PDSoftMuonMvaEstimator as public virtual classes to class PDAnalyzer in PDAnalyzer.h
 //
 //      ---Definitions---
-
-//      BARREL <-> abs(muoEta)<1.2
-//      ENDCAP <-> abs(muoEta)>=1.2
-//      Methods trained with global muons with pT>2 GeV and abs(eta)<2.4 and basic quality cuts
 //
+//      Methods trained with global muons with pT>2 GeV and abs(eta)<2.4 and basic quality cuts
 //
 //      ---How to use the discriminator ---
 //
 //      0. You can find the weights in /lustre/cmswork/abragagn/mvaWeights/MvaMuonID/
 //      1. Initialize the discriminator in PDAnalyzer::beginJob with 'void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName)'
 //          -methodName should be in the form of prefix + year + variable flags (w = with, wo = without. The order is "IP" followed by "Iso")
-//              --e.g "DNNGlobal2016woIPwIso", but even "DNNGlobalBarrel2016woIPwIso" is accepted
+//              --e.g "DNNMuonIDFull2017woIPwIso"
 //      2. In PDAnalyzer::analyze compute the needed muon variables for each event with 'void computeMuonVar() 
 //          and fill the Cartesian coordinates vectors of muons, tracks, jet and pfcs
 //          e.g convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz);
 //      3. Compute the Mva response with 'float PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)'
-//          -- Remember that Barrel and Encap use completely different methods
-//
-//
 //
 //
 //      ---Possible output values---
@@ -53,7 +47,7 @@ PDSoftMuonMvaEstimator::PDSoftMuonMvaEstimator():
 PDSoftMuonMvaEstimator::~PDSoftMuonMvaEstimator() {}
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName, TString path = "/lustre/cmswork/abragagn/mvaWeights/MvaMuonID/")
+void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName = "DNNMuonIDFull2017woIPwIso", TString path = "/lustre/cmswork/abragagn/mvaWeights/MvaMuonID/")
 {
     methodSetup(methodName, path);
 
@@ -81,16 +75,14 @@ void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName, TString
     muonMvaIdReader_.AddVariable( "muoVMuHits", &muoVMuHits_ );
     muonMvaIdReader_.AddVariable( "muoNumMatches", &muoNumMatches_ );
     muonMvaIdReader_.AddVariable( "muoQprod", &muoQprod_ );
-    if(useIp(methodNameBarrel_)){
+    if(useIp(methodName_)){
         muonMvaIdReader_.AddVariable( "trkDxy/trkExy", &trkDxy_ );
         muonMvaIdReader_.AddVariable( "trkDz/trkEz", &trkDz_ );
     }
-    if(useIso(methodNameBarrel_)) muonMvaIdReader_.AddVariable( "muoPFiso", &muoPFiso_ );
-
+    if(useIso(methodName_)) muonMvaIdReader_.AddVariable( "muoPFiso", &muoPFiso_ );
     muonMvaIdReader_.AddSpectator( "muoEvt", &DUMMY_ );
 
-    muonMvaIdReader_.BookMVA( methodNameBarrel_, weightFileBarrel_ );
-    muonMvaIdReader_.BookMVA( methodNameEndcap_, weightFileEndcap_ );
+    muonMvaIdReader_.BookMVA( methodName_, weightFile_ );
 
     return;
 }
@@ -138,7 +130,6 @@ void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon)
     if(betaCorr>0) PFIso+=betaCorr;
 
     muoPFiso_ = PFIso;
-
     muoQprod_ = muoQprod->at(iMuon);
 
     return;
@@ -173,7 +164,7 @@ float PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)
         return -2;
     }
 
-    return (abs(muoEta->at( iMuon ))<1.2) ? muonMvaIdReader_.EvaluateMVA(methodNameBarrel_) : muonMvaIdReader_.EvaluateMVA(methodNameEndcap_);
+    return muonMvaIdReader_.EvaluateMVA(methodName_);
 }
 
 // =====================================================================================
@@ -293,20 +284,7 @@ void PDSoftMuonMvaEstimator::methodSetup(TString methodName, TString path)
     if(methodName.Contains("2017")) year = "2017";
     if(methodName.Contains("2018")) year = "2018";
 
-    if(useIp(methodName)) var += "wIP"; 
-        else var += "woIP";
-    if(useIso(methodName)) var += "wIso"; 
-        else var += "woIso";
-
-    TString name( methodName( 0, methodName.Index(year) ) );
-
-    if(methodName.Contains("Barrel") || methodName.Contains("Endcap")) name.Remove(name.Length() - 6, 6);
-
-    weightFileBarrel_ = path + year + "/" + "TMVAClassification_" + name + "Barrel" + year + var + ".weights.xml";
-    weightFileEndcap_ = path + year + "/" + "TMVAClassification_" + name + "Endcap" + year + var + ".weights.xml";
-
-    methodNameBarrel_ = methodNameFromWeightName(weightFileBarrel_);
-    methodNameEndcap_ = methodNameFromWeightName(weightFileEndcap_);
-
+    weightFile_ = path + year + "/" + "TMVAClassification_" + methodName + ".weights.xml";
+    methodName_ = methodName;
     return;
 }

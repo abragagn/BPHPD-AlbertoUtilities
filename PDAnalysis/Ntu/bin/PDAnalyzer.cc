@@ -39,10 +39,9 @@ PDAnalyzer::PDAnalyzer() {
 
     setUserParameter( "outputFile", "ntu.root" );
 
-    setUserParameter( "muonIdWpBarrel", "0.8910" ); 
-    setUserParameter( "muonIdWpEndcap", "0.8925" ); 
+    setUserParameter( "muonIdWp", "0.35" ); 
 
-    setUserParameter( "muonMvaMethod",      "BDTMuonID2017woIPwIso" ); 
+    setUserParameter( "muonMvaMethod",      "DNNMuonIDFull2017woIPwIso" ); 
     setUserParameter( "osMuonTagMvaMethod", "DNNOsMuonHLTJpsiMu_test241" ); 
 
     setUserParameter( "ptCut", "40.0" ); //needed for paolo's code (no influence in the code whatsoever)
@@ -71,8 +70,7 @@ void PDAnalyzer::beginJob() {
 
     getUserParameter( "outputFile", outputFile );
 
-    getUserParameter( "muonIdWpBarrel", muonIdWpBarrel ); 
-    getUserParameter( "muonIdWpEndcap", muonIdWpEndcap ); 
+    getUserParameter( "muonIdWp", muonIdWp ); 
 
     getUserParameter( "muonMvaMethod", muonMvaMethod );
     getUserParameter( "osMuonTagMvaMethod", osMuonTagMvaMethod );

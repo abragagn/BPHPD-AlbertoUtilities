@@ -30,8 +30,7 @@ public:
 
 protected:
     
-    TString methodNameBarrel_, methodNameEndcap_;
-    TString weightFileBarrel_, weightFileEndcap_;
+    TString methodName_, weightFile_;
 
 private:
     void computeMvaVariables(int iMuon);
@@ -68,7 +67,6 @@ private:
     float muoGNchi2_;
     float muoVMuHits_;
     float muoNumMatches_;
-
 
     float trkDxy_;
     float trkDz_;

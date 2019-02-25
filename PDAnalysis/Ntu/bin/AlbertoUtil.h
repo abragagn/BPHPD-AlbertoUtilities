@@ -122,7 +122,7 @@ public:
     float GetMuoPFiso (int iMuon);
     float GetJetCharge(int iJet, float kappa);
     float GetListCharge(std::vector <int> *list, float kappa);
-    bool isMvaMuon(int iMuon, float wpB, float wpE);
+    bool isMvaMuon(int iMuon, float wp);
     int IPsign(int iMuon);
     int IPsign(int iMuon, int iPV);
     float GetJetProbb(int iJet);

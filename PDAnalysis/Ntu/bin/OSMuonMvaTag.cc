@@ -11,8 +11,7 @@ OSMuonMvaTag::OSMuonMvaTag():
 ,               osMuonIndex_(-1)
 ,               osMuonTrackIndex_(-1)
 ,               osMuonTagMvaValue_(-1)
-,               wpB_(0.)
-,               wpE_(0.)
+,               wp_(0.)
 ,               dzCut_(1.)
 ,               nMuonsSel_(0)
 {}
@@ -36,10 +35,9 @@ void OSMuonMvaTag::setWeights(TString methodName, TString path)
     methodName_ = methodName;
 }
 
-void OSMuonMvaTag::setOsMuonCuts(float wpB = 0., float wpE = 0., float dzCut = 1.)
+void OSMuonMvaTag::setOsMuonCuts(float wp = 0., float dzCut = 1.)
 {
-    wpB_ = wpB;
-    wpE_ = wpE;
+    wp_ = wp;
     dzCut_ = dzCut;
 }
 
@@ -126,7 +124,7 @@ int OSMuonMvaTag::getOsMuon()
 
         if(muoPt->at( iMuon ) < 2.) continue;
         if(fabs(muoEta->at( iMuon )) > 2.4) continue;
-        if(!isMvaMuon(iMuon, wpB_, wpE_)) continue;
+        if(!isMvaMuon(iMuon, wp_)) continue;
         if(fabs(dZ(itkmu, iPV)) > dzCut_) continue;
         if(deltaR(tB.Eta(), tB.Phi(), muoEta->at(iMuon), muoPhi->at(iMuon)) < 0.4) continue;
         //if(GetMuoPFiso(iMuon) > PFIsoCut_)  continue;
