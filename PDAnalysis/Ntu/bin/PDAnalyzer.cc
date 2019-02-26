@@ -40,8 +40,6 @@ PDAnalyzer::PDAnalyzer() {
     setUserParameter( "outputFile", "ntu.root" );
 
     setUserParameter( "muonIdWp", "0.35" ); 
-
-    setUserParameter( "muonMvaMethod",      "DNNMuonIDFull2017woIPwIso" ); 
     setUserParameter( "osMuonTagMvaMethod", "DNNOsMuonHLTJpsiMu_test241" ); 
 
     setUserParameter( "ptCut", "40.0" ); //needed for paolo's code (no influence in the code whatsoever)
@@ -71,8 +69,6 @@ void PDAnalyzer::beginJob() {
     getUserParameter( "outputFile", outputFile );
 
     getUserParameter( "muonIdWp", muonIdWp ); 
-
-    getUserParameter( "muonMvaMethod", muonMvaMethod );
     getUserParameter( "osMuonTagMvaMethod", osMuonTagMvaMethod );
 
     getUserParameter( "ptCut", ptCut ); //needed for paolo's code (no influence in the code whatsoever)
@@ -83,7 +79,7 @@ void PDAnalyzer::beginJob() {
 
     setOsMuonCuts(muonIdWpBarrel, muonIdWpEndcap, 1. ); //set wp for muonID and Dz cut
 
-    inizializeMuonMvaReader( muonMvaMethod );           //initialize mva muon id
+    inizializeMuonMvaReader();           //initialize mva muon id
     inizializeOSMuonMvaTagReader( osMuonTagMvaMethod ); //inizialize mva os muon method
     bool osInit = inizializeOSMuonMvaMistagMethods();   //read os muon method for per-event-mistag
     if(!osInit) cout<<"METHOD NOT INIZIALIZATED. ABORT"<<endl;
