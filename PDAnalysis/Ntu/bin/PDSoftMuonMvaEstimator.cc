@@ -14,9 +14,7 @@
 //      ---How to use the discriminator ---
 //
 //      0. You can find the weights in /lustre/cmswork/abragagn/mvaWeights/MvaMuonID/
-//      1. Initialize the discriminator in PDAnalyzer::beginJob with 'void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName)'
-//          -methodName should be in the form of prefix + year + variable flags (w = with, wo = without. The order is "IP" followed by "Iso")
-//              --e.g "DNNMuonIDFull2017woIPwIso"
+//      1. Initialize the discriminator in PDAnalyzer::beginJob with 'void PDSoftMuonMvaEstimator::inizializeMuonMvaReader()'
 //      2. In PDAnalyzer::analyze compute the needed muon variables for each event with 'void computeMuonVar() 
 //          and fill the Cartesian coordinates vectors of muons, tracks, jet and pfcs
 //          e.g convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz);
@@ -30,8 +28,13 @@
 //      [0, 1] = mva discriminator response
 //
 //
-//      Author: Alberto Bragagnolo (alberto.bragagnolo@pd.infn.it)
-//      Based on the BMM4 soft muon ID developed by Stephan Wiederkehr (wistepha@phys.ethz.ch)
+//      ---Preselection efficienty for particle with pT>2 GeV and abs(eta)<2.4---
+//
+//          mu           --> %
+//          K, pi, p, e  --> %
+//
+//
+//      Author: Alberto Bragagnolo (alberto.bragagnolo@cern.ch)
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,7 +50,7 @@ PDSoftMuonMvaEstimator::PDSoftMuonMvaEstimator():
 PDSoftMuonMvaEstimator::~PDSoftMuonMvaEstimator() {}
 
 // =====================================================================================
-void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName = "DNNMuonIDFull2017woIPwIso", TString path = "/lustre/cmswork/abragagn/mvaWeights/MvaMuonID/")
+void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName = "DNNMuonID", TString path = "/lustre/cmswork/abragagn/mvaWeights/MvaMuonID/")
 {
     methodSetup(methodName, path);
 
@@ -181,26 +184,9 @@ bool PDSoftMuonMvaEstimator::useIso(TString methodName)
 }
 
 // =====================================================================================
-TString PDSoftMuonMvaEstimator::methodNameFromWeightName(TString weightsName)
-{
-    TString prefix = "TMVAClassification_";
-    int start = weightsName.Index(prefix) + prefix.Length();
-    int length = weightsName.Index(".weights") - start;
-    TString name( weightsName(start, length) );
-    return name;
-}
-
-// =====================================================================================
 void PDSoftMuonMvaEstimator::methodSetup(TString methodName, TString path)
 {
-    TString year = "";
-    TString var = "";
-
-    if(methodName.Contains("2016")) year = "2016";
-    if(methodName.Contains("2017")) year = "2017";
-    if(methodName.Contains("2018")) year = "2018";
-
-    weightFile_ = path + year + "/" + "TMVAClassification_" + methodName + ".weights.xml";
+    weightFile_ = path + "TMVAClassification_" + methodName + ".weights.xml";
     methodName_ = methodName;
     return;
 }

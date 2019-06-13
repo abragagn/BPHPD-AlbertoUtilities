@@ -32,7 +32,6 @@ protected:
 private:
     void computeMvaVariables(int iMuon);
     void methodSetup(TString methodName, TString path);
-    TString methodNameFromWeightName(TString weightname);
     bool useIso(TString methodName);
 
     TMVA::Reader muonMvaIdReader_;
