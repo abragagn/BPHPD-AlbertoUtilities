@@ -32,7 +32,8 @@ public:
     std::pair<float,float> getOsMuonTagMistagProb(int type);
 
     void    setSsForTag(int iB, int iPV) { ssIndex_ = iB; pvIndex_ = iPV;}
-    void    setOsMuonCuts(float wp, float dzCut);
+    void    setOsMuonMvaCut(float wp);
+    void    setOsMuonDzCut(float dzCut);
     void    inizializeOSMuonMvaTagReader(TString weightsFile, TString path);
     bool    inizializeOSMuonMvaMistagMethods(TString path, TString hltName, TString fitName, TString graphName);
 

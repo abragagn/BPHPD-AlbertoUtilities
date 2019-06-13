@@ -35,9 +35,13 @@ void OSMuonMvaTag::setWeights(TString methodName, TString path)
     methodName_ = methodName;
 }
 
-void OSMuonMvaTag::setOsMuonCuts(float wp = 0., float dzCut = 1.)
+void OSMuonMvaTag::setOsMuonMvaCut(float wp = 0.)
 {
     wp_ = wp;
+}
+
+void OSMuonMvaTag::setOsMuonDzCut(float dzCut = 1.)
+{
     dzCut_ = dzCut;
 }
 
@@ -127,6 +131,7 @@ int OSMuonMvaTag::getOsMuon()
         if(!isMvaMuon(iMuon, wp_)) continue;
         if(fabs(dZ(itkmu, iPV)) > dzCut_) continue;
         if(deltaR(tB.Eta(), tB.Phi(), muoEta->at(iMuon), muoPhi->at(iMuon)) < 0.4) continue;
+        if(TMath::IsNaN(trkDxy->at(itkmu))) continue;
         //if(GetMuoPFiso(iMuon) > PFIsoCut_)  continue;
 
         nMuonsSel_++;

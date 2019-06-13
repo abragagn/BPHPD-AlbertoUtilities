@@ -70,6 +70,7 @@ int AlbertoUtil::GetClosestGen( float eta, float phi, float pt )
 
     return best;
 }
+
 // =====================================================================================
 int AlbertoUtil::GetOverlappedTrack( int trk, vector <int> *List )
 {
@@ -91,11 +92,12 @@ int AlbertoUtil::GetOverlappedTrack( int trk, vector <int> *List )
 
     return best;
 }
+
 // =====================================================================================
 bool AlbertoUtil::AreOverlapped( float pt1, float eta1, float phi1, float pt2, float eta2, float phi2 )
 {
-    double drb = 0.1;
-    double dpb = 0.1; 
+    double drb = 0.01;
+    double dpb = 0.05; 
 
     float dr = deltaR(eta1, phi1, eta2, phi2);
     float dpt = fabs(pt1 - pt2)/pt1;
@@ -105,6 +107,7 @@ bool AlbertoUtil::AreOverlapped( float pt1, float eta1, float phi1, float pt2, f
 
     return true;
 }
+
 // =====================================================================================
 int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector <int> *GenList ) 
 {
@@ -140,24 +143,25 @@ int AlbertoUtil::GetAncestor( uint iGen, vector <int> *GenList )
 }
 
 // =====================================================================================
-int AlbertoUtil::WhichMuon(int trk)
+int AlbertoUtil::MuonFromTrack(int trk)
 {
     for( int iMuon = 0; iMuon<nMuons; ++iMuon){
        if(muonTrack( iMuon, PDEnumString::muInner ) == trk) return iMuon;
     }
     return -1;
 }
+
 // =====================================================================================
 float AlbertoUtil::GetGenCT( uint genIndex ) 
 {
     const vector <int>& aD = allDaughters(genIndex);
-    if( aD.size() == 0 ) return -1 ;
+    if( aD.size() == 0 ) return -1;
 
     uint mthIndex = aD[0];
 
     if( genId->at( genIndex ) == - genId->at(genMother->at(genIndex)) ) mthIndex = genMother->at(genIndex ); 
  
-    TLorentzVector pGen ;
+    TLorentzVector pGen;
     pGen.SetPtEtaPhiM( (double) genPt->at(genIndex), (double) genEta->at(genIndex),
          (double) genPhi->at(genIndex), (double) genMass->at(genIndex) );
 
@@ -386,7 +390,6 @@ int AlbertoUtil::GetBestBdownTight()
             TLorentzVector a;
             a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
             tB += a;
-
         }
 
         //Bd
@@ -411,14 +414,12 @@ int AlbertoUtil::GetBestJpsi()
     int index = -1;
     float bestChi2 = 1e9;
     for( int i=0; i<nSVertices; ++i ){
-
         if((svtType->at(i)!=PDEnumString::svtJPsi) ) continue;
         if( fabs(svtMass->at(i)-MassJPsi) > MassRangeJPsi) continue;
 
         if( svtChi2->at(i)>bestChi2 ) continue;
         index = i;
         bestChi2 = svtChi2->at(i);
-
     }
     return index;
 }
@@ -426,7 +427,6 @@ int AlbertoUtil::GetBestJpsi()
 // ========================================================================================
 float AlbertoUtil::GetInvMass(int i1, int i2, float mass1, float mass2)
 {
-
     float px1=trkPx->at(i1);
     float px2=trkPx->at(i2);
     float py1=trkPy->at(i1);
@@ -454,14 +454,13 @@ int AlbertoUtil::TagMixStatus( uint genindex )
     if( aM.size()>0 && genId->at(aM[0]) == -Code ) return 1;
 
     return 0;
- 
 }
 
 // ========================================================================================
 float AlbertoUtil::GetMuoPFiso (int iMuon)
 {
     float PFIso = muoSumCPpt->at(iMuon)/muoPt->at(iMuon);
-    float betaCorr = muoSumNHet->at(iMuon) + muoSumPHet->at(iMuon)-0.5*(muoSumPUpt->at(iMuon));
+    float betaCorr = muoSumNHet->at(iMuon)+muoSumPHet->at(iMuon)-0.5*(muoSumPUpt->at(iMuon));
     betaCorr/=muoPt->at(iMuon);
     if(betaCorr>0) PFIso+=betaCorr;
 
@@ -469,7 +468,7 @@ float AlbertoUtil::GetMuoPFiso (int iMuon)
 }
 
 // ========================================================================================
-bool AlbertoUtil::isMvaMuon(int iMuon, float wp)
+bool AlbertoUtil::IsMvaMuon(int iMuon, float wp)
 {
     if(computeMuonMva(iMuon)>=wp) return true;
     return false;
@@ -498,6 +497,7 @@ float AlbertoUtil::GetJetCharge(int iJet, float kappa)
 
     return QJet; 
 }
+
 // =====================================================================================
 float AlbertoUtil::GetListCharge(vector <int> *list, float kappa)
 {
@@ -511,33 +511,33 @@ float AlbertoUtil::GetListCharge(vector <int> *list, float kappa)
 }
 
 // =====================================================================================
-int AlbertoUtil::IPsign(int iMuon)
-{
-    return IPsign_(iMuon);
-}
-// =====================================================================================
-int AlbertoUtil::IPsign(int iMuon, int iPV)
-{
-
-    return IPsign_(iMuon, iPV);
-}
-
-// =====================================================================================
 float AlbertoUtil::GetJetProbb(int iJet)
 {
-    float jetdfprob = 0;
-    int iTagType = 0;
+    float probb = 0;
+    float probbb = 0;
+    float problepb = 0;
     for(int iTag=0; iTag<nTags; ++iTag){
-       if(tagJet->at(iTag) != iJet) continue;
-       ++iTagType;
-       if((iTagType == 4) || (iTagType == 5)) jetdfprob += tagProb->at(iTag); 
+        if(tagJet->at(iTag) != iJet) continue;
+        if(tagType->at(iTag) == PDEnumString::pfDeepFlavourJetTags_probb){
+            probb = tagProb->at(iTag);
+            continue;
+        }
+        if(tagType->at(iTag) == PDEnumString::pfDeepFlavourJetTags_probbb){
+            probbb = tagProb->at(iTag);
+            continue;
+        }
+        if(tagType->at(iTag) == PDEnumString::pfDeepFlavourJetTags_problepb){
+            problepb = tagProb->at(iTag);
+            break;
+        }
     }
-    return jetdfprob;
+    return probb + probbb + problepb;
 }
+
 // =====================================================================================
 float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
 {
-    ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls( 10000 );
+    //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls( 10000 );
 
     float mean=MassBs;
     if(process=="BsJPsiPhi")   mean=MassBs;
@@ -550,9 +550,7 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
     TString sgnDef = "[1]*TMath::Gaus(x, [0], [4], true)";
     sgnDef +=       "+[2]*TMath::Gaus(x, [0], [5], true)";
     sgnDef +=       "+[3]*TMath::Gaus(x, [0], [6], true)";
-    TString bkgDef = "[7]+[8]*TMath::Erfc([9]*(x-[10]))";
-
-    if(hist->GetEntries()<=250) bkgDef = "[7]";
+    TString bkgDef = "[7]+[8]*x";
 
     TString funcDef = sgnDef + "+" + bkgDef;
 
@@ -577,34 +575,22 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
     func->SetParLimits(6, sigma/2, sigma*2);
 
     //BKG
-    float bkgHeight = 0.;
-    int nBinsBkgEst = 7;
-    for(int i=0; i<nBinsBkgEst; i++)
-        bkgHeight += hist->GetBinContent(hist->GetNbinsX()-i);
-    bkgHeight /= nBinsBkgEst;
-
-    func->SetParameter(7, bkgHeight);
-    if(hist->GetEntries()>250){
-        func->SetParameter(8, hist->GetBinContent(1)/2);
-        func->SetParameter(9, 10);
-        func->SetParameter(10, 5);
-        func->SetParLimits(7, 0, bkgHeight*2);
-        func->SetParLimits(8, 0, hist->GetBinContent(1));
-    }
-    
+    func->SetParameter(7, 1);
+    func->SetParameter(8, 100);
 
     hist->Fit("func","MRLQ");
 
-    TF1 *fit = hist->GetFunction("func");
+    TF1 *fit = hist->GetFunction("MRLSQ");
 
     float nEvt = fit->GetParameter(1);
     nEvt += fit->GetParameter(2);
     nEvt += fit->GetParameter(3);
 
-    nEvt/=hist->GetBinWidth(0);
+    nEvt/=hist->GetBinWidth(1);
 
     return nEvt;
 }
+
 // =====================================================================================
 int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 {
@@ -632,11 +618,12 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 
     return ssPV;
 }
+
 // =====================================================================================
 TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
 {
     int iJPsi = (subVtxFromSV(iSvt)).at(0);
-    vector <int> tkJpsi = tracksFromSV(iJPsi) ;
+    vector <int> tkJpsi = tracksFromSV(iJPsi);
     vector <int> tkSsB = tracksFromSV(iSvt);
     TLorentzVector t(0,0,0,0);
 
@@ -651,6 +638,7 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
 
     return t;
 }
+
 // =====================================================================================
 int AlbertoUtil::GetTightCandidate(TString process)
 {
@@ -658,6 +646,7 @@ int AlbertoUtil::GetTightCandidate(TString process)
     if(process=="BuJPsiK") return GetBestBupTight();
     return -1;
 }
+
 // =====================================================================================
 int AlbertoUtil::GetCandidate(TString process)
 {
@@ -665,35 +654,32 @@ int AlbertoUtil::GetCandidate(TString process)
     if(process=="BuJPsiK") return GetBestBup();
     return -1;
 }
+
 // =====================================================================================
 float AlbertoUtil::dZ(int itk, int iPV)
 {
     return PDAnalyzerUtil::dZ(itk, pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV));
 }
+
 // =====================================================================================
 float AlbertoUtil::dXYjet(int itk, int iPV, int iJet)
 {
     return fabs(dXY( itk, pvtX->at(iPV), pvtY->at(iPV) ))*dSign( itk, iJet, pvtX->at(iPV), pvtY->at(iPV) );
 }
-// =====================================================================================
-float AlbertoUtil::GetMuonSignedDxy(int iMuon, int iPV)
-{
-    float dxy = dXY( muonTrack( iMuon, PDEnumString::muInner ), pvtX->at(iPV), pvtY->at(iPV) );
-    int sign = IPsign(iMuon, iPV);
-    return fabs(dxy)*sign;
-}
+
 // =================================================================================================
-void AlbertoUtil::printMotherChain(int iGen)
+void AlbertoUtil::PrintMotherChain(int iGen)
 {
     cout<<genId->at(iGen)<<" << ";
     const vector <int>& vM = allMothers(iGen);
     uint nmot = vM.size();
     if(nmot>1) for(uint im=0; im<nmot; ++im) if(genId->at(vM[im])!=21) cout<<genId->at(vM[im])<<" ";
-    if(nmot==1) printMotherChain(vM[0]);
+    if(nmot==1) PrintMotherChain(vM[0]);
     return;
 }
+
 // =================================================================================================
-void AlbertoUtil::printDaughterTree(int iGen, const string & pre)
+void AlbertoUtil::PrintDaughterTree(int iGen, const string & pre)
 {
     cout<<genId->at(iGen)<<endl;
 
@@ -703,7 +689,7 @@ void AlbertoUtil::printDaughterTree(int iGen, const string & pre)
 
     bool lastLevel = true;
     for(uint id =0; id<ndau; ++id){
-        if ( hasDaughter( vD[id] ) ) {
+        if ( HasDaughter( vD[id] ) ) {
             lastLevel = false;
             break;
         }
@@ -719,17 +705,18 @@ void AlbertoUtil::printDaughterTree(int iGen, const string & pre)
         return;
     }
 
-  for( uint id=0; id<ndau; ++id ) {
-    int d = vD[id];
-    cout<<pre<< "+-> ";
-    string prepre(pre);
-    if ( id == ndau - 1 ) prepre += "    ";
-    else prepre += "|   ";
-    printDaughterTree( d, prepre );
-  }
+    for( uint id=0; id<ndau; ++id ) {
+        int d = vD[id];
+        cout<<pre<< "+-> ";
+        string prepre(pre);
+        if ( id == ndau - 1 ) prepre += "    ";
+        else prepre += "|   ";
+        PrintDaughterTree( d, prepre );
+    }
 }
+
 // =================================================================================================
-void AlbertoUtil::printDaughterTreePt(int iGen, const string & pre)
+void AlbertoUtil::PrintDaughterTreePt(int iGen, const string & pre)
 {
     cout<<genId->at(iGen)<<" ["<<genPt->at(iGen)<<"]"<<endl;
 
@@ -739,7 +726,7 @@ void AlbertoUtil::printDaughterTreePt(int iGen, const string & pre)
 
     bool lastLevel = true;
     for(uint id =0; id<ndau; ++id){
-        if ( hasDaughter( vD[id] ) ) {
+        if ( HasDaughter( vD[id] ) ) {
             lastLevel = false;
             break;
         }
@@ -761,19 +748,20 @@ void AlbertoUtil::printDaughterTreePt(int iGen, const string & pre)
     string prepre(pre);
     if ( id == ndau - 1 ) prepre += "    ";
     else prepre += "|   ";
-    printDaughterTreePt( d, prepre );
+    PrintDaughterTreePt( d, prepre );
   }
 }
+
 // =================================================================================================
-bool AlbertoUtil::hasDaughter(int iGen)
+bool AlbertoUtil::HasDaughter(int iGen)
 {
     const vector <int>& vD = allDaughters(iGen);
     return vD.size()>0 ? true : false;
 }
+
 // =================================================================================================
 float AlbertoUtil::GetCt2D(TLorentzVector t, int iSV)
 {
-
     TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
     TVector3 vPV( bsX, bsY, 0. );
 
@@ -806,6 +794,7 @@ float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
 
     return MassBs/t.P() * vPointing.Dot(vBs)/vBs.Mag();
 }
+
 // =================================================================================================
 /*float AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV)
 {
@@ -900,6 +889,7 @@ float AlbertoUtil::GetCt3DErr(TLorentzVector t, int iSV, int iPV)
 
     return MassBs/t.P() * sqrt(covTot.Similarity(diff)) / sqrt(diff.Norm2Sqr()); 
 }
+
 // =================================================================================================
 void AlbertoUtil::SetJpsiMuCut()
 {
@@ -908,6 +898,7 @@ void AlbertoUtil::SetJpsiMuCut()
     SetBmuptCut(3.5);
     SetBkptCut(1.2);
 }
+
 // =================================================================================================
 void AlbertoUtil::SetJpsiTrkTrkCut()
 {

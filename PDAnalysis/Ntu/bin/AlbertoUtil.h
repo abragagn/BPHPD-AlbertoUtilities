@@ -102,7 +102,7 @@ public:
     int GetOverlappedTrack( int trk, std::vector <int> *List );
     bool AreOverlapped( float pt1, float eta1, float phi1, float pt2, float eta2, float phi2 );
     int GetAncestor( unsigned int iGen, std::vector <int> *GenList );
-    int WhichMuon(int trk);
+    int MuonFromTrack(int trk);
     float GetGenCT( unsigned int genIndex );
 
     int GetBestBstrange();
@@ -122,20 +122,18 @@ public:
     float GetMuoPFiso (int iMuon);
     float GetJetCharge(int iJet, float kappa);
     float GetListCharge(std::vector <int> *list, float kappa);
-    bool isMvaMuon(int iMuon, float wp);
-    int IPsign(int iMuon);
+    bool IsMvaMuon(int iMuon, float wp);
     int IPsign(int iMuon, int iPV);
     float GetJetProbb(int iJet);
     float CountEventsWithFit(TH1 *hist, TString process);
     int GetBestPV(int isvt, TLorentzVector t);
-    float GetMuonSignedDxy(int iMuon, int iPV);
     TLorentzVector GetTLorentzVecFromJpsiX(int iSvt);
     float dZ(int itk, int iPV);
     float dXYjet(int itk, int iPV, int iJet);
-    void printMotherChain(int iGen);
-    void printDaughterTree(int iGen, const std::string & pre);
-    void printDaughterTreePt(int iGen, const std::string & pre);
-    bool hasDaughter(int iGen);
+    void PrintMotherChain(int iGen);
+    void PrintDaughterTree(int iGen, const std::string & pre);
+    void PrintDaughterTreePt(int iGen, const std::string & pre);
+    bool HasDaughter(int iGen);
 
     float GetCt2D(TLorentzVector t, int iSV);
     float GetCt2D(TLorentzVector t, int iSV, int iPV);

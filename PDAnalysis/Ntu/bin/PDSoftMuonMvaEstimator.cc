@@ -52,7 +52,7 @@ void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName = "DNNMu
     methodSetup(methodName, path);
 
     muonMvaIdReader_.AddVariable( "muoPt", &muoPt_ );
-    muonMvaIdReader_.AddVariable( "abs(muoEta)", &absMuoEta_ );
+    muonMvaIdReader_.AddVariable( "muoEta", &muoEta_ );
     muonMvaIdReader_.AddVariable( "muoSegmComp", &muoSegmComp_ );
     muonMvaIdReader_.AddVariable( "muoChi2LM", &muoChi2LM_ );
     muonMvaIdReader_.AddVariable( "muoChi2LP", &muoChi2LP_ );
@@ -75,10 +75,6 @@ void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName = "DNNMu
     muonMvaIdReader_.AddVariable( "muoVMuHits", &muoVMuHits_ );
     muonMvaIdReader_.AddVariable( "muoNumMatches", &muoNumMatches_ );
     muonMvaIdReader_.AddVariable( "muoQprod", &muoQprod_ );
-    if(useIp(methodName_)){
-        muonMvaIdReader_.AddVariable( "trkDxy/trkExy", &trkDxy_ );
-        muonMvaIdReader_.AddVariable( "trkDz/trkEz", &trkDz_ );
-    }
     if(useIso(methodName_)) muonMvaIdReader_.AddVariable( "muoPFiso", &muoPFiso_ );
     muonMvaIdReader_.AddSpectator( "muoEvt", &DUMMY_ );
 
@@ -91,12 +87,10 @@ void PDSoftMuonMvaEstimator::inizializeMuonMvaReader(TString methodName = "DNNMu
 // =====================================================================================
 void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon)
 {
-    int itkmu = muonTrack( iMuon, PDEnumString::muInner );
-
     DUMMY_ = -1;
 
     muoPt_ = muoPt->at(iMuon);
-    absMuoEta_ = abs(muoEta->at(iMuon));
+    muoEta_ = muoEta->at(iMuon);
 
     muoSegmComp_ = muoSegmComp->at(iMuon);
     muoChi2LM_ = muoChi2LM->at(iMuon);
@@ -120,9 +114,6 @@ void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon)
     muoGNchi2_ = muoGNchi2->at(iMuon);
     muoVMuHits_ = muoVMuHits->at(iMuon);
     muoNumMatches_ = muoNumMatches->at(iMuon);
-
-    trkDxy_ = (abs(trkDxy->at(itkmu)) * IPsign_(iMuon)) / trkExy->at(itkmu);
-    trkDz_ = trkDz->at(itkmu) / trkEz->at(itkmu);
 
     float PFIso = muoSumCPpt->at(iMuon)/muoPt->at(iMuon);
     float betaCorr = muoSumNHet->at(iMuon) + muoSumPHet->at(iMuon)-0.5*(muoSumPUpt->at(iMuon));
@@ -170,92 +161,17 @@ float PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)
 // =====================================================================================
 bool PDSoftMuonMvaEstimator::muonPassedPreselection(int iMuon)
 {
-    if ( muoChi2LM->at( iMuon ) > 5000 ) {return false;}
-    if ( muoChi2LP->at( iMuon ) > 2000 ) {return false;}
-    if ( muoGlbTrackTailProb->at( iMuon ) > 5000 ) {return false;}
-    if ( muoTrkKink->at( iMuon ) > 900 ) {return false;}
-    if ( muoGlbKinkFinderLOG->at( iMuon ) > 50 ) {return false;}
-    if ( muoTimeAtIpInOutErr->at( iMuon ) > 4 ) {return false;}
-    if ( muoOuterChi2->at( iMuon ) > 1000 ) {return false;}
-    if ( muoInnerChi2->at( iMuon ) > 10 ) {return false;}
-    if ( muoTrkRelChi2->at( iMuon ) > 3 ) {return false;}
+    if ( muoChi2LM->at( iMuon ) > 5000 ) return false;
+    if ( muoChi2LP->at( iMuon ) > 2000 ) return false;
+    if ( muoGlbTrackTailProb->at( iMuon ) > 5000 ) return false;
+    if ( muoTrkKink->at( iMuon ) > 900 ) return false;
+    if ( muoGlbKinkFinderLOG->at( iMuon ) > 50 ) return false;
+    if ( muoTimeAtIpInOutErr->at( iMuon ) > 4 ) return false;
+    if ( muoOuterChi2->at( iMuon ) > 1000 ) return false;
+    if ( muoInnerChi2->at( iMuon ) > 10 ) return false;
+    if ( muoTrkRelChi2->at( iMuon ) > 3 ) return false;
 
     return true;
-}
-
-// =====================================================================================
-int PDSoftMuonMvaEstimator::IPsign_(int iMuon)
-{
-    int itkmu = muonTrack( iMuon, PDEnumString::muInner );
-    int ipftkmu = trkPFC->at(itkmu);
-    int IPsign = ((double)rand() / (RAND_MAX)) < 0.5 ? -1 : +1; //random value +-1
-
-    int iJet = trkJet->at(itkmu);
-    if(iJet<0 && ipftkmu>=0) iJet=pfcJet->at(ipftkmu);
-
-    if(iJet>=0){
-        IPsign = dSign(itkmu, jetPx->at( iJet ), jetPy->at( iJet ));
-    }else{
-        int coneNtrk = 0;
-        float pxCone = 0, pyCone = 0;
-
-        for(int ipf = 0; ipf<nPF; ++ipf){
-
-            if( deltaR(pfcEta->at(ipf), pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > 0.4 ) continue;
-            //if(std::find(signalTracks.begin(), signalTracks.end(), pfcTrk->at(ipf)) != signalTracks.end()) continue;
-            if(pfcTrk->at(ipf) == itkmu) continue;
-            if(pfcPt->at(ipf) < 0.2) continue;
-            if(abs(pfcEta->at(ipf)) > 2.5) continue;
-            //if( !(( trkQuality->at( itk ) >> 2 ) & 1) ) continue;
-            ++coneNtrk;
-            pxCone += pfcPt->at(ipf)*TMath::Cos(pfcPhi->at(ipf));
-            pyCone += pfcPt->at(ipf)*TMath::Sin(pfcPhi->at(ipf));
-
-        }
-
-        if(coneNtrk>=2) IPsign = dSign(itkmu, pxCone, pyCone);
-    }
-
-    return IPsign;
-}
-
-// =====================================================================================
-int PDSoftMuonMvaEstimator::IPsign_(int iMuon, int iPV)
-{
-    int itkmu = muonTrack( iMuon, PDEnumString::muInner );
-    int ipftkmu = trkPFC->at(itkmu);
-    int IPsign = ((double)rand() / (RAND_MAX)) < 0.5 ? -1 : +1; //random value +-1
-
-    int iJet = trkJet->at(itkmu);
-    if(iJet<0 && ipftkmu>=0) iJet=pfcJet->at(ipftkmu);
-
-    if(iJet>=0){
-        IPsign = dSign(itkmu, jetPx->at( iJet ), jetPy->at( iJet ), pvtX->at(iPV), pvtY->at(iPV));
-    }else{
-        int coneNtrk = 0;
-        float pxCone = 0, pyCone = 0;
-
-        for(int ipf = 0; ipf<nPF; ++ipf){
-
-            if( deltaR(pfcEta->at(ipf), pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > 0.4 ) continue;
-            if(pfcPt->at(ipf) < 0.2) continue;
-            if(abs(pfcEta->at(ipf)) > 2.5) continue;
-
-            ++coneNtrk;
-            pxCone += pfcPx->at(ipf);
-            pyCone += pfcPy->at(ipf);
-
-        }
-        if(coneNtrk>2) IPsign = dSign(itkmu, pxCone, pyCone, pvtX->at(iPV), pvtY->at(iPV));
-    }
-
-    return IPsign;
-}
-
-// =====================================================================================
-bool PDSoftMuonMvaEstimator::useIp(TString methodName)
-{
-    return !methodName.Contains("woIP");
 }
 
 // =====================================================================================

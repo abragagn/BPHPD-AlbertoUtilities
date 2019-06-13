@@ -25,9 +25,6 @@ public:
     void inizializeMuonMvaReader(TString methodName, TString path);
     float computeMuonMva(int iMuon);
     bool muonPassedPreselection(int iMuon);
-    int IPsign_(int iMuon);
-    int IPsign_(int iMuon, int iPV);
-
 protected:
     
     TString methodName_, weightFile_;
@@ -36,14 +33,13 @@ private:
     void computeMvaVariables(int iMuon);
     void methodSetup(TString methodName, TString path);
     TString methodNameFromWeightName(TString weightname);
-    bool useIp(TString methodName);
     bool useIso(TString methodName);
 
     TMVA::Reader muonMvaIdReader_;
 
     // MVA Variable
     float muoPt_;
-    float absMuoEta_;
+    float muoEta_;
 
     float muoSegmComp_;
     float muoChi2LM_;
@@ -67,9 +63,6 @@ private:
     float muoGNchi2_;
     float muoVMuHits_;
     float muoNumMatches_;
-
-    float trkDxy_;
-    float trkDz_;
 
     float muoPFiso_;
     float muoQprod_;
