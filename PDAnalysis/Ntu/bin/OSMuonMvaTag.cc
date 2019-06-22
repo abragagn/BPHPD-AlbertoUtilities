@@ -61,7 +61,7 @@ void OSMuonMvaTag::inizializeOSMuonMvaReader(
     osMuonTagReader_.AddVariable("muoConeCleanDr", &muoConeCleanDr_);
     osMuonTagReader_.AddVariable("muoConeCleanEnergyRatio", &muoConeCleanEnergyRatio_);
     osMuonTagReader_.AddVariable("muoConeCleanQ", &muoConeCleanQ_);
-    osMuonTagReader_.BookMVA( methodName_, methodPath + methodName_ + ".weights.xml" );
+    osMuonTagReader_.BookMVA( methodName_, methodPath + "TMVAClassification_" + methodName_ + ".weights.xml" );
 }
 
 bool OSMuonMvaTag::inizializeOSMuonCalibration( 
