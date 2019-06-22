@@ -5,13 +5,12 @@ using namespace std;
 
 OSMuonMvaTag::OSMuonMvaTag():
                 osMuonTagReader_("!Color:Silent")
-,               path_("/lustre/cmswork/abragagn/mvaWeights/OsMuonTag/")
 ,               ssIndex_(-1)
 ,               pvIndex_(-1)
 ,               osMuonIndex_(-1)
 ,               osMuonTrackIndex_(-1)
 ,               osMuonTagMvaValue_(-1)
-,               wp_(0.)
+,               wp_(0.21)
 ,               dzCut_(1.)
 ,               nMuonsSel_(0)
 {}
@@ -29,13 +28,7 @@ void OSMuonMvaTag::inizializeTagVariables()
     nMuonsSel_ = 0;
 }
 
-void OSMuonMvaTag::setWeights(TString methodName, TString path)
-{    
-    weightsFile_ = path + "/TMVAClassification_" + methodName  + ".weights.xml";
-    methodName_ = methodName;
-}
-
-void OSMuonMvaTag::setOsMuonMvaCut(float wp = 0.)
+void OSMuonMvaTag::setOsMuonMvaCut(float wp = 0.21)
 {
     wp_ = wp;
 }
@@ -45,60 +38,43 @@ void OSMuonMvaTag::setOsMuonDzCut(float dzCut = 1.)
     dzCut_ = dzCut;
 }
 
-void OSMuonMvaTag::inizializeOSMuonMvaTagReader(
-    TString methodName, 
-    TString path = "/lustre/cmswork/abragagn/mvaWeights/OsMuonTag/" )
+void OSMuonMvaTag::inizializeOSMuonMvaReader(
+    TString methodName = "DNNOsMuonHLTJpsiMu"
+,   TString methodPath = ""
+    )
 {
+    if(methodPath == "") methodPath = methodPath_;
     TMVA::PyMethodBase::PyInitialize();
-    setWeights(methodName, path);
+    methodName_ = methodName;
 
     osMuonTagReader_.AddVariable("muoPt", &muoPt_);
-    osMuonTagReader_.AddVariable("abs_muoEta := fabs(muoEta)", &absmuoEta_);
+    osMuonTagReader_.AddVariable("muoEta", &muoEta_);
     osMuonTagReader_.AddVariable("muoDxy", &muoDxy_);
-    osMuonTagReader_.AddVariable("abs_muoDz := fabs(muoDz)", &absmuoDz_);
+    osMuonTagReader_.AddVariable("muoExy", &muoExy_);
+    osMuonTagReader_.AddVariable("muoDz", &muoDz_);
+    osMuonTagReader_.AddVariable("muoEz", &muoEz_);
     osMuonTagReader_.AddVariable("muoSoftMvaValue", &muoSoftMvaValue_);
     osMuonTagReader_.AddVariable("muoDrB", &muoDrB_);
     osMuonTagReader_.AddVariable("muoPFIso", &muoPFIso_);
-    osMuonTagReader_.AddVariable("muoJetConePt := muoJetPt != -1 ? muoJetPt : muoConePt", &muoJetConePt_);
-    osMuonTagReader_.AddVariable("muoJetConePtRel := muoJetPt != -1 ? muoJetPtRel : muoConePtRel", &muoJetConePtRel_);
-    osMuonTagReader_.AddVariable("muoJetConeDr := muoJetPt != -1 ? muoJetDr : muoConeDr", &muoJetConeDr_);
-    osMuonTagReader_.AddVariable("muoJetConeEnergyRatio := muoJetPt != -1 ? muoJetEnergyRatio : muoConeEnergyRatio", &muoJetConeEnergyRatio_);
-    osMuonTagReader_.AddVariable("muoJetDFprob", &muoJetDFprob_);
-    osMuonTagReader_.AddVariable("muoJetConeSize := muoJetPt != -1 ? muoJetSize : muoConeSize", &muoJetConeSize_);
-    osMuonTagReader_.AddVariable("muoJetConeQ := muoJetPt != -1 ? muoJetQ : muoConeQ", &muoJetConeQ_);
-    osMuonTagReader_.BookMVA( methodName_, weightsFile_ );
+    osMuonTagReader_.AddVariable("muoConeCleanPt", &muoConeCleanPt_);
+    osMuonTagReader_.AddVariable("muoConeCleanPtRel", &muoConeCleanPtRel_);
+    osMuonTagReader_.AddVariable("muoConeCleanDr", &muoConeCleanDr_);
+    osMuonTagReader_.AddVariable("muoConeCleanEnergyRatio", &muoConeCleanEnergyRatio_);
+    osMuonTagReader_.AddVariable("muoConeCleanQ", &muoConeCleanQ_);
+    osMuonTagReader_.BookMVA( methodName_, methodPath + methodName_ + ".weights.xml" );
 }
 
-bool OSMuonMvaTag::inizializeOSMuonMvaMistagMethods( 
-    TString path = "/lustre/cmswork/abragagn/mvaWeights/OsMuonTag/"
-,    TString hltName = "HltJpsiMu"    
-,    TString fitName = "fitErf"
-,    TString graphName = "pdfW_extended"
+bool OSMuonMvaTag::inizializeOSMuonCalibration( 
+    TString process = "BuJPsiKData2018"
+,   TString methodPath = ""  
 )
 {
-    //CAT
-    std::ifstream ifs(path + "OSMuonTagger" + hltName + "Categories.txt", std::ifstream::in);
-    if(!ifs.is_open()) return false;
-    ifs >> methodName_;
-    ifs >> nCat_;
-    catEdgeL_     = new float[nCat_];
-    catEdgeR_     = new float[nCat_];
-    catMistag_    = new float[nCat_];
-    catMistagErr_ = new float[nCat_];
-    for(int i=0; i<nCat_; ++i){
-        ifs >> catEdgeL_[i];
-        ifs >> catEdgeR_[i];
-        ifs >> catMistag_[i];
-        ifs >> catMistagErr_[i];
-    }
-    ifs.close();
-
-    //FIT
-    auto *f = new TFile(path + "OSMuonTagger" + hltName + "Functions.root");
+    if(methodPath == "") methodPath = methodPath_;
+    auto *f = new TFile(methodPath + "OSMuonTaggerCalibration" + process + ".root");
     if(f->IsZombie()) return false;
     f->cd();
-    perEvtWfit_ = (TF1*)f->Get(fitName);
-    perEvtWgraph_ = (TGraph*)f ->Get(graphName); //KDE
+    wCal_ = (TF1*)f->Get("osMuonCal");
+    f->Close();
     delete f;
     return true;  
 }
@@ -128,10 +104,9 @@ int OSMuonMvaTag::getOsMuon()
 
         if(muoPt->at( iMuon ) < 2.) continue;
         if(fabs(muoEta->at( iMuon )) > 2.4) continue;
-        if(!isMvaMuon(iMuon, wp_)) continue;
+        if(!IsMvaMuon(iMuon, wp_)) continue;
         if(fabs(dZ(itkmu, iPV)) > dzCut_) continue;
         if(deltaR(tB.Eta(), tB.Phi(), muoEta->at(iMuon), muoPhi->at(iMuon)) < 0.4) continue;
-        if(TMath::IsNaN(trkDxy->at(itkmu))) continue;
         //if(GetMuoPFiso(iMuon) > PFIsoCut_)  continue;
 
         nMuonsSel_++;
@@ -157,98 +132,78 @@ void OSMuonMvaTag::computeVariables()
     int itkmu = muonTrack( iMuon, PDEnumString::muInner );
     TLorentzVector tB = GetTLorentzVecFromJpsiX(iB);
     vector <int> tkSsB = tracksFromSV(iB);
+
+    TLorentzVector tConeClean(0.,0.,0.,0.), tMu;
+    tMu.SetPtEtaPhiM(muoPt->at(iMuon),muoEta->at(iMuon),muoPhi->at(iMuon),MassMu);
+
     float kappa = 1;
-    float drCharge = 0.4;
+    float drCone = 0.4;
 
-    //JET VARIABLES
-    int iJet = trkJet->at(itkmu);
-    if(iJet<0 && trkPFC->at(itkmu)>=0) iJet=pfcJet->at(trkPFC->at(itkmu));  
-    TVector3 vMu(muoPx->at(iMuon), muoPy->at(iMuon), muoPz->at(iMuon));
-
-    float muoJetPtRel = -1;
-    float muoJetDr = -1;
-    float muoJetEnergyRatio = -1;
-    float muoJetDFprob = -1;
-    float muoJetSize = -1;
-    float muoJetQ = -1;
-    float muoJetPt = -1;
-
-    if(iJet>=0){
-        vector <int> jet_pfcs = pfCandFromJet( iJet );
-        TVector3 vJet(jetPx->at(iJet), jetPy->at(iJet), jetPz->at(iJet));
-        muoJetPt = jetPt->at(iJet);
-        muoJetDr = deltaR(jetEta->at(iJet), jetPhi->at(iJet), muoEta->at( iMuon ), muoPhi->at(iMuon));
-        muoJetEnergyRatio = muoE->at(iMuon) / jetE->at(iJet);
-        vJet -= vMu;
-        muoJetPtRel = muoPt->at( iMuon ) * (vMu.Unit() * vJet.Unit());
-        muoJetSize = jet_pfcs.size();
-        muoJetQ = GetJetCharge(iJet, kappa);
-        muoJetQ *= trkCharge->at(itkmu); 
-        muoJetDFprob = GetJetProbb(iJet);
-    }
-
-    //CONE VARIABLES
-    float muoConePtRel = -1;
-    float muoConeDr = -1;
-    float muoConeEnergyRatio = -1;
-    float muoConeSize = 0;
-    float muoConeQ = -1;
-    float muoConePt = -1;
-
-    TLorentzVector tCone, tMu;
-    tCone.SetPtEtaPhiM(0.,0.,0.,0.);
-    tMu.SetPtEtaPhiM(muoPt->at( iMuon ), muoEta->at( iMuon ), muoPhi->at( iMuon ), MassMu);
-    float qCone=0, ptCone=0;
+    float qConeClean = 0., ptConeClean = 0.;
+    float muoConeCleanNF = 0., muoConeCleanCF = 0;
+    int muoConeCleanNCH = 0;
 
     for(int ipf=0; ipf<nPF; ++ipf){
-        float pfpfc = pfcPt->at(ipf);
+        float ptpfc = pfcPt->at(ipf);
         float etapfc = pfcEta->at(ipf);
-        if( deltaR(etapfc, pfcPhi->at( ipf ), muoEta->at( iMuon ), muoPhi->at( iMuon )) > drCharge) continue;
+        if( deltaR(etapfc, pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > drCone) continue;
+        if(ptpfc < 0.5) continue;
+        if(fabs(etapfc) > 3.0) continue;
+        if(pfcCharge->at(ipf) == 0) continue;
         if(std::find(tkSsB.begin(), tkSsB.end(), pfcTrk->at(ipf)) != tkSsB.end()) continue;
-        if(pfpfc < 0.2) continue;
-        if(fabs(etapfc) > 2.5) continue;        
+        if(pfcTrk->at(ipf)<0) continue;
+        if(fabs(dZ(pfcTrk->at(ipf), iPV))>=1.0) continue;
+  
         TLorentzVector a;
         a.SetPxPyPzE(pfcPx->at(ipf), pfcPy->at(ipf), pfcPz->at(ipf), pfcE->at(ipf));
-        tCone += a;
-        ++muoConeSize;
-        qCone += pfcCharge->at(ipf) * pow(pfpfc, kappa);
-        ptCone += pow(pfpfc, kappa);
+        tConeClean += a;
+
+        qConeClean += pfcCharge->at(ipf) * pow(ptpfc, kappa);
+        ptConeClean += pow(ptpfc, kappa);
+
+        if(pfcCharge->at(ipf)==0) muoConeCleanNF += pfcE->at(ipf);
+        if(abs(pfcCharge->at(ipf))==1){
+            muoConeCleanNCH++;
+            muoConeCleanCF += pfcE->at(ipf);
+        }
     }
 
-    if(ptCone != 0) qCone /= ptCone;
-    else qCone = 1;
-    qCone *= trkCharge->at(itkmu);
+    if(ptConeClean != 0) qConeClean /= ptConeClean;
+    else qConeClean = 1;
+    qConeClean *= trkCharge->at(itkmu);
+    if(tConeClean.E()!=0){
+        muoConeCleanCF /= tConeClean.E();
+        muoConeCleanNF /= tConeClean.E();
+    }
 
-    muoConePt = tCone.Pt();
-    muoConeDr = deltaR(tCone.Eta(), tCone.Phi(), muoEta->at( iMuon ), muoPhi->at(iMuon));
-    muoConeEnergyRatio = muoE->at(iMuon) / tCone.E();
-    tCone -= tMu;
-    muoConePtRel = muoPt->at( iMuon ) * (tMu.Vect().Unit() * tCone.Vect().Unit());
-    muoConeQ = qCone;
+    muoConeCleanQ_ = qConeClean;
+    muoConeCleanPt_ = tConeClean.Pt();
+    muoConeCleanDr_ = deltaR(tConeClean.Eta(), tConeClean.Phi(), muoEta->at( iMuon ), muoPhi->at(iMuon));
+    if(tConeClean.E()!=0) muoConeCleanEnergyRatio_ = muoE->at(iMuon) / tConeClean.E();
+    else muoConeCleanEnergyRatio_ = 1;
 
-    DUMMY_ = -1;
-    muoPt_ = muoPt->at(iMuon);
-    absmuoEta_ = fabs(muoEta->at(iMuon));
-    muoDxy_= GetMuonSignedDxy(iMuon, iPV);
-    absmuoDz_= fabs(dZ(itkmu, iPV));
-    muoSoftMvaValue_= computeMuonMva(iMuon);
-    muoDrB_= deltaR(tB.Eta(), tB.Phi(), muoEta->at(iMuon), muoPhi->at(iMuon));
-    muoPFIso_= GetMuoPFiso(iMuon);
-    muoJetConePt_ = muoJetPt != -1 ? muoJetPt : muoConePt;
-    muoJetConePtRel_ = muoJetPt != -1 ? muoJetPtRel : muoConePtRel;
-    muoJetConeDr_ = muoJetPt != -1 ? muoJetDr : muoConeDr;
-    muoJetConeEnergyRatio_ = muoJetPt != -1 ? muoJetEnergyRatio : muoConeEnergyRatio;
-    muoJetDFprob_ = muoJetDFprob;
-    muoJetConeSize_ = muoJetPt != -1 ? muoJetSize : muoConeSize;
-    muoJetConeQ_ = muoJetPt != -1 ? muoJetQ : muoConeQ;
+    tConeClean -= tMu;
+    muoConeCleanPtRel_ = muoPt->at( iMuon ) * (tMu.Vect().Unit() * tConeClean.Vect().Unit());
+    tConeClean += tMu; // for IP sign
+
+    muoPt_ = muoPt->at( iMuon );
+    muoEta_ = muoEta->at( iMuon );
+    muoCharge_ = trkCharge->at(itkmu);
+    muoDxy_ = dSign(itkmu, tConeClean.Px(), tConeClean.Py())*abs(trkDxy->at(itkmu));
+    muoExy_ = trkExy->at(itkmu);
+    muoDz_ = dZ(itkmu, iPV);
+    muoEz_ = trkEz->at(itkmu);
+    muoSoftMvaValue_ = computeMuonMva(iMuon);
+    muoDrB_ = deltaR(tB.Eta(), tB.Phi(), muoEta->at(iMuon), muoPhi->at(iMuon));
+    muoPFIso_ = GetMuoPFiso(iMuon);
+    
 }
 
 int OSMuonMvaTag::getOsMuonTag()
 {
     if(ssIndex_ < 0){ cout<<"SS NOT INITIALIZED"<<endl; return -999; }
-    getOsMuon();
+    if(osMuonIndex_ < 0) getOsMuon();
     if(osMuonIndex_ < 0) return 0;
-
     return -1*trkCharge->at(osMuonTrackIndex_); 
 }
 
@@ -262,46 +217,17 @@ float OSMuonMvaTag::getOsMuonTagMvaValue()
     return osMuonTagMvaValue_;
 }
 
-pair<float, float> OSMuonMvaTag::getOsMuonTagMistagProb( int type = 0 )
+pair<float, float> OSMuonMvaTag::getOsMuonTagMistagProb()
 {
-    if(type<0 || type>2){cout<<"WRONG MISTAG TYPE"<<endl; return make_pair(-1, 0);}
+    float dnnValue = osMuonTagMvaValue_;
+    if(dnnValue == -1) dnnValue = getOsMuonTagMvaValue();
 
-    float evtMistag[3] = {-1, -1, -1};
-    float evtMistagError[3] = {0, 0, 0};
+    float wPred = 1. - dnnValue;
+    float evtMistagProb = wCal_->Eval(wPred);
+    float evtMistagProbError = sqrt(pow(wCal_->GetParError(0),2)+pow((wCal_->GetParError(1))*(wPred),2));
 
-    float mvaValue = osMuonTagMvaValue_;
-    if(mvaValue == -1) mvaValue = getOsMuonTagMvaValue();
+    if(evtMistagProb > 1.) evtMistagProb = 1.;
+    if(evtMistagProb < 0.) evtMistagProb = 0.;
 
-    if( mvaValue < catEdgeL_[0] ){
-        evtMistag[0] = catMistag_[0];
-        evtMistagError[0] = catMistagErr_[0];
-    }else if( mvaValue >= catEdgeR_[nCat_-1] ){
-        evtMistag[0] = catMistag_[nCat_-1];
-        evtMistagError[0] = catMistagErr_[nCat_-1];
-    }else{
-        for(int j=0; j<nCat_; ++j){
-            if(( mvaValue >= catEdgeL_[j]) && (mvaValue < catEdgeR_[j]) )
-            { 
-                evtMistag[0] = catMistag_[j];                //CAT
-                evtMistagError[0] = catMistagErr_[j];
-                break; 
-            }
-        }
-    }
-
-    evtMistag[1] = perEvtWfit_->Eval(mvaValue);             //FIT
-    evtMistag[2] = perEvtWgraph_->Eval(mvaValue, 0, "S");   //KDE
-
-    return make_pair(evtMistag[type], evtMistagError[type]);
-}
-
-////// DEPRECATED FUNCTIONS /////
-
-TString OSMuonMvaTag::methodNameFromWeightName()
-{
-    TString prefix = "TMVAClassification_";
-    int start = weightsFile_.Index(prefix) + prefix.Length();
-    int length = weightsFile_.Index(".weights") - start;
-    TString name( weightsFile_(start, length) );
-    return name;
+    return make_pair(evtMistagProb, evtMistagProbError);
 }

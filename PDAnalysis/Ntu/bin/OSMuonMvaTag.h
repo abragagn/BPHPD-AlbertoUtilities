@@ -29,25 +29,24 @@ public:
     int     getOsMuon();
     int     getOsMuonTag();
     float   getOsMuonTagMvaValue();
-    std::pair<float,float> getOsMuonTagMistagProb(int type);
+    std::pair<float,float> getOsMuonTagMistagProb();
 
-    void    setSsForTag(int iB, int iPV) { ssIndex_ = iB; pvIndex_ = iPV;}
+    void    setVtxForTag(int iB, int iPV) { ssIndex_ = iB; pvIndex_ = iPV;}
     void    setOsMuonMvaCut(float wp);
     void    setOsMuonDzCut(float dzCut);
-    void    inizializeOSMuonMvaTagReader(TString weightsFile, TString path);
-    bool    inizializeOSMuonMvaMistagMethods(TString path, TString hltName, TString fitName, TString graphName);
+    void    inizializeOSMuonMvaReader(TString, TString);
+    bool    inizializeOSMuonCalibration(TString , TString);
 
     int     getNosMuons(){return nMuonsSel_;}
 
 private:    
     TString methodNameFromWeightName();
     void    computeVariables();
-    void    setWeights(TString methodName, TString path);
 
     TMVA::Reader osMuonTagReader_;
     TString weightsFile_;
     TString methodName_;
-    TString path_;
+    TString methodPath_ = "/lustre/cmswork/abragagn/mvaWeights/OsMuonTag/";
 
     int ssIndex_;
     int pvIndex_;
@@ -64,32 +63,25 @@ private:
 
     //MVA Variables
     float muoPt_;
-    float absmuoEta_;
+    float muoEta_;
     float muoDxy_;
-    float absmuoDz_;
+    float muoExy_;
+    float muoDz_;
+    float muoEz_;
     float muoSoftMvaValue_;
     float muoDrB_;
     float muoPFIso_;
-    float muoJetConePt_;
-    float muoJetConePtRel_;
-    float muoJetConeDr_;
-    float muoJetConeEnergyRatio_;
-    float muoJetDFprob_;
-    float muoJetConeSize_;
-    float muoJetConeQ_;
+    float muoConeCleanPt_;
+    float muoConeCleanPtRel_;
+    float muoConeCleanDr_;
+    float muoConeCleanEnergyRatio_;
+    float muoConeCleanQ_;
     float muoCharge_;
 
     float DUMMY_;
 
     //MISTAG VARIABLES
-    int nCat_;
-    float *catEdgeL_;
-    float *catEdgeR_;
-    float *catMistag_;
-    float *catMistagErr_;
-
-    TF1 *perEvtWfit_;
-    TGraph *perEvtWgraph_;
+    TF1 *wCal_;
 
 };
 
