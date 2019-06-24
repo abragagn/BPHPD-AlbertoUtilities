@@ -40,7 +40,7 @@ and in the list of base classes:
 ,                 public virtual OSMuonMvaTag
 ```
 
-Edit PDAnalyzed.cc ro include in the header
+Edit PDAnalyzer.cc ro include in the header
 ```
 #include "PDMuonVar.cc"
 #include "PDSoftMuonMvaEstimator.cc"
@@ -54,9 +54,75 @@ May be necessary to include additional ROOT classes such as TLorenzVector, TFile
 #include "TFile.h"
 ```
 
+Compile:
 
-## Usage example
+```
+cd .../workingArea/src/
+scram b clean
+scram b
+```
 
+## Usage
+
+> A set of PDAnalyzer.* examples can be found in PDAnalysis/Ntu/bin/examples/
+
+
+** The following lines of code need to be included in the code to correcly initialize the various methods: **
+
+* In PDAnalyzer::beginJob() 
+```
+inizializeMuonMvaReader(); // initialize TMVA methods for muon ID
+inizializeOSMuonMvaReader(); // initialize TMVA methods for muon tagger
+bool osInit = inizializeOSMuonCalibration(); // initialize calibration methods for muon tagger
+```
+* In PDAnalyzer::analyze() at the top
+```
+computeMuonVar(); // compute variable needed for the muon ID
+inizializeTagVariables(); // initialize variables for muon tagger 
+convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz); // needed for the methods
+convSpheCart(muoPt, muoEta, muoPhi, muoPx, muoPy, muoPz); // needed for the methods
+convSpheCart(trkPt, trkEta, trkPhi, trkPx, trkPy, trkPz); // needed for the methods
+convSpheCart(pfcPt, pfcEta, pfcPhi, pfcPx, pfcPy, pfcPz); // needed for the methods
+```
+
+* In PDAnalyzer::analyze() after the SVT and PVT selection
+```
+setVtxForTag(ssbSVT, ssbPVT); // set vertices index dor muon tagger
+```
+
+** Use the following lines of code to retrieve the tagging informations: **
+
+```
+int bestMuIndex = getOsMuon(); // get OS muon index
+int tagDecision = getOsMuonTag(); get Tag decision // 1*trkCharge->at(osMuonTrackIndex_), 0 -> no muon.
+float osMuonTagMvaValue = -1;
+pair<float,float> osMuonTagMistag (-1.,-,1.);
+if( tagDecision != 0 ){
+    osMuonTagMvaValue = getOsMuonTagMvaValue();
+    osMuonTagMistag = getOsMuonTagMistagProb();
+
+}
+cout<<"muon "<<bestMuIndex<<", tag "<<tagDecision<<", mistag "<<osMuonTagMistag.first<<" +- "<<osMuonTagMistag.second<<endl;
+
+```
+
+### Addedum: usage outside PD network
+
+The code is flexible but all the default paths to the various TMVA weights are related to the PD network.
+
+To use the code outside PD please look at the function declarations in the source code. Usually the path to the weiths is one of the optional arguments (if not please tell me).
+
+** Unavoidable (to my knowledge) nuisance **
+Keras pyTMVA .xlm weights files have hardcoded the path to the Keras .h5 weight files (both of them are needed) e.g.
+```
+ <Option name="FilenameTrainedModel" modified="No">/lustre/cmswork/abragagn/BPH/BTag/osMuonV13/src/PDAnalysis/Ntu/bin/mvaTraining/dataset/weights/TrainedModel_DNNOsMuonHLTJpsiMu.h5</Option>
+```
+
+You need to edit this line to reflect your new path in 
+```
+TMVAClassification_DNNOsMuonHLTJpsiMu.weights
+TMVAClassification_DNNMuonID.weights
+```
 
 
 ## Meta

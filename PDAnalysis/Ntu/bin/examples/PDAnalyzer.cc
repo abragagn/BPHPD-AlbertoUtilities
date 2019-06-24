@@ -108,7 +108,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 // additional features
     computeMuonVar(); // compute variable needed for the muon ID
     inizializeTagVariables(); // initialize variables for muon tagger 
-    tWriter->Reset();
+    // tWriter->Reset();
     convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz); // needed for the methods
     convSpheCart(muoPt, muoEta, muoPhi, muoPx, muoPy, muoPz); // needed for the methods
     convSpheCart(trkPt, trkEta, trkPhi, trkPx, trkPy, trkPz); // needed for the methods
