@@ -122,7 +122,7 @@ Keras pyTMVA .xlm weights files have hardcoded the path to the Keras .h5 weight 
 e.g.
 
 ```
-/lustre/cmswork/abragagn/BPH/BTag/osMuonV13/src/PDAnalysis/Ntu/bin/mvaTraining/dataset/weights/TrainedModel_DNNOsMuonHLTJpsiMu.h5
+ <Option name="FilenameTrainedModel" modified="No">/lustre/cmswork/abragagn/BPH/BTag/osMuonV13/src/PDAnalysis/Ntu/bin/mvaTraining/dataset/weights/TrainedModel_DNNOsMuonHLTJpsiMu.h5Option>
 ```
 
 You need to edit this line to reflect your new path in 
