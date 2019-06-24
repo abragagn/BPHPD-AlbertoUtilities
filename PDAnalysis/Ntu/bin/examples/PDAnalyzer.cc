@@ -23,26 +23,15 @@
 
 using namespace std;
 
-/* EXAMPLE OF USAGE
-pdTreeAnalyze /lustre/cmswork/abragagn/ntuList/MC2017Lists/BsToJpsiPhi_2017_DCAP.list hist.root -v outputFile ntu.root -v histoMode RECREATE -v use_gen t -v useHLT t -n 10000
-*/
 PDAnalyzer::PDAnalyzer() {
 
     std::cout << "new PDAnalyzer" << std::endl;
 
     // default values can be set in the analyzer class contructor
 
-    setUserParameter( "verbose", "f" );
-
     setUserParameter( "process", "BsJPsiPhi" );
-    setUserParameter( "useHLT", "false" );
-
     setUserParameter( "outputFile", "ntu.root" );
-
-    setUserParameter( "muonIdWp", "0.35" ); 
-    setUserParameter( "osMuonTagMvaMethod", "DNNOsMuonHLTJpsiMu_test241" ); 
-
-    setUserParameter( "ptCut", "40.0" ); //needed for paolo's code (no influence in the code whatsoever)
+    setUserParameter( "ptCut", "40.0" ); //needed for paolo's code for unknow reasons
 
 }
 
@@ -61,31 +50,21 @@ void PDAnalyzer::beginJob() {
     // by passing the corresponding variable,
     // e.g. getUserParameter( "name", x )
 
-    getUserParameter( "verbose", verbose );
-
     getUserParameter( "process", process );
-    getUserParameter( "useHLT", useHLT );
-
     getUserParameter( "outputFile", outputFile );
-
-    getUserParameter( "muonIdWp", muonIdWp ); 
-    getUserParameter( "osMuonTagMvaMethod", osMuonTagMvaMethod );
-
-    getUserParameter( "ptCut", ptCut ); //needed for paolo's code (no influence in the code whatsoever)
+    getUserParameter( "ptCut", ptCut ); //needed for paolo's code for unknow reasons
 
 //  additional features
-    tWriter = new PDSecondNtupleWriter; // second ntuple
-    tWriter->open( getUserParameter("outputFile"), "RECREATE" ); // second ntuple
+//  tWriter = new PDSecondNtupleWriter; // second ntuple
+//  tWriter->open( getUserParameter("outputFile"), "RECREATE" ); // second ntuple
 
-    setOsMuonCuts(muonIdWpBarrel, muonIdWpEndcap, 1. ); //set wp for muonID and Dz cut
+    inizializeMuonMvaReader(); // initialize TMVA methods for muon ID
+    inizializeOSMuonMvaReader(); // initialize TMVA methods for muon tagger
+    bool osInit = inizializeOSMuonCalibration(); // initialize calibration methods for muon tagger
+    if(!osInit) cout<<endl<<"!!! FAILED TO INIZIALIZED TAG CALIBRATION"<<endl<<endl;
 
-    inizializeMuonMvaReader();           //initialize mva muon id
-    inizializeOSMuonMvaTagReader( osMuonTagMvaMethod ); //inizialize mva os muon method
-    bool osInit = inizializeOSMuonMvaMistagMethods();   //read os muon method for per-event-mistag
-    if(!osInit) cout<<"METHOD NOT INIZIALIZATED. ABORT"<<endl;
-
-    if(process=="BsJPsiPhi") SetBsMassRange(5.20, 5.50);
-    if(process=="BuJPsiK") SetBuMassRange(5.1, 5.50);
+    if(process=="BsJPsiPhi") SetBsMassRange(5.20, 5.65);
+    if(process=="BuJPsiK") SetBuMassRange(5.1, 5.65);
 
     return;
 
@@ -94,25 +73,23 @@ void PDAnalyzer::beginJob() {
 
 void PDAnalyzer::book() {
 
-    // putting "autoSavedObject" in front of the histo creation 
-    // it's automatically marked for saving on file; the option 
-    // is uneffective when not using the full utility
 
-    float min = 5.0;
-    float max = 5.5;
+    float min = 5.15;
+    float max = 5.65;
     float nbin = 250;
 
 
     autoSavedObject =
     hmass_ssB       = new TH1D( "hmass_ssB", "hmass_ssB", nbin, min, max );
 
-    return;
+    autoSavedObject =
+    hmass_ssB_os    = new TH1D( "hmass_ssB_os", "hmass_ssB_os", nbin, min, max );
 
+    return;
 }
 
 
 void PDAnalyzer::reset() {
-
     autoReset();
     return;
 }
@@ -120,31 +97,22 @@ void PDAnalyzer::reset() {
 
 bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 
-    if ( verbose ) {
-        cout << " +++++++++++++++++++++++++++ " << endl;
-        cout << "entry: "
-             << entry << " " << event_file << " " << event_tot << endl;
-        cout << "run: " << runNumber << " , "
-             << "evt: " << eventNumber << endl;
-    }
-    else {
-        if ( (!(event_tot%10) && event_tot<100 ) || 
-        (!(event_tot %100) && event_tot<1000 ) || 
-        (!(event_tot %1000)&& event_tot<10000 ) || 
-        (!(event_tot %10000) && event_tot<100000 ) || 
-        (!(event_tot %100000) && event_tot<1000000 ) || 
-        (!(event_tot %1000000) && event_tot<10000000 ) )
-            cout << " == at event " << event_file << " " << event_tot << endl;
-    }
+    if ( (!(event_tot%10) && event_tot<100 ) || 
+    (!(event_tot %100) && event_tot<1000 ) || 
+    (!(event_tot %1000)&& event_tot<10000 ) || 
+    (!(event_tot %10000) && event_tot<100000 ) || 
+    (!(event_tot %100000) && event_tot<1000000 ) || 
+    (!(event_tot %1000000) && event_tot<10000000 ) )
+        cout << " == at event " << event_file << " " << event_tot << endl;
 
 // additional features
-    computeMuonVar();   //compute muon variable for soft id
-    inizializeTagVariables(); //initialiaze some variable for tagging
+    computeMuonVar(); // compute variable needed for the muon ID
+    inizializeTagVariables(); // initialize variables for muon tagger 
     tWriter->Reset();
-    convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz);
-    convSpheCart(muoPt, muoEta, muoPhi, muoPx, muoPy, muoPz);
-    convSpheCart(trkPt, trkEta, trkPhi, trkPx, trkPy, trkPz);
-    convSpheCart(pfcPt, pfcEta, pfcPhi, pfcPx, pfcPy, pfcPz);
+    convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz); // needed for the methods
+    convSpheCart(muoPt, muoEta, muoPhi, muoPx, muoPy, muoPz); // needed for the methods
+    convSpheCart(trkPt, trkEta, trkPhi, trkPx, trkPy, trkPz); // needed for the methods
+    convSpheCart(pfcPt, pfcEta, pfcPhi, pfcPx, pfcPy, pfcPz); // needed for the methods
 
     if( !((process=="BsJPsiPhi")||(process=="BuJPsiK")) ) {
         cout<<"!$!#$@$% PROCESS NAME WRONG"<<endl;
@@ -155,50 +123,53 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 
     bool jpsimu = false;
     bool jpsitktk = false;
-    bool jpsitk = false;
 
     if(hlt(PDEnumString::HLT_Dimuon0_Jpsi3p5_Muon2_v)||hlt(PDEnumString::HLT_Dimuon0_Jpsi_Muon_v)) jpsimu = true;
     if(hlt(PDEnumString::HLT_DoubleMu4_JpsiTrkTrk_Displaced_v)) jpsitktk =  true;
-    if(hlt(PDEnumString::HLT_DoubleMu4_JpsiTrk_Displaced_v)) jpsitk = true;
 
-    if( !jpsimu ) return false; //currently only jpsimu is allowed
-    if( jpsimu ) SetJpsiMuCut();    //set analysis cut for jpsimu
-    if( !jpsimu ) SetJpsiTrkTrkCut();   //set analysis cut for jpsitktk
+    if( !jpsimu ) return false; // hlt veto
+    SetJpsiMuCut(); //set selection for jpsimu
 
-    if(useHLT && process=="BsJPsiPhi" && !(jpsimu || jpsitktk)) return false;
-    if(useHLT && process=="BuJPsiK" && !(jpsimu || jpsitk)) return false;
+//------------------------------------------------SEARCH FOR SS---------------------------------------
 
-//------------------------------------------------Signal---------------------------------------
+    int ssbSVT = GetCandidate(process);
+    if(ssbSVT<0) return false;
 
-    int iSsB = GetTightCandidate(process); //get best svt with analysis selection
-    if(iSsB<0) return false;
+    bool isTight = false;
+    int ssbSVTtight = GetTightCandidate(process);
+    if(ssbSVTtight>=0){
+        isTight = true;
+        ssbSVT = ssbSVTtight;
+    }
 
-    TLorentzVector tB = GetTLorentzVecFromJpsiX(iSsB);
-    int iSsPV = GetBestPV(iSsB, tB); //select PV
-    if(iSsPV < 0) return false;
+    int iJPsi = (subVtxFromSV(ssbSVT)).at(0);
+    vector <int> tkJpsi = tracksFromSV(iJPsi);
+    vector <int> tkSsB = tracksFromSV(ssbSVT);
 
-    setSsForTag(iSsB, iSsPV); //set PV and SVT for tagging class
+    TLorentzVector tB = GetTLorentzVecFromJpsiX(ssbSVT);
 
-    hmass_ssB->Fill(svtMass->at(iSsB));
-    (tWriter->ssbMass) = svtMass->at(iSsB);
+    int ssbPVT = GetBestPV(ssbSVT, tB);
+    if(ssbPVT < 0) return false;
+
+    setVtxForTag(ssbSVT, ssbPVT); // set vertices index dor muon tagger
+
+    hmass_ssB->Fill(svtMass->at(ssbSVT));
     
-//-----------------------------------------TAG-----------------------------------------
+//-----------------------------------------OPPOSITE SIDE-----------------------------------------
 
-    int bestMuIndex = getOsMuon(); //get OS muon
-    int tagDecision = getOsMuonTag();   //get tag decision 
+    int bestMuIndex = getOsMuon(); // get OS muon index
+    int tagDecision = getOsMuonTag(); get Tag decision // 1*trkCharge->at(osMuonTrackIndex_), 0 -> no muon.
 
     if( tagDecision == 0 ){
-        cout<<"no os muon founded"<<endl;
-        (tWriter->osMuonTag) = 0;
         return true;
     }
 
-    pair<float,float> osMuonTagMistag = getOsMuonTagMistagProb(2); //.first =  mistag, .second =  error (still not implemented). Argument define what method to use (0 = bin, 1 = fit, 2= kde ratio)
+    hmass_ssB_os->Fill(svtMass->at(ssbSVT));
 
-    (tWriter->osMuonTag) = tagDecision;
-    (tWriter->osMuonTagMistag) = osMuonTagMistag.first;
+    float osMuonTagMvaValue = getOsMuonTagMvaValue();
+    pair<float,float> osMuonTagMistag = getOsMuonTagMistagProb();
 
-    cout<<"os muon "<<bestMuIndex<<" founded with decision "<<tagDecision<<" and mistag "<<osMuonTagMistag.first<<endl;
+    cout<<"muon "<<bestMuIndex<<", tag "<<tagDecision<<", mistag "<<osMuonTagMistag.first<<" +- "<<osMuonTagMistag.second<<endl;
 
     return true;
 
@@ -207,7 +178,8 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 void PDAnalyzer::endJob() {
 
 // additional features
-    tWriter->close();   // second ntuple
+//    tWriter->close();   // second ntuple
+
     return;
 }
 

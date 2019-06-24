@@ -43,6 +43,7 @@ void OSMuonMvaTag::inizializeOSMuonMvaReader(
 ,   TString methodPath = ""
     )
 {
+
     if(methodPath == "") methodPath = methodPath_;
     TMVA::PyMethodBase::PyInitialize();
     methodName_ = methodName;

@@ -5,7 +5,6 @@
 #include "PDAnalyzerUtil.h"
 #include "PDAnalysis/Ntu/interface/PDGenHandler.h"
 #include "PDMuonVar.h"
-#include "TopDecayClassifier.h"
 #include "PDSoftMuonMvaEstimator.h"
 #include "AlbertoUtil.h"
 #include "OSMuonMvaTag.h"
@@ -15,7 +14,7 @@
 
 // additional features
 //#include "DataSetFilter.h"
-class PDSecondNtupleWriter;
+//class PDSecondNtupleWriter;
 
 // to skim the N-tuple replace the the following line
 // with the "commented" ones
@@ -30,9 +29,9 @@ class PDAnalyzer: public virtual PDAnalyzerUtil
 //,                              public virtual DataSetFilter    // dataset filter
 // to skim the N-tuple "uncomment" the following line
 //,                              public virtual TreeFilter
-{
+ {
 
-public:
+ public:
 
     PDAnalyzer();
     virtual ~PDAnalyzer();
@@ -60,26 +59,22 @@ public:
     virtual void save();     // save the histograms on a ROOT file
 
 
-protected:
+ protected:
 
     double ptCut; //needed for paolo's code for unknow reasons
 
     //PARAMETERS
-    bool verbose, useHLT;
     TString outputFile;
-    float muonIdWp;
     TString process;
-    TString muonMvaMethod;
-    TString osMuonTagMvaMethod;
-
-    //OTHER VARIABLES
 
     // HISTOGRAMS
+
     TH1D *hmass_ssB;
+    TH1D *hmass_ssB_os;
 
     //FUNCTIONS
 // additional features: second ntuple
-    PDSecondNtupleWriter* tWriter;
+//    PDSecondNtupleWriter* tWriter;
 
 
  private:
