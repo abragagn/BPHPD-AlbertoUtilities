@@ -67,7 +67,7 @@ scram b
 > A set of PDAnalyzer.* examples can be found in PDAnalysis/Ntu/bin/examples/
 
 
-** The following lines of code need to be included in the code to correcly initialize the various methods: **
+**The following lines of code need to be included in the code to correcly initialize the various methods:**
 
 * In PDAnalyzer::beginJob() 
 ```
@@ -113,6 +113,7 @@ The code is flexible but all the default paths to the various TMVA weights are r
 To use the code outside PD please look at the function declarations in the source code. Usually the path to the weiths is one of the optional arguments (if not please tell me).
 
 **Unavoidable (to my knowledge) nuisance**
+
 Keras pyTMVA .xlm weights files have hardcoded the path to the Keras .h5 weight files (both of them are needed) e.g.
 ```
  <Option name="FilenameTrainedModel" modified="No">/lustre/cmswork/abragagn/BPH/BTag/osMuonV13/src/PDAnalysis/Ntu/bin/mvaTraining/dataset/weights/TrainedModel_DNNOsMuonHLTJpsiMu.h5</Option>
