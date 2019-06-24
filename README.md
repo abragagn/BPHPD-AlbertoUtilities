@@ -125,13 +125,13 @@ e.g.
  <Option name="FilenameTrainedModel" modified="No">/lustre/cmswork/abragagn/BPH/BTag/osMuonV13/src/PDAnalysis/Ntu/bin/mvaTraining/dataset/weights/TrainedModel_DNNOsMuonHLTJpsiMu.h5Option>
 ```
 
-You need to edit this line to reflect your new path in 
+You need to edit this line to reflect your new path in the following files:
 ```
 TMVAClassification_DNNOsMuonHLTJpsiMu.weights
 TMVAClassification_DNNMuonID.weights
 ```
 
 
-## Meta
+## Contacts
 
 Alberto Bragagnolo – alberto.bragagnolo@cern.ch
