@@ -114,9 +114,15 @@ To use the code outside PD please look at the function declarations in the sourc
 
 **Unavoidable (to my knowledge) nuisance**
 
-Keras pyTMVA .xlm weights files have hardcoded the path to the Keras .h5 weight files (both of them are needed) e.g.
+Keras pyTMVA .xlm weights files have hardcoded the path to the Keras .h5 weight files (both of them are needed) in the following line:
 ```
- <Option name="FilenameTrainedModel" modified="No">/lustre/cmswork/abragagn/BPH/BTag/osMuonV13/src/PDAnalysis/Ntu/bin/mvaTraining/dataset/weights/TrainedModel_DNNOsMuonHLTJpsiMu.h5</Option>
+ <Option name="FilenameTrainedModel" modified="No">/path/</Option>
+```
+
+e.g.
+
+```
+/lustre/cmswork/abragagn/BPH/BTag/osMuonV13/src/PDAnalysis/Ntu/bin/mvaTraining/dataset/weights/TrainedModel_DNNOsMuonHLTJpsiMu.h5
 ```
 
 You need to edit this line to reflect your new path in 
