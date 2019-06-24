@@ -90,7 +90,7 @@ convSpheCart(pfcPt, pfcEta, pfcPhi, pfcPx, pfcPy, pfcPz); // needed for the meth
 setVtxForTag(ssbSVT, ssbPVT); // set vertices index dor muon tagger
 ```
 
-** Use the following lines of code to retrieve the tagging informations: **
+**Use the following lines of code to retrieve the tagging informations:**
 
 ```
 int bestMuIndex = getOsMuon(); // get OS muon index
@@ -112,7 +112,7 @@ The code is flexible but all the default paths to the various TMVA weights are r
 
 To use the code outside PD please look at the function declarations in the source code. Usually the path to the weiths is one of the optional arguments (if not please tell me).
 
-** Unavoidable (to my knowledge) nuisance **
+**Unavoidable (to my knowledge) nuisance**
 Keras pyTMVA .xlm weights files have hardcoded the path to the Keras .h5 weight files (both of them are needed) e.g.
 ```
  <Option name="FilenameTrainedModel" modified="No">/lustre/cmswork/abragagn/BPH/BTag/osMuonV13/src/PDAnalysis/Ntu/bin/mvaTraining/dataset/weights/TrainedModel_DNNOsMuonHLTJpsiMu.h5</Option>
