@@ -4,7 +4,7 @@ This repository contains the class needed to use the OS Muon code.
 
 As today it has been developed and calibrated only for the JpsiMuon trigger.
 
-The needed weights are stored locally at 
+The needed weight/calibration files are stored locally at 
 
 ```
 /lustre/cmswork/abragagn/mvaWeights/
@@ -13,6 +13,15 @@ The needed weights are stored locally at
 and remotely at
 
 https://github.com/abragagn/PDMvaMethods-WeightFiles
+
+The calibration files contained in 
+```
+mvaWeights/OsMuonTag
+```
+store:
+* the calibration function for the given process
+* the TGraphAsymmetricErrors where the function was actually fitted
+* the TFitResultPtr of the fit
 
 ## Installation
 
@@ -75,6 +84,16 @@ inizializeMuonMvaReader(); // initialize TMVA methods for muon ID
 inizializeOSMuonMvaReader(); // initialize TMVA methods for muon tagger
 bool osInit = inizializeOSMuonCalibration(); // initialize calibration methods for muon tagger
 ```
+the default parameters of inizializeOSMuonCalibration() are: 
+```
+OSMuonMvaTag::inizializeOSMuonCalibration( 
+    TString process = "BuJPsiKData2018"
+,   TString processBuMC = "BuJPsiKMC2018"
+,   TString processBsMC = "BsJPsiPhiMC2018"
+,   TString methodPath = ""  
+)
+```
+
 * In PDAnalyzer::analyze() at the top
 ```
 computeMuonVar(); // compute variable needed for the muon ID
@@ -102,7 +121,7 @@ int tagDecision = getOsMuonTag(); get Tag decision // 1*trkCharge->at(osMuonTrac
 float osMuonTagMvaValue = getOsMuonTagMvaValue();
 float osMuonTagMistag = getOsMuonTagMistagProbCalProcess();
 
-cout<<"muon "<<bestMuIndex<<", tag "<<tagDecision<<", mistag "<<osMuonTagMistag.first<<" +- "<<osMuonTagMistag.second<<endl;
+cout<<"muon "<<bestMuIndex<<", tag "<<tagDecision<<", mistag "<<osMuonTagMistag<<endl;
 
 ```
 
