@@ -143,6 +143,8 @@ public:
     float GetCt2DErr(TLorentzVector t, int iSV, int iPV);
     float GetCt3DErr(TLorentzVector t, int iSV, int iPV);
 
+    bool isTrkHighPurity(int itk){ return (( trkQuality->at( itk ) >> 2 ) & 1); }
+
 
 protected:
 

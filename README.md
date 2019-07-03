@@ -87,7 +87,7 @@ convSpheCart(pfcPt, pfcEta, pfcPhi, pfcPx, pfcPy, pfcPz); // needed for the meth
 
 * In PDAnalyzer::analyze() after the SVT and PVT selection
 ```
-setVtxForTag(ssbSVT, ssbPVT); // set vertices index dor muon tagger
+setVtxOsMuonTag(ssbSVT, ssbPVT); // set vertices index dor muon tagger
 ```
 
 **Use the following lines of code to retrieve the tagging informations:**
