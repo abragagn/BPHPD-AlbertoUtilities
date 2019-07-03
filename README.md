@@ -78,7 +78,7 @@ bool osInit = inizializeOSMuonCalibration(); // initialize calibration methods f
 * In PDAnalyzer::analyze() at the top
 ```
 computeMuonVar(); // compute variable needed for the muon ID
-inizializeTagVariables(); // initialize variables for muon tagger 
+inizializeOsMuonTagVars(); // initialize variables for muon tagger 
 convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz); // needed for the methods
 convSpheCart(muoPt, muoEta, muoPhi, muoPx, muoPy, muoPz); // needed for the methods
 convSpheCart(trkPt, trkEta, trkPhi, trkPx, trkPy, trkPz); // needed for the methods
@@ -90,21 +90,23 @@ convSpheCart(pfcPt, pfcEta, pfcPhi, pfcPx, pfcPy, pfcPz); // needed for the meth
 setVtxOsMuonTag(ssbSVT, ssbPVT); // set vertices index dor muon tagger
 ```
 
-**Use the following lines of code to retrieve the tagging informations:**
+**All tagging variables are computed with the following function:**
 
+```
+makeOsMuonTagging();
+```
+**And can be retrieved with the following set of function:**
 ```
 int bestMuIndex = getOsMuon(); // get OS muon index
 int tagDecision = getOsMuonTag(); get Tag decision // 1*trkCharge->at(osMuonTrackIndex_), 0 -> no muon.
-float osMuonTagMvaValue = -1;
-pair<float,float> osMuonTagMistag (-1.,-,1.);
-if( tagDecision != 0 ){
-    osMuonTagMvaValue = getOsMuonTagMvaValue();
-    osMuonTagMistag = getOsMuonTagMistagProb();
+float osMuonTagMvaValue = getOsMuonTagMvaValue();
+float osMuonTagMistag = getOsMuonTagMistagProbCalProcess();
 
-}
 cout<<"muon "<<bestMuIndex<<", tag "<<tagDecision<<", mistag "<<osMuonTagMistag.first<<" +- "<<osMuonTagMistag.second<<endl;
 
 ```
+
+See OSMuonMvaTag.cc/.h for more informations. 
 
 ### Addedum: usage outside PD network
 

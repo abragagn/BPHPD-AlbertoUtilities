@@ -9,7 +9,11 @@ OSMuonMvaTag::OSMuonMvaTag():
 ,               pvIndex_(-1)
 ,               osMuonIndex_(-1)
 ,               osMuonTrackIndex_(-1)
-,               osMuonTagMvaValue_(-1)
+,               osMuonTagDecision_(0)
+,               osMuonTagMvaValue_(-1.)
+,               osMuonTagMistagProbRaw_(-1.)
+,               osMuonTagMistagProbCalProcess_(-1.)
+,               osMuonTagMistagProbCalProcessBuBs_(-1.)
 ,               wp_(0.21)
 ,               dzCut_(1.)
 ,               nMuonsSel_(0)
@@ -18,13 +22,17 @@ OSMuonMvaTag::OSMuonMvaTag():
 OSMuonMvaTag::~OSMuonMvaTag() {}
 
 // =====================================================================================
-void OSMuonMvaTag::inizializeTagVariables()
+void OSMuonMvaTag::inizializeOsMuonTagVars()
 {
     ssIndex_ = -1;
     pvIndex_ = -1;
     osMuonIndex_ = -1;
     osMuonTrackIndex_ = -1;
+    osMuonTagDecision_ = 0;
     osMuonTagMvaValue_ = -1;
+    osMuonTagMistagProbRaw_ = -1;
+    osMuonTagMistagProbCalProcess_ = -1;
+    osMuonTagMistagProbCalProcessBuBs_ = -1;
     nMuonsSel_ = 0;
 }
 
@@ -67,23 +75,59 @@ void OSMuonMvaTag::inizializeOSMuonMvaReader(
 
 bool OSMuonMvaTag::inizializeOSMuonCalibration( 
     TString process = "BuJPsiKData2018"
+,   TString processBuMC = "BuJPsiKMC2018"
+,   TString processBsMC = "BsJPsiPhiMC2018"
 ,   TString methodPath = ""  
 )
 {
     if(methodPath == "") methodPath = methodPath_;
-    auto *f = new TFile(methodPath + "OSMuonTaggerCalibration" + process + ".root");
-    if(f->IsZombie()) return false;
+    auto *f   = new TFile(methodPath + "OSMuonTaggerCalibration" + process + ".root");
+    auto *fBu = new TFile(methodPath + "OSMuonTaggerCalibration" + processBuMC + ".root");
+    auto *fBs = new TFile(methodPath + "OSMuonTaggerCalibration" + processBsMC + ".root");
+
+    if(f->IsZombie() || fBu->IsZombie() || fBs->IsZombie()) return false;
     f->cd();
-    wCal_ = (TF1*)f->Get("osMuonCal");
+    wCalProcess_ = (TF1*)f->Get("osMuonCal");
     f->Close();
+
+    fBu->cd();
+    wCalBuMC_ = (TF1*)f->Get("osMuonCal");
+    fBu->Close();
+
+    fBs->cd();
+    wCalBsMC_ = (TF1*)f->Get("osMuonCal");
+    fBs->Close();
+
+    wCalBuBs_ = new TF1("osMuonCalBuBs","[0]-[1]*[2]/[3]+[2]/[3]*x",0.,1.);
+    float qs = wCalBsMC_->GetParameter(0);
+    float ms = wCalBsMC_->GetParameter(1);
+    float qu = wCalBuMC_->GetParameter(0);
+    float mu = wCalBuMC_->GetParameter(1);
+    wCalBuBs_->SetParameters(qs, qu, ms, mu);
+
     delete f;
+    delete fBu;
+    delete fBs;
     return true;  
 }
 
-int OSMuonMvaTag::getOsMuon()
-{
-    if(ssIndex_ < 0){ cout<<"SS NOT INITIALIZED"<<endl; return -2; }
+bool OSMuonMvaTag::makeOsMuonTagging(){
+    if(ssIndex_ < 0){ cout<<"SS NOT INITIALIZED"<<endl; return -999; }
+    selectOsMuon();
+    if(osMuonIndex_ < 0){ osMuonTagDecision_ = 0; return 1;}
+    else osMuonTagDecision_ = -1*trkCharge->at(osMuonTrackIndex_); 
 
+    computeOsMuonTagVariables();
+    osMuonTagMvaValue_ = osMuonTagReader_.EvaluateMVA(methodName_);
+    osMuonTagMistagProbRaw_ = 1 - osMuonTagMvaValue_;
+    osMuonTagMistagProbCalProcess_ = wCalProcess_->Eval(osMuonTagMistagProbRaw_);
+    osMuonTagMistagProbCalProcessBuBs_ = wCalBuBs_->Eval(osMuonTagMistagProbCalProcess_);
+
+    return 1;
+}
+
+void OSMuonMvaTag::selectOsMuon()
+{
     int iB = ssIndex_;
     int iPV = pvIndex_;
 
@@ -121,10 +165,9 @@ int OSMuonMvaTag::getOsMuon()
 
     osMuonIndex_ = bestMuIndex;
     osMuonTrackIndex_ = bestMuTrack;
-    return bestMuIndex;
 }
 
-void OSMuonMvaTag::computeVariables()
+void OSMuonMvaTag::computeOsMuonTagVariables()
 {
     int iB = ssIndex_;
     int iMuon = osMuonIndex_;
@@ -198,37 +241,4 @@ void OSMuonMvaTag::computeVariables()
     muoDrB_ = deltaR(tB.Eta(), tB.Phi(), muoEta->at(iMuon), muoPhi->at(iMuon));
     muoPFIso_ = GetMuoPFiso(iMuon);
     
-}
-
-int OSMuonMvaTag::getOsMuonTag()
-{
-    if(ssIndex_ < 0){ cout<<"SS NOT INITIALIZED"<<endl; return -999; }
-    if(osMuonIndex_ < 0) getOsMuon();
-    if(osMuonIndex_ < 0) return 0;
-    return -1*trkCharge->at(osMuonTrackIndex_); 
-}
-
-float OSMuonMvaTag::getOsMuonTagMvaValue()
-{
-    if(ssIndex_ < 0){ cout<<"SS NOT INITIALIZED"<<endl; return -999; }
-    if(osMuonIndex_ < 0){ cout<<"WARNING: OS MU NOT INITIALIZED"<<endl; getOsMuon(); }
-    
-    computeVariables();
-    osMuonTagMvaValue_ = osMuonTagReader_.EvaluateMVA(methodName_);
-    return osMuonTagMvaValue_;
-}
-
-pair<float, float> OSMuonMvaTag::getOsMuonTagMistagProb()
-{
-    float dnnValue = osMuonTagMvaValue_;
-    if(dnnValue == -1) dnnValue = getOsMuonTagMvaValue();
-
-    float wPred = 1. - dnnValue;
-    float evtMistagProb = wCal_->Eval(wPred);
-    float evtMistagProbError = sqrt(pow(wCal_->GetParError(0),2)+pow((wCal_->GetParError(1))*(wPred),2));
-
-    if(evtMistagProb > 1.) evtMistagProb = 1.;
-    if(evtMistagProb < 0.) evtMistagProb = 0.;
-
-    return make_pair(evtMistagProb, evtMistagProbError);
 }

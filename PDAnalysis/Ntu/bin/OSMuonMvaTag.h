@@ -24,24 +24,29 @@ public:
     OSMuonMvaTag();
     ~OSMuonMvaTag();
 
-    void    inizializeTagVariables();
+    void    inizializeOsMuonTagVars();
 
-    int     getOsMuon();
-    int     getOsMuonTag();
-    float   getOsMuonTagMvaValue();
-    std::pair<float,float> getOsMuonTagMistagProb();
+    bool    makeOsMuonTagging();
 
-    void    setVtxForTag(int iB, int iPV) { ssIndex_ = iB; pvIndex_ = iPV;}
+    int     getOsMuon(){ return osMuonIndex_; }
+    int     getOsMuonTag(){ return osMuonTagDecision_; }
+    float   getOsMuonTagMvaValue(){ return osMuonTagMvaValue_; }
+    float   getOsMuonTagMistagProbRaw(){ return osMuonTagMistagProbRaw_; }
+    float   getOsMuonTagMistagProbCalProcess(){ return osMuonTagMistagProbCalProcess_; }
+    float   getOsMuonTagMistagProbCalProcessbuBs(){ return osMuonTagMistagProbCalProcessBuBs_; }
+
+    void    setVtxOsMuonTag(int iB, int iPV) { ssIndex_ = iB; pvIndex_ = iPV;}
     void    setOsMuonMvaCut(float wp);
     void    setOsMuonDzCut(float dzCut);
     void    inizializeOSMuonMvaReader(TString, TString);
-    bool    inizializeOSMuonCalibration(TString , TString);
+    bool    inizializeOSMuonCalibration(TString process, TString processBuMC, TString processBsMC, TString methodPath);
 
-    int     getNosMuons(){return nMuonsSel_;}
+    int     getNosMuons(){ return nMuonsSel_; }
 
-private:    
+private:
+    void    selectOsMuon(); 
     TString methodNameFromWeightName();
-    void    computeVariables();
+    void    computeOsMuonTagVariables();
 
     TMVA::Reader osMuonTagReader_;
     TString weightsFile_;
@@ -52,8 +57,12 @@ private:
     int pvIndex_;
     int osMuonIndex_;
     int osMuonTrackIndex_;
+    int osMuonTagDecision_;
 
     float osMuonTagMvaValue_;
+    float osMuonTagMistagProbRaw_;
+    float osMuonTagMistagProbCalProcess_;
+    float osMuonTagMistagProbCalProcessBuBs_;
 
     float wp_;
     float dzCut_;
@@ -81,7 +90,10 @@ private:
     float DUMMY_;
 
     //MISTAG VARIABLES
-    TF1 *wCal_;
+    TF1 *wCalProcess_;
+    TF1 *wCalBuMC_;
+    TF1 *wCalBsMC_;
+    TF1 *wCalBuBs_;
 
 };
 
