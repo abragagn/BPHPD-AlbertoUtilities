@@ -82,7 +82,8 @@ scram b
 ```
 inizializeMuonMvaReader(); // initialize TMVA methods for muon ID
 inizializeOSMuonMvaReader(); // initialize TMVA methods for muon tagger
-bool osInit = inizializeOSMuonCalibration("BuJPsiKData2018", "BuJPsiKMC2018", "BsJPsiPhiMC2018"); // initialize calibration methods for muon tagger, the parameters are respectively:
+bool osInit = inizializeOSMuonCalibration("BuJPsiKData2018", "BuJPsiKMC2018", "BsJPsiPhiMC2018"); 
+// initialize calibration methods for muon tagger, the parameters are respectively:
 // the calibration process, and the two MC processes you want to construct the Bu->Bs transformation
 ```
 
