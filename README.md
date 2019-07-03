@@ -82,16 +82,8 @@ scram b
 ```
 inizializeMuonMvaReader(); // initialize TMVA methods for muon ID
 inizializeOSMuonMvaReader(); // initialize TMVA methods for muon tagger
-bool osInit = inizializeOSMuonCalibration(); // initialize calibration methods for muon tagger
-```
-the default parameters of inizializeOSMuonCalibration() are: 
-```
-OSMuonMvaTag::inizializeOSMuonCalibration( 
-    TString process = "BuJPsiKData2018"
-,   TString processBuMC = "BuJPsiKMC2018"
-,   TString processBsMC = "BsJPsiPhiMC2018"
-,   TString methodPath = ""  
-)
+bool osInit = inizializeOSMuonCalibration("BuJPsiKData2018", "BuJPsiKMC2018", "BsJPsiPhiMC2018"); // initialize calibration methods for muon tagger, the parameters are respectively:
+// the calibration process, and the two MC processes you want to construct the Bu->Bs transformation
 ```
 
 * In PDAnalyzer::analyze() at the top
@@ -116,12 +108,13 @@ makeOsMuonTagging();
 ```
 **And can be retrieved with the following set of function:**
 ```
-int bestMuIndex = getOsMuon(); // get OS muon index
-int tagDecision = getOsMuonTag(); get Tag decision // 1*trkCharge->at(osMuonTrackIndex_), 0 -> no muon.
-float osMuonTagMvaValue = getOsMuonTagMvaValue();
-float osMuonTagMistag = getOsMuonTagMistagProbCalProcess();
+int     getOsMuon(); // os muon index
+int     getOsMuonTag(); // Tag decision // 1*trkCharge->at(osMuonTrackIndex_), 0 -> no muon.
+float   getOsMuonTagMvaValue();
+float   getOsMuonTagMistagProbRaw(); // 1- dnn score
+float   getOsMuonTagMistagProbCalProcess(); // mistag calibrated to the calibration choosen as a first argument of in inizializeOSMuonCalibration()
+float   getOsMuonTagMistagProbCalProcessBuBs(); // mistag calibrated with the Bu->Bs correction using the calibration files specified as second and third arguments of in inizializeOSMuonCalibration()
 
-cout<<"muon "<<bestMuIndex<<", tag "<<tagDecision<<", mistag "<<osMuonTagMistag<<endl;
 
 ```
 

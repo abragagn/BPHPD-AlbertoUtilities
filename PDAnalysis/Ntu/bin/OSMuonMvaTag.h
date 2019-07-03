@@ -33,7 +33,7 @@ public:
     float   getOsMuonTagMvaValue(){ return osMuonTagMvaValue_; }
     float   getOsMuonTagMistagProbRaw(){ return osMuonTagMistagProbRaw_; }
     float   getOsMuonTagMistagProbCalProcess(){ return osMuonTagMistagProbCalProcess_; }
-    float   getOsMuonTagMistagProbCalProcessbuBs(){ return osMuonTagMistagProbCalProcessBuBs_; }
+    float   getOsMuonTagMistagProbCalProcessBuBs(){ return osMuonTagMistagProbCalProcessBuBs_; }
 
     void    setVtxOsMuonTag(int iB, int iPV) { ssIndex_ = iB; pvIndex_ = iPV;}
     void    setOsMuonMvaCut(float wp);
