@@ -60,7 +60,7 @@ void PDAnalyzer::beginJob() {
 
     inizializeMuonMvaReader(); // initialize TMVA methods for muon ID
     inizializeOSMuonMvaReader(); // initialize TMVA methods for muon tagger
-    bool osInit = inizializeOSMuonCalibration(); // initialize calibration methods for muon tagger
+    bool osInit = inizializeOSMuonCalibration("BuJPsiKData2018", "BuJPsiKMC2018", "BsJPsiPhiMC2018"); // initialize calibration methods for muon tagger
     if(!osInit) cout<<endl<<"!!! FAILED TO INIZIALIZED TAG CALIBRATION"<<endl<<endl;
 
     if(process=="BsJPsiPhi") SetBsMassRange(5.20, 5.65);
@@ -107,7 +107,7 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 
 // additional features
     computeMuonVar(); // compute variable needed for the muon ID
-    inizializeTagVariables(); // initialize variables for muon tagger 
+    inizializeOsMuonTagVars(); // initialize variables for muon tagger 
     // tWriter->Reset();
     convSpheCart(jetPt, jetEta, jetPhi, jetPx, jetPy, jetPz); // needed for the methods
     convSpheCart(muoPt, muoEta, muoPhi, muoPx, muoPy, muoPz); // needed for the methods
@@ -151,14 +151,16 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
     int ssbPVT = GetBestPV(ssbSVT, tB);
     if(ssbPVT < 0) return false;
 
-    setVtxForTag(ssbSVT, ssbPVT); // set vertices index dor muon tagger
+    setVtxOsMuonTag(ssbSVT, ssbPVT); // set vertices index dor muon tagger
 
     hmass_ssB->Fill(svtMass->at(ssbSVT));
     
 //-----------------------------------------OPPOSITE SIDE-----------------------------------------
 
+    makeOsMuonTagging();
+
     int bestMuIndex = getOsMuon(); // get OS muon index
-    int tagDecision = getOsMuonTag(); get Tag decision // 1*trkCharge->at(osMuonTrackIndex_), 0 -> no muon.
+    int tagDecision = getOsMuonTag(); //get Tag decision  1*trkCharge->at(osMuonTrackIndex_), 0 -> no muon.
 
     if( tagDecision == 0 ){
         return true;
@@ -167,9 +169,9 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
     hmass_ssB_os->Fill(svtMass->at(ssbSVT));
 
     float osMuonTagMvaValue = getOsMuonTagMvaValue();
-    pair<float,float> osMuonTagMistag = getOsMuonTagMistagProb();
+    float osMuonTagMistag = getOsMuonTagMistagProbCalProcess();
 
-    cout<<"muon "<<bestMuIndex<<", tag "<<tagDecision<<", mistag "<<osMuonTagMistag.first<<" +- "<<osMuonTagMistag.second<<endl;
+    cout<<"muon "<<bestMuIndex<<", tag "<<tagDecision<<", mistag "<<osMuonTagMistag<<endl;
 
     return true;
 

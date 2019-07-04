@@ -27,6 +27,7 @@ public:
     void    inizializeOsMuonTagVars();
 
     bool    makeOsMuonTagging();
+    int     selectOsMuon(); 
 
     int     getOsMuon(){ return osMuonIndex_; }
     int     getOsMuonTag(){ return osMuonTagDecision_; }
@@ -44,7 +45,7 @@ public:
     int     getNosMuons(){ return nMuonsSel_; }
 
 private:
-    void    selectOsMuon(); 
+    
     TString methodNameFromWeightName();
     void    computeOsMuonTagVariables();
 

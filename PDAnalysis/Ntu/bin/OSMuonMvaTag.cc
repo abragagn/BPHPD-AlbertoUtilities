@@ -126,8 +126,7 @@ bool OSMuonMvaTag::makeOsMuonTagging(){
     return 1;
 }
 
-void OSMuonMvaTag::selectOsMuon()
-{
+int OSMuonMvaTag::selectOsMuon(){
     int iB = ssIndex_;
     int iPV = pvIndex_;
 
@@ -165,6 +164,8 @@ void OSMuonMvaTag::selectOsMuon()
 
     osMuonIndex_ = bestMuIndex;
     osMuonTrackIndex_ = bestMuTrack;
+
+    return bestMuIndex;
 }
 
 void OSMuonMvaTag::computeOsMuonTagVariables()
