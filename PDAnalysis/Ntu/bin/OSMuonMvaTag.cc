@@ -85,18 +85,13 @@ bool OSMuonMvaTag::inizializeOSMuonCalibration(
     auto *fBu = new TFile(methodPath + "OSMuonTaggerCalibration" + processBuMC + ".root");
     auto *fBs = new TFile(methodPath + "OSMuonTaggerCalibration" + processBsMC + ".root");
 
-    if(f->IsZombie() || fBu->IsZombie() || fBs->IsZombie()) return false;
-    f->cd();
+    if(f->IsZombie()){ cout<<"f IsZombie"<<endl;return false; }
+    if(fBu->IsZombie()){ cout<<"fBu IsZombie"<<endl;return false; }
+    if(fBs->IsZombie()){ cout<<"fBs IsZombie"<<endl;return false; }
+
     wCalProcess_ = (TF1*)f->Get("osMuonCal");
-    f->Close();
-
-    fBu->cd();
-    wCalBuMC_ = (TF1*)f->Get("osMuonCal");
-    fBu->Close();
-
-    fBs->cd();
-    wCalBsMC_ = (TF1*)f->Get("osMuonCal");
-    fBs->Close();
+    wCalBuMC_    = (TF1*)fBu->Get("osMuonCal");
+    wCalBsMC_    = (TF1*)fBs->Get("osMuonCal");
 
     wCalBuBs_ = new TF1("osMuonCalBuBs","[0]-[1]*[2]/[3]+[2]/[3]*x",0.,1.);
     float qs = wCalBsMC_->GetParameter(0);
