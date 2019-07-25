@@ -109,7 +109,7 @@ bool OSMuonMvaTag::inizializeOSMuonCalibration(
 bool OSMuonMvaTag::makeOsMuonTagging(){
     if(ssIndex_ < 0){ cout<<"SS NOT INITIALIZED"<<endl; return -999; }
     selectOsMuon();
-    if(osMuonIndex_ < 0){ osMuonTagDecision_ = 0; return 1;}
+    if(osMuonIndex_ < 0){ osMuonTagDecision_ = 0; return 0;}
     else osMuonTagDecision_ = -1*trkCharge->at(osMuonTrackIndex_); 
 
     computeOsMuonTagVariables();
