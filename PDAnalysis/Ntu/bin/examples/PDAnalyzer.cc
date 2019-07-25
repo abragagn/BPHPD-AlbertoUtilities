@@ -122,10 +122,10 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
 //------------------------------------------------HLT---------------------------------------
 
     bool jpsimu = false;
-    bool jpsitktk = false;
+    // bool jpsitktk = false;
 
     if(hlt(PDEnumString::HLT_Dimuon0_Jpsi3p5_Muon2_v)||hlt(PDEnumString::HLT_Dimuon0_Jpsi_Muon_v)) jpsimu = true;
-    if(hlt(PDEnumString::HLT_DoubleMu4_JpsiTrkTrk_Displaced_v)) jpsitktk =  true;
+    // if(hlt(PDEnumString::HLT_DoubleMu4_JpsiTrkTrk_Displaced_v)) jpsitktk =  true;
 
     if( !jpsimu ) return false; // hlt veto
     SetJpsiMuCut(); //set selection for jpsimu
@@ -135,12 +135,13 @@ bool PDAnalyzer::analyze( int entry, int event_file, int event_tot ) {
     int ssbSVT = GetCandidate(process);
     if(ssbSVT<0) return false;
 
-    bool isTight = false;
-    int ssbSVTtight = GetTightCandidate(process);
-    if(ssbSVTtight>=0){
-        isTight = true;
-        ssbSVT = ssbSVTtight;
-    }
+    // Tight selection
+    // bool isTight = false;
+    // int ssbSVTtight = GetTightCandidate(process);
+    // if(ssbSVTtight>=0){
+    //     isTight = true;
+    //     ssbSVT = ssbSVTtight;
+    // }
 
     int iJPsi = (subVtxFromSV(ssbSVT)).at(0);
     vector <int> tkJpsi = tracksFromSV(iJPsi);

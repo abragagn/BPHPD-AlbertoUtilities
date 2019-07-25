@@ -6,6 +6,7 @@ AlbertoUtil::AlbertoUtil() {}
 
 AlbertoUtil::~AlbertoUtil() {}
 
+using namespace std;
 
 // =====================================================================================
 bool AlbertoUtil::IsB( uint genindex ) 

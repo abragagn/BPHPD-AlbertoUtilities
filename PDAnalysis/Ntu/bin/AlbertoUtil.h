@@ -14,6 +14,8 @@
 #include "TMatrixF.h"
 #include "TVectorF.h"
 
+using namespace std;
+
 
 class AlbertoUtil:  public virtual PDAnalyzerUtil
 ,                   public virtual PDSoftMuonMvaEstimator
