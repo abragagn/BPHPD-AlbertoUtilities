@@ -11,8 +11,8 @@
 #include "TF1.h"
 #include "TLorentzVector.h"
 #include "Math/MinimizerOptions.h"
-#include "TMatrixF.h"
-#include "TVectorF.h"
+#include "TMatrixD.h"
+#include "TVectorD.h"
 
 using namespace std;
 
@@ -26,18 +26,26 @@ public:
     AlbertoUtil();
     virtual ~AlbertoUtil();
 
-    const float MassJPsi = 3.097;
-    const float MassMu = 0.1057;
-    const float MassK = 0.4937;
-    const float MassKx = 0.8917;
-    const float MassBs = 5.3663;
-    const float MassBu = 5.2793;
-    const float MassBd = 5.2796;
-    const float MassKs = 0.4977;
-    const float MassPi = 0.1396;
-    const float MassPhi = 1.019;
-    const float MassProton = 0.9382;
-    const float MassLambda = 1.116;
+    const double MUMASS  = 0.1056583745;
+    const double EMASS   = 0.00051099895;
+    const double PMASS   = 0.93827208816;
+
+    const double PIMASS  = 0.13957039;
+    const double PI0MASS = 0.1349768;
+
+    const double KMASS   = 0.493677;
+    const double K0MASS  = 0.497611;
+    const double KXMASS  = 0.89166;
+
+    const double BSMASS  = 5.36688;
+    const double B0MASS  = 5.27965;
+    const double BUMASS  = 5.27934;
+    const double BCMASS  = 6.2749;
+
+    const double JPSIMASS = 3.0969;
+    const double PHIMASS  = 1.019461;
+
+    const double LAMBDAMASS = 5.61960;
 
     const unsigned int listLundBmesons[24] = {511, 521, 10511, 10521, 513, 523, 10513, 10523, 20513, 
                                             20523, 515, 525, 531, 10531, 533, 10533, 20533, 535, 541, 
@@ -65,33 +73,33 @@ public:
     const unsigned int listLundCharmonium[13] = {441, 10441, 100441, 443, 10443, 20443, 100443, 30443, 9000443,
                                             9010443, 9020443, 445, 100445};
 
-    float MassRangeJPsi = 0.15;
+    double MassRangeJPsi = 0.15;
 
-    float BsMassRange[2] = {5.0, 6.0};
-    float BuMassRange[2] = {5.0, 6.0};
-    float BdMassRange[2] = {5.0, 6.0};
+    double BsMassRange[2] = {5.0, 6.0};
+    double BuMassRange[2] = {5.0, 6.0};
+    double BdMassRange[2] = {5.0, 6.0};
 
-    //B tight cuts JpsiMu hlt
-    float bPtCut = 11; //10
-    float bCtCut = 0.007; //0.02
-    float bVprobCut = 0.001;
-    float bMuPtCut = 3.5; //3.6
-    float bMuEtaCut = 2.4;
-    float bKPtCut = 1.2; //1.0
-    float bKEtaCut = 2.5;
+    //B tight cuts JpsiMu / JpsiTrkTrk
+    double bPtCut    = 11;    //10
+    double bCtCut    = 0.007; //0.02
+    double bVprobCut = 0.001;
+    double bMuPtCut  = 3.5;   //3.6
+    double bMuEtaCut = 2.4;
+    double bKPtCut   = 1.2;   //1.0
+    double bKEtaCut  = 2.5;
 
-    void SetBctCut(float newValue = 0.007){ bCtCut = newValue; }
-    void SetBptCut(float newValue = 10){ bPtCut = newValue; }
-    void SetBmuptCut(float newValue = 3.5){ bMuPtCut = newValue; }
-    void SetBkptCut(float newValue = 1.2){ bKPtCut = newValue; }
+    void SetBctCut(double newValue = 0.007){ bCtCut = newValue; }
+    void SetBptCut(double newValue = 10){ bPtCut = newValue; }
+    void SetBmuptCut(double newValue = 3.5){ bMuPtCut = newValue; }
+    void SetBkptCut(double newValue = 1.2){ bKPtCut = newValue; }
 
     void SetJpsiMuCut();
     void SetJpsiTrkTrkCut();
 
-    void SetMassRangeJPsi(float newValue){ MassRangeJPsi = newValue; }
-    void SetBsMassRange(float lower, float upper) { BsMassRange[0] = lower; BsMassRange[1] = upper; }
-    void SetBuMassRange(float lower, float upper) { BuMassRange[0] = lower; BuMassRange[1] = upper; }
-    void SetBdMassRange(float lower, float upper) { BdMassRange[0] = lower; BdMassRange[1] = upper; }
+    void SetMassRangeJPsi(double newValue){ MassRangeJPsi = newValue; }
+    void SetBsMassRange(double lower, double upper) { BsMassRange[0] = lower; BsMassRange[1] = upper; }
+    void SetBuMassRange(double lower, double upper) { BuMassRange[0] = lower; BuMassRange[1] = upper; }
+    void SetBdMassRange(double lower, double upper) { BdMassRange[0] = lower; BdMassRange[1] = upper; }
 
     bool IsLongLived( unsigned int i );
     bool IsB( unsigned int i ) ;
@@ -99,13 +107,13 @@ public:
     bool IsCharmonium( unsigned int i ) ;
     bool IsBottomium( unsigned int i ) ;
 
-    int GetClosestGen( float eta, float phi, float pt );
-    int GetClosestGenLongLivedB( float eta, float phi, float pt, std::vector <int> *GenList );
+    int GetClosestGen( double eta, double phi, double pt );
+    int GetClosestGenLongLivedB( double eta, double phi, double pt, std::vector <int> *GenList );
     int GetOverlappedTrack( int trk, std::vector <int> *List );
-    bool AreOverlapped( float pt1, float eta1, float phi1, float pt2, float eta2, float phi2 );
+    bool AreOverlapped( double pt1, double eta1, double phi1, double pt2, double eta2, double phi2 );
     int GetAncestor( unsigned int iGen, std::vector <int> *GenList );
     int MuonFromTrack(int trk);
-    float GetGenCT( unsigned int genIndex );
+    double GetGenCT( unsigned int genIndex );
 
     int GetBestBstrange();
     int GetBestBdown();
@@ -119,31 +127,31 @@ public:
     int GetTightCandidate(TString process);
     int GetCandidate(TString process);
     
-    float GetInvMass(int i1, int i2, float mass1, float mass2);
+    double GetInvMass(int i1, int i2, double mass1, double mass2);
     int TagMixStatus( unsigned int genIndex );
-    float GetMuoPFiso (int iMuon);
-    float GetJetCharge(int iJet, float kappa);
-    float GetListCharge(std::vector <int> *list, float kappa);
-    bool IsMvaMuon(int iMuon, float wp);
+    double GetMuoPFiso (int iMuon);
+    double GetJetCharge(int iJet, double kappa);
+    double GetListCharge(std::vector <int> *list, double kappa);
+    bool IsMvaMuon(int iMuon, double wp);
     int IPsign(int iMuon, int iPV);
-    float GetJetProbb(int iJet);
-    float CountEventsWithFit(TH1 *hist, TString process);
+    double GetJetProbb(int iJet);
+    double CountEventsWithFit(TH1 *hist, TString process);
     int GetBestPV(int isvt, TLorentzVector t);
     TLorentzVector GetTLorentzVecFromJpsiX(int iSvt);
-    float dZ(int itk, int iPV);
-    float dXYjet(int itk, int iPV, int iJet);
+    double dZ(int itk, int iPV);
+    double dXYjet(int itk, int iPV, int iJet);
     void PrintMotherChain(int iGen);
     void PrintDaughterTree(int iGen, const std::string & pre);
     void PrintDaughterTreePt(int iGen, const std::string & pre);
     bool HasDaughter(int iGen);
 
-    float GetCt2D(TLorentzVector t, int iSV);
-    float GetCt2D(TLorentzVector t, int iSV, int iPV);
-    float GetCt3D(TLorentzVector t, int iSV, int iPV);
+    double GetCt2D(TLorentzVector t, int iSV);
+    double GetCt2D(TLorentzVector t, int iSV, int iPV);
+    double GetCt3D(TLorentzVector t, int iSV, int iPV);
 
-    float GetCt2DErr(TLorentzVector t, int iSV);
-    float GetCt2DErr(TLorentzVector t, int iSV, int iPV);
-    float GetCt3DErr(TLorentzVector t, int iSV, int iPV);
+    double GetCt2DErr(TLorentzVector t, int iSV);
+    double GetCt2DErr(TLorentzVector t, int iSV, int iPV);
+    double GetCt3DErr(TLorentzVector t, int iSV, int iPV);
 
     bool isTrkHighPurity(int itk){ return (( trkQuality->at( itk ) >> 2 ) & 1); }
 

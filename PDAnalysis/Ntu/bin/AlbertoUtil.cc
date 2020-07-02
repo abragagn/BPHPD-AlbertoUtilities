@@ -51,7 +51,7 @@ bool AlbertoUtil::IsLongLived( uint genindex )
 }
 
 // =====================================================================================
-int AlbertoUtil::GetClosestGen( float eta, float phi, float pt ) 
+int AlbertoUtil::GetClosestGen( double eta, double phi, double pt ) 
 {
     double drb = 0.12;
     double dpb = 0.3; 
@@ -59,8 +59,8 @@ int AlbertoUtil::GetClosestGen( float eta, float phi, float pt )
     
     for( uint i=0; i<genId->size(); ++i ){
        if( !IsLongLived(i) ) continue;
-       float dr = deltaR(eta, phi, genEta->at(i), genPhi->at(i));
-       float dpt = fabs(genPt->at(i) - pt)/genPt->at(i);
+       double dr = deltaR(eta, phi, genEta->at(i), genPhi->at(i));
+       double dpt = fabs(genPt->at(i) - pt)/genPt->at(i);
 
        if( dr > drb ) continue;
        if( dpt > dpb) continue;
@@ -81,8 +81,8 @@ int AlbertoUtil::GetOverlappedTrack( int trk, vector <int> *List )
     
     for(int it:*List){
 
-       float dr = deltaR(trkEta->at(trk), trkPhi->at(trk), trkEta->at(it), trkPhi->at(it));
-       float dpt = fabs(trkPt->at(it) - trkPt->at(trk))/trkPt->at(it);
+       double dr = deltaR(trkEta->at(trk), trkPhi->at(trk), trkEta->at(it), trkPhi->at(it));
+       double dpt = fabs(trkPt->at(it) - trkPt->at(trk))/trkPt->at(it);
 
        if( dr > drb ) continue;
        if( dpt > dpb) continue;
@@ -95,13 +95,13 @@ int AlbertoUtil::GetOverlappedTrack( int trk, vector <int> *List )
 }
 
 // =====================================================================================
-bool AlbertoUtil::AreOverlapped( float pt1, float eta1, float phi1, float pt2, float eta2, float phi2 )
+bool AlbertoUtil::AreOverlapped( double pt1, double eta1, double phi1, double pt2, double eta2, double phi2 )
 {
     double drb = 0.01;
     double dpb = 0.05; 
 
-    float dr = deltaR(eta1, phi1, eta2, phi2);
-    float dpt = fabs(pt1 - pt2)/pt1;
+    double dr = deltaR(eta1, phi1, eta2, phi2);
+    double dpt = fabs(pt1 - pt2)/pt1;
 
     if( dr > drb ) return false;
     if( dpt > dpb) return false;
@@ -110,7 +110,7 @@ bool AlbertoUtil::AreOverlapped( float pt1, float eta1, float phi1, float pt2, f
 }
 
 // =====================================================================================
-int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector <int> *GenList ) 
+int AlbertoUtil::GetClosestGenLongLivedB( double eta, double phi, double pt, vector <int> *GenList ) 
 {
     double drb = 0.4;
     double dpb = 0.4; 
@@ -118,8 +118,8 @@ int AlbertoUtil::GetClosestGenLongLivedB( float eta, float phi, float pt, vector
     
     for(int it:*GenList){
 
-       float dr = deltaR(eta, phi, genEta->at(it), genPhi->at(it));
-       float dpt = fabs(genPt->at(it) - pt)/genPt->at(it);
+       double dr = deltaR(eta, phi, genEta->at(it), genPhi->at(it));
+       double dpt = fabs(genPt->at(it) - pt)/genPt->at(it);
 
        if( dr > drb ) continue;
        if( dpt > dpb) continue;
@@ -153,7 +153,7 @@ int AlbertoUtil::MuonFromTrack(int trk)
 }
 
 // =====================================================================================
-float AlbertoUtil::GetGenCT( uint genIndex ) 
+double AlbertoUtil::GetGenCT( uint genIndex ) 
 {
     const vector <int>& aD = allDaughters(genIndex);
     if( aD.size() == 0 ) return -1;
@@ -166,9 +166,9 @@ float AlbertoUtil::GetGenCT( uint genIndex )
     pGen.SetPtEtaPhiM( (double) genPt->at(genIndex), (double) genEta->at(genIndex),
          (double) genPhi->at(genIndex), (double) genMass->at(genIndex) );
 
-    float dx = genVx->at(genIndex)-genVx->at(mthIndex);
-    float dy = genVy->at(genIndex)-genVy->at(mthIndex);
-    float dz = genVz->at(genIndex)-genVz->at(mthIndex);
+    double dx = genVx->at(genIndex)-genVx->at(mthIndex);
+    double dy = genVy->at(genIndex)-genVy->at(mthIndex);
+    double dz = genVz->at(genIndex)-genVz->at(mthIndex);
 
     return sqrt( dx*dx+dy*dy+dz*dz )/pGen.Beta()/pGen.Gamma();
 }
@@ -177,7 +177,7 @@ float AlbertoUtil::GetGenCT( uint genIndex )
 int AlbertoUtil::GetBestBstrange()
 {
     int index = -1;
-    float bestChi2 = 1e9;
+    double bestChi2 = 1e9;
     for( int iB=0; iB<nSVertices; ++iB ){
 
        if((svtType->at(iB)!=PDEnumString::svtBsJPsiPhi) ) continue;
@@ -195,7 +195,7 @@ int AlbertoUtil::GetBestBstrange()
 int AlbertoUtil::GetBestBup()
 {
     int index = -1;
-    float bestChi2 = 1e9;
+    double bestChi2 = 1e9;
     for( int iB=0; iB<nSVertices; ++iB ){
 
        if((svtType->at(iB)!=PDEnumString::svtBuJPsiK) ) continue;
@@ -213,7 +213,7 @@ int AlbertoUtil::GetBestBup()
 int AlbertoUtil::GetBestBdown()
 {
     int index = -1;
-    float bestChi2 = 1e9;
+    double bestChi2 = 1e9;
     for( int iB=0; iB<nSVertices; ++iB ){
 
        if((svtType->at(iB)!=PDEnumString::svtBdJPsiKx) ) continue;
@@ -229,7 +229,7 @@ int AlbertoUtil::GetBestBdown()
 // ========================================================================================
 bool AlbertoUtil::IsTightJPsi(int iJPsi)
 {
-    if(fabs(svtMass->at(iJPsi) - MassJPsi) > 0.15 ) return false;
+    if(fabs(svtMass->at(iJPsi) - JPSIMASS) > 0.15 ) return false;
 
     vector <int> tkJpsi = tracksFromSV(iJPsi);
     TLorentzVector tJPsi(0,0,0,0);
@@ -239,7 +239,7 @@ bool AlbertoUtil::IsTightJPsi(int iJPsi)
         if(trkPt->at(j) < bMuPtCut) return false;
         if(fabs(trkEta->at(j)) > bMuEtaCut) return false;
         TLorentzVector a;
-        a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), MassMu );
+        a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), MUMASS );
         tJPsi += a;
     }
 
@@ -251,7 +251,7 @@ bool AlbertoUtil::IsTightJPsi(int iJPsi)
 // ========================================================================================
 bool AlbertoUtil::IsTightPhi(int iPhi)
 {
-    if(fabs(svtMass->at(iPhi) - MassPhi) > 0.01 ) return false;
+    if(fabs(svtMass->at(iPhi) - PHIMASS) > 0.01 ) return false;
     
     vector <int> tkPhi = tracksFromSV(iPhi);
     for( uint i=0; i<tkPhi.size(); ++i ){
@@ -273,7 +273,7 @@ bool AlbertoUtil::IsTightPhi(int iPhi)
 int AlbertoUtil::GetBestBstrangeTight()
 {
     int index = -1;
-    float best = 0.;
+    double best = 0.;
     SetBsMassRange(5.2, 5.65);
 
     for( int iB=0; iB<nSVertices; ++iB ){
@@ -297,15 +297,15 @@ int AlbertoUtil::GetBestBstrangeTight()
 
         for( uint i=0; i<tkSsB.size(); ++i ){
             int j = tkSsB[i];
-            float m = MassK;
-            if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MassMu;
+            double m = KMASS;
+            if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MUMASS;
             TLorentzVector a;
             a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
             tB += a;
         }
 
         //BS
-        float bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
+        double bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
         if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
         if( bVprob < bVprobCut ) continue;
         if(tB.Pt() < bPtCut) continue;
@@ -326,7 +326,7 @@ int AlbertoUtil::GetBestBstrangeTight()
 int AlbertoUtil::GetBestBupTight()
 {
     int index = -1;
-    float best = 0.;
+    double best = 0.;
     for( int iB=0; iB<nSVertices; ++iB ){
 
         if((svtType->at(iB)!=PDEnumString::svtBuJPsiK) ) continue;
@@ -338,19 +338,19 @@ int AlbertoUtil::GetBestBupTight()
         vector <int> tkSsB = tracksFromSV(iB);
 
         TLorentzVector tB(0,0,0,0);
-        float KaonPt = 0;
+        double KaonPt = 0;
 
         for( uint i=0; i<tkSsB.size(); ++i ){
             int j = tkSsB[i];
-            float m = MassK;
-            if( j == tkJpsi[0] || j == tkJpsi[1] ){ m = MassMu; }else{ KaonPt = trkPt->at(j); }
+            double m = KMASS;
+            if( j == tkJpsi[0] || j == tkJpsi[1] ){ m = MUMASS; }else{ KaonPt = trkPt->at(j); }
             TLorentzVector a;
             a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
             tB += a;
        }
 
        //Bu
-        float bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
+        double bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
         if( svtMass->at(iB)<BuMassRange[0] || svtMass->at(iB)>BuMassRange[1] ) continue;
         if( bVprob < bVprobCut ) continue;
         if(tB.Pt() < bPtCut) continue;
@@ -371,7 +371,7 @@ int AlbertoUtil::GetBestBupTight()
 int AlbertoUtil::GetBestBdownTight()
 {
     int index = -1;
-    float best = 0.;
+    double best = 0.;
     for( int iB=0; iB<nSVertices; ++iB ){
 
         if((svtType->at(iB)!=PDEnumString::svtBdJPsiKx) ) continue;
@@ -386,15 +386,15 @@ int AlbertoUtil::GetBestBdownTight()
 
         for( uint i=0; i<tkSsB.size(); ++i ){
             int j = tkSsB[i];
-            float m = MassKx;
-            if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MassMu;
+            double m = KXMASS;
+            if( j == tkJpsi[0] || j == tkJpsi[1] ) m = MUMASS;
             TLorentzVector a;
             a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
             tB += a;
         }
 
         //Bd
-        float bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
+        double bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
         if( svtMass->at(iB)<BdMassRange[0] || svtMass->at(iB)>BdMassRange[1] ) continue;
         if( bVprob < bVprobCut ) continue;
         if(tB.Pt() < bPtCut) continue;
@@ -413,10 +413,10 @@ int AlbertoUtil::GetBestBdownTight()
 int AlbertoUtil::GetBestJpsi()
 {
     int index = -1;
-    float bestChi2 = 1e9;
+    double bestChi2 = 1e9;
     for( int i=0; i<nSVertices; ++i ){
         if((svtType->at(i)!=PDEnumString::svtJPsi) ) continue;
-        if( fabs(svtMass->at(i)-MassJPsi) > MassRangeJPsi) continue;
+        if( fabs(svtMass->at(i)-JPSIMASS) > MassRangeJPsi) continue;
 
         if( svtChi2->at(i)>bestChi2 ) continue;
         index = i;
@@ -426,19 +426,19 @@ int AlbertoUtil::GetBestJpsi()
 }
 
 // ========================================================================================
-float AlbertoUtil::GetInvMass(int i1, int i2, float mass1, float mass2)
+double AlbertoUtil::GetInvMass(int i1, int i2, double mass1, double mass2)
 {
-    float px1=trkPx->at(i1);
-    float px2=trkPx->at(i2);
-    float py1=trkPy->at(i1);
-    float py2=trkPy->at(i2);
-    float pz1=trkPz->at(i1);
-    float pz2=trkPz->at(i2);
+    double px1=trkPx->at(i1);
+    double px2=trkPx->at(i2);
+    double py1=trkPy->at(i1);
+    double py2=trkPy->at(i2);
+    double pz1=trkPz->at(i1);
+    double pz2=trkPz->at(i2);
 
-    float E1=sqrt( pow(mass1,2) + pow(px1,2)+pow(py1,2)+pow(pz1,2) );
-    float E2=sqrt( pow(mass2,2) + pow(px2,2)+pow(py2,2)+pow(pz2,2) );
+    double E1=sqrt( pow(mass1,2) + pow(px1,2)+pow(py1,2)+pow(pz1,2) );
+    double E2=sqrt( pow(mass2,2) + pow(px2,2)+pow(py2,2)+pow(pz2,2) );
 
-    float m=sqrt( pow( (E1+E2),2) - ( pow(px1+px2,2) + pow(py1+py2,2) + pow(pz1+pz2,2) ) );
+    double m=sqrt( pow( (E1+E2),2) - ( pow(px1+px2,2) + pow(py1+py2,2) + pow(pz1+pz2,2) ) );
 
     return m;
 }
@@ -458,10 +458,10 @@ int AlbertoUtil::TagMixStatus( uint genindex )
 }
 
 // ========================================================================================
-float AlbertoUtil::GetMuoPFiso (int iMuon)
+double AlbertoUtil::GetMuoPFiso (int iMuon)
 {
-    float PFIso = muoSumCPpt->at(iMuon)/muoPt->at(iMuon);
-    float betaCorr = muoSumNHet->at(iMuon)+muoSumPHet->at(iMuon)-0.5*(muoSumPUpt->at(iMuon));
+    double PFIso = muoSumCPpt->at(iMuon)/muoPt->at(iMuon);
+    double betaCorr = muoSumNHet->at(iMuon)+muoSumPHet->at(iMuon)-0.5*(muoSumPUpt->at(iMuon));
     betaCorr/=muoPt->at(iMuon);
     if(betaCorr>0) PFIso+=betaCorr;
 
@@ -469,23 +469,23 @@ float AlbertoUtil::GetMuoPFiso (int iMuon)
 }
 
 // ========================================================================================
-bool AlbertoUtil::IsMvaMuon(int iMuon, float wp)
+bool AlbertoUtil::IsMvaMuon(int iMuon, double wp)
 {
     if(computeMuonMva(iMuon)>=wp) return true;
     return false;
 }
 
 // =====================================================================================
-float AlbertoUtil::GetJetCharge(int iJet, float kappa)
+double AlbertoUtil::GetJetCharge(int iJet, double kappa)
 {
-    float QJet = 0;
-    float ptJet = 0;
+    double QJet = 0;
+    double ptJet = 0;
 
     vector <int> list = pfCandFromJet( iJet );
 
     for(int it:list){
-       float pt = pfcPt->at(it);
-       float eta = pfcEta->at(it);
+       double pt = pfcPt->at(it);
+       double eta = pfcEta->at(it);
 
        if(pt<0.2) continue;
        if(fabs(eta)>2.5) continue;
@@ -500,10 +500,10 @@ float AlbertoUtil::GetJetCharge(int iJet, float kappa)
 }
 
 // =====================================================================================
-float AlbertoUtil::GetListCharge(vector <int> *list, float kappa)
+double AlbertoUtil::GetListCharge(vector <int> *list, double kappa)
 {
-    float Q = 0;
-    float pt = 0;
+    double Q = 0;
+    double pt = 0;
     for(int it:*list){
        Q += trkCharge->at(it) * pow(trkPt->at(it), kappa);
        pt += pow(trkPt->at(it), kappa);
@@ -512,11 +512,11 @@ float AlbertoUtil::GetListCharge(vector <int> *list, float kappa)
 }
 
 // =====================================================================================
-float AlbertoUtil::GetJetProbb(int iJet)
+double AlbertoUtil::GetJetProbb(int iJet)
 {
-    float probb = 0;
-    float probbb = 0;
-    float problepb = 0;
+    double probb = 0;
+    double probbb = 0;
+    double problepb = 0;
     for(int iTag=0; iTag<nTags; ++iTag){
         if(tagJet->at(iTag) != iJet) continue;
         if(tagType->at(iTag) == PDEnumString::pfDeepFlavourJetTags_probb){
@@ -536,17 +536,17 @@ float AlbertoUtil::GetJetProbb(int iJet)
 }
 
 // =====================================================================================
-float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
+double AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
 {
     //ROOT::Math::MinimizerOptions::SetDefaultMaxFunctionCalls( 10000 );
 
-    float mean=MassBs;
-    if(process=="BsJPsiPhi")   mean=MassBs;
-    if(process=="BuJPsiK")     mean=MassBu;
-    if(process=="BdJPsiKx")    mean=MassBd;
-    if(process=="BdKxMuMu")    mean=MassBd;
+    double mean = BSMASS;
+    if(process=="BsJPsiPhi")   mean=BSMASS;
+    if(process=="BuJPsiK")     mean=BUMASS;
+    if(process=="BdJPsiKx")    mean=B0MASS;
+    if(process=="BdKxMuMu")    mean=B0MASS;
 
-    float sigma = 0.015;
+    double sigma = 0.015;
 
     TString sgnDef = "[1]*TMath::Gaus(x, [0], [4], true)";
     sgnDef +=       "+[2]*TMath::Gaus(x, [0], [5], true)";
@@ -558,7 +558,7 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
     TF1 *func = new TF1("func", funcDef, hist->GetBinLowEdge(1), hist->GetBinLowEdge(hist->GetNbinsX()));
 
     //SIGNAL
-    float limit = hist->GetEntries()*hist->GetBinWidth(1);
+    double limit = hist->GetEntries()*hist->GetBinWidth(1);
 
     func->SetParameter(0, mean);
     func->SetParameter(1, limit/3);
@@ -583,7 +583,7 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
 
     TF1 *fit = hist->GetFunction("MRLSQ");
 
-    float nEvt = fit->GetParameter(1);
+    double nEvt = fit->GetParameter(1);
     nEvt += fit->GetParameter(2);
     nEvt += fit->GetParameter(3);
 
@@ -596,7 +596,7 @@ float AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
 int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 {
     int ssPV = -1;
-    float bestCos = -1;
+    double bestCos = -1;
 
     TVector3 vB(t.Px(),t.Py(),t.Pz());
     TVector3 vSVT( svtX->at(isvt), svtY->at(isvt), svtZ->at(isvt) );
@@ -608,7 +608,7 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
        TVector3 vPV(pvtX->at( i ), pvtY->at( i ), pvtZ->at( i ) );
        TVector3 vPointing;
        vPointing = vSVT - vPV;
-       float cos = vPointing.Unit() * vB.Unit();
+       double cos = vPointing.Unit() * vB.Unit();
 
        if(cos > bestCos ){
          bestCos = cos;
@@ -630,8 +630,8 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
 
     for( uint i=0; i<tkSsB.size(); ++i ){
         int j = tkSsB.at(i);
-        float m = MassK;
-        if( (j==tkJpsi.at(0)) || (j==tkJpsi.at(1)) ) m = MassMu;
+        double m = KMASS;
+        if( (j==tkJpsi.at(0)) || (j==tkJpsi.at(1)) ) m = MUMASS;
         TLorentzVector a;
         a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), m );
         t += a;
@@ -657,13 +657,13 @@ int AlbertoUtil::GetCandidate(TString process)
 }
 
 // =====================================================================================
-float AlbertoUtil::dZ(int itk, int iPV)
+double AlbertoUtil::dZ(int itk, int iPV)
 {
     return PDAnalyzerUtil::dZ(itk, pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV));
 }
 
 // =====================================================================================
-float AlbertoUtil::dXYjet(int itk, int iPV, int iJet)
+double AlbertoUtil::dXYjet(int itk, int iPV, int iJet)
 {
     return fabs(dXY( itk, pvtX->at(iPV), pvtY->at(iPV) ))*dSign( itk, iJet, pvtX->at(iPV), pvtY->at(iPV) );
 }
@@ -761,7 +761,7 @@ bool AlbertoUtil::HasDaughter(int iGen)
 }
 
 // =================================================================================================
-float AlbertoUtil::GetCt2D(TLorentzVector t, int iSV)
+double AlbertoUtil::GetCt2D(TLorentzVector t, int iSV)
 {
     TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
     TVector3 vPV( bsX, bsY, 0. );
@@ -769,11 +769,11 @@ float AlbertoUtil::GetCt2D(TLorentzVector t, int iSV)
     TVector3 vPointing = vSVT - vPV;
     TVector3 vBs = t.Vect();
 
-    return MassBs/t.Pt() * (vPointing * vBs.Unit());
+    return BSMASS/t.Pt() * (vPointing * vBs.Unit());
 }
 
 // =================================================================================================
-float AlbertoUtil::GetCt2D(TLorentzVector t, int iSV, int iPV)
+double AlbertoUtil::GetCt2D(TLorentzVector t, int iSV, int iPV)
 {
     TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
     TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), 0. );
@@ -781,11 +781,11 @@ float AlbertoUtil::GetCt2D(TLorentzVector t, int iSV, int iPV)
     TVector3 vPointing = vSVT - vPV;
     TVector3 vBs = t.Vect();
 
-    return MassBs/t.Pt() * (vPointing * vBs.Unit());
+    return BSMASS/t.Pt() * (vPointing * vBs.Unit());
 }
 
 // =================================================================================================
-float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
+double AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
 {
     TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
     TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV) );
@@ -793,11 +793,11 @@ float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
     TVector3 vPointing = vSVT - vPV;
     TVector3 vBs = t.Vect();
 
-    return MassBs/t.P() * vPointing.Dot(vBs)/vBs.Mag();
+    return BSMASS/t.P() * vPointing.Dot(vBs)/vBs.Mag();
 }
 
 // =================================================================================================
-/*float AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV)
+/*double AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV)
 {
 
   TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
@@ -806,31 +806,31 @@ float AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
   TVector3 vPointing = vSVT - vPV;
   TVector3 vBs = t.Vect();
 
-  TMatrixF covSV(3,3);
-  float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
+  TMatrixD covSV(3,3);
+  double covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
                       svtSxy->at(iSV),svtSyy->at(iSV),svtSyz->at(iSV), 
                       svtSxz->at(iSV),svtSyz->at(iSV),svtSzz->at(iSV)};
   covSV.SetMatrixArray(covSVArray);
 
-  TMatrixF covPV(3,3);
-  float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
+  TMatrixD covPV(3,3);
+  double covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
                       pvtSxy->at(iPV),pvtSyy->at(iPV),pvtSyz->at(iPV), 
                       pvtSxz->at(iPV),pvtSyz->at(iPV),pvtSzz->at(iPV)};
   covPV.SetMatrixArray(covPVArray);
 
-  TMatrixF covTot= covSV+covPV;
+  TMatrixD covTot= covSV+covPV;
 
-  float distArray2D[]={float(vPointing.X()),float(vPointing.Y()),0.};
-  TVectorF diff2D(3,distArray2D);
+  double distArray2D[]={double(vPointing.X()),double(vPointing.Y()),0.};
+  TVectorD diff2D(3,distArray2D);
 
   if (diff2D.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
 
-  return MassBs/t.Pt() * sqrt(covTot.Similarity(diff2D)) / sqrt(diff2D.Norm2Sqr()); 
+  return BSMASS/t.Pt() * sqrt(covTot.Similarity(diff2D)) / sqrt(diff2D.Norm2Sqr()); 
    
 }
 */
 // =================================================================================================
-float AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV, int iPV)
+double AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV, int iPV)
 {
     TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
     TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), 0. );
@@ -838,30 +838,30 @@ float AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV, int iPV)
     TVector3 vPointing = vSVT - vPV;
     TVector3 vBs = t.Vect();
 
-    TMatrixF covSV(3,3);
-    float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
+    TMatrixD covSV(3,3);
+    double covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
                       svtSxy->at(iSV),svtSyy->at(iSV),svtSyz->at(iSV), 
                       svtSxz->at(iSV),svtSyz->at(iSV),svtSzz->at(iSV)};
     covSV.SetMatrixArray(covSVArray);
 
-    TMatrixF covPV(3,3);
-    float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
+    TMatrixD covPV(3,3);
+    double covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
                       pvtSxy->at(iPV),pvtSyy->at(iPV),pvtSyz->at(iPV), 
                       pvtSxz->at(iPV),pvtSyz->at(iPV),pvtSzz->at(iPV)};
     covPV.SetMatrixArray(covPVArray);
 
-    TMatrixF covTot= covSV+covPV;
+    TMatrixD covTot= covSV+covPV;
 
-    float distArray2D[]={float(vPointing.X()),float(vPointing.Y()),0.};
-    TVectorF diff2D(3,distArray2D);
+    double distArray2D[]={double(vPointing.X()),double(vPointing.Y()),0.};
+    TVectorD diff2D(3,distArray2D);
 
     if (diff2D.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
 
-    return MassBs/t.Pt() * sqrt(covTot.Similarity(diff2D)) / sqrt(diff2D.Norm2Sqr()); 
+    return BSMASS/t.Pt() * sqrt(covTot.Similarity(diff2D)) / sqrt(diff2D.Norm2Sqr()); 
 }
 
 // =================================================================================================
-float AlbertoUtil::GetCt3DErr(TLorentzVector t, int iSV, int iPV)
+double AlbertoUtil::GetCt3DErr(TLorentzVector t, int iSV, int iPV)
 {
     TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), svtZ->at(iSV) );
     TVector3 vPV( pvtX->at(iPV), pvtY->at(iPV), pvtZ->at(iPV) );
@@ -869,26 +869,26 @@ float AlbertoUtil::GetCt3DErr(TLorentzVector t, int iSV, int iPV)
     TVector3 vPointing = vSVT - vPV;
     TVector3 vBs = t.Vect();
 
-    TMatrixF covSV(3,3);
-    float covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
+    TMatrixD covSV(3,3);
+    double covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
                       svtSxy->at(iSV),svtSyy->at(iSV),svtSyz->at(iSV), 
                       svtSxz->at(iSV),svtSyz->at(iSV),svtSzz->at(iSV)};
     covSV.SetMatrixArray(covSVArray);
 
-    TMatrixF covPV(3,3);
-    float covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
+    TMatrixD covPV(3,3);
+    double covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
                       pvtSxy->at(iPV),pvtSyy->at(iPV),pvtSyz->at(iPV), 
                       pvtSxz->at(iPV),pvtSyz->at(iPV),pvtSzz->at(iPV)};
     covPV.SetMatrixArray(covPVArray);
 
-    TMatrixF covTot= covSV+covPV;
+    TMatrixD covTot= covSV+covPV;
 
-    float distArray[]={float(vPointing.X()),float(vPointing.Y()),float(vPointing.Z())};
-    TVectorF diff(3,distArray);
+    double distArray[]={double(vPointing.X()),double(vPointing.Y()),double(vPointing.Z())};
+    TVectorD diff(3,distArray);
 
     if ( diff.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
 
-    return MassBs/t.P() * sqrt(covTot.Similarity(diff)) / sqrt(diff.Norm2Sqr()); 
+    return BSMASS/t.P() * sqrt(covTot.Similarity(diff)) / sqrt(diff.Norm2Sqr()); 
 }
 
 // =================================================================================================
