@@ -12,7 +12,7 @@ using namespace std;
 bool AlbertoUtil::IsB( uint genindex ) 
 {
     uint genCode = abs( genId->at(genindex) );
-    for( uint i=0; i<ARRAY_SIZE(listLundBmesons); ++i ) if( genCode == listLundBmesons[i] ) return true;
+    for( uint i=0; i<ARRAY_SIZE(listLundBmesons); ++i ) if( genCode == listLundBmesons[i] )   return true;
     for( uint i=0; i<ARRAY_SIZE(listLundBbaryons); ++i ) if( genCode == listLundBbaryons[i] ) return true;
     return false;
 }
@@ -29,7 +29,7 @@ bool AlbertoUtil::IsBottomium(uint genindex)
 bool AlbertoUtil::IsC( uint genindex ) 
 {
     uint genCode = abs( genId->at(genindex) );
-    for( uint i=0; i<ARRAY_SIZE(listLundCmesons); ++i ) if( genCode == listLundCmesons[i] ) return true;
+    for( uint i=0; i<ARRAY_SIZE(listLundCmesons); ++i ) if( genCode == listLundCmesons[i] )   return true;
     for( uint i=0; i<ARRAY_SIZE(listLundCbaryons); ++i ) if( genCode == listLundCbaryons[i] ) return true;
     return false;
 }
@@ -60,7 +60,7 @@ int AlbertoUtil::GetClosestGen( double eta, double phi, double pt )
     for( uint i=0; i<genId->size(); ++i ){
        if( !IsLongLived(i) ) continue;
        double dr = deltaR(eta, phi, genEta->at(i), genPhi->at(i));
-       double dpt = fabs(genPt->at(i) - pt)/genPt->at(i);
+       double dpt = abs(genPt->at(i) - pt)/genPt->at(i);
 
        if( dr > drb ) continue;
        if( dpt > dpb) continue;
@@ -73,7 +73,7 @@ int AlbertoUtil::GetClosestGen( double eta, double phi, double pt )
 }
 
 // =====================================================================================
-int AlbertoUtil::GetOverlappedTrack( int trk, vector <int> *List )
+int AlbertoUtil::GetOverlappedTrack( int trk, vector<int> *List )
 {
     double drb = 0.1;
     double dpb = 0.1; 
@@ -82,7 +82,7 @@ int AlbertoUtil::GetOverlappedTrack( int trk, vector <int> *List )
     for(int it:*List){
 
        double dr = deltaR(trkEta->at(trk), trkPhi->at(trk), trkEta->at(it), trkPhi->at(it));
-       double dpt = fabs(trkPt->at(it) - trkPt->at(trk))/trkPt->at(it);
+       double dpt = abs(trkPt->at(it) - trkPt->at(trk))/trkPt->at(it);
 
        if( dr > drb ) continue;
        if( dpt > dpb) continue;
@@ -101,7 +101,7 @@ bool AlbertoUtil::AreOverlapped( double pt1, double eta1, double phi1, double pt
     double dpb = 0.05; 
 
     double dr = deltaR(eta1, phi1, eta2, phi2);
-    double dpt = fabs(pt1 - pt2)/pt1;
+    double dpt = abs(pt1 - pt2)/pt1;
 
     if( dr > drb ) return false;
     if( dpt > dpb) return false;
@@ -110,7 +110,7 @@ bool AlbertoUtil::AreOverlapped( double pt1, double eta1, double phi1, double pt
 }
 
 // =====================================================================================
-int AlbertoUtil::GetClosestGenLongLivedB( double eta, double phi, double pt, vector <int> *GenList ) 
+int AlbertoUtil::GetClosestGenLongLivedB( double eta, double phi, double pt, vector<int> *GenList ) 
 {
     double drb = 0.4;
     double dpb = 0.4; 
@@ -119,7 +119,7 @@ int AlbertoUtil::GetClosestGenLongLivedB( double eta, double phi, double pt, vec
     for(int it:*GenList){
 
        double dr = deltaR(eta, phi, genEta->at(it), genPhi->at(it));
-       double dpt = fabs(genPt->at(it) - pt)/genPt->at(it);
+       double dpt = abs(genPt->at(it) - pt)/genPt->at(it);
 
        if( dr > drb ) continue;
        if( dpt > dpb) continue;
@@ -132,9 +132,9 @@ int AlbertoUtil::GetClosestGenLongLivedB( double eta, double phi, double pt, vec
 }
 
 // =====================================================================================
-int AlbertoUtil::GetAncestor( uint iGen, vector <int> *GenList ) 
+int AlbertoUtil::GetAncestor( uint iGen, vector<int> *GenList ) 
 {
-    const vector <int>* aM = &allMothers(iGen);
+    const vector<int>* aM = &allMothers(iGen);
     while( aM->size()>0 ){ 
        int a = aM->at(0);
        for( uint i=0; i<GenList->size(); ++i ) if( GenList->at(i) == a ) return GenList->at(i);
@@ -155,7 +155,7 @@ int AlbertoUtil::MuonFromTrack(int trk)
 // =====================================================================================
 double AlbertoUtil::GetGenCT( uint genIndex ) 
 {
-    const vector <int>& aD = allDaughters(genIndex);
+    const vector<int>& aD = allDaughters(genIndex);
     if( aD.size() == 0 ) return -1;
 
     uint mthIndex = aD[0];
@@ -177,16 +177,16 @@ double AlbertoUtil::GetGenCT( uint genIndex )
 int AlbertoUtil::GetBestBstrange()
 {
     int index = -1;
-    double bestChi2 = 1e9;
+    double bestVtxProb = 0.;
     for( int iB=0; iB<nSVertices; ++iB ){
-
        if((svtType->at(iB)!=PDEnumString::svtBsJPsiPhi) ) continue;
        if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
 
-       if( svtChi2->at(iB)>bestChi2 ) continue;
-       index = iB;
-       bestChi2 = svtChi2->at(iB);
+       double vtxprob = TMath::Prob(svtChi2->at(iB),svtNDOF->at(iB));
+       if( vtxprob < bestVtxProb ) continue;
 
+       index = iB;
+       bestVtxProb = vtxprob;
     }
     return index;
 }
@@ -195,16 +195,16 @@ int AlbertoUtil::GetBestBstrange()
 int AlbertoUtil::GetBestBup()
 {
     int index = -1;
-    double bestChi2 = 1e9;
+    double bestVtxProb = 0.;
     for( int iB=0; iB<nSVertices; ++iB ){
+        if((svtType->at(iB)!=PDEnumString::svtBuJPsiK) ) continue;
+        if( svtMass->at(iB)<BuMassRange[0] || svtMass->at(iB)>BuMassRange[1] ) continue;
 
-       if((svtType->at(iB)!=PDEnumString::svtBuJPsiK) ) continue;
-       if( svtMass->at(iB)<BuMassRange[0] || svtMass->at(iB)>BuMassRange[1] ) continue;
+        double vtxprob = TMath::Prob(svtChi2->at(iB),svtNDOF->at(iB));
+        if( vtxprob < bestVtxProb ) continue;
 
-       if( svtChi2->at(iB) > bestChi2 ) continue;
-       index = iB;
-       bestChi2 = svtChi2->at(iB);
-
+        index = iB;
+        bestVtxProb = vtxprob;
     }
     return index;
 }
@@ -213,15 +213,16 @@ int AlbertoUtil::GetBestBup()
 int AlbertoUtil::GetBestBdown()
 {
     int index = -1;
-    double bestChi2 = 1e9;
+    double bestVtxProb = 0.;
     for( int iB=0; iB<nSVertices; ++iB ){
-
        if((svtType->at(iB)!=PDEnumString::svtBdJPsiKx) ) continue;
        if( svtMass->at(iB)<BdMassRange[0] || svtMass->at(iB)>BdMassRange[1] ) continue;
-       if( svtChi2->at(iB) > bestChi2 ) continue;
-       index = iB;
-       bestChi2 = svtChi2->at(iB);
 
+       double vtxprob = TMath::Prob(svtChi2->at(iB),svtNDOF->at(iB));
+        if( vtxprob < bestVtxProb ) continue;
+
+        index = iB;
+        bestVtxProb = vtxprob;
     }
     return index;
 }
@@ -229,18 +230,18 @@ int AlbertoUtil::GetBestBdown()
 // ========================================================================================
 bool AlbertoUtil::IsTightJPsi(int iJPsi)
 {
-    if(fabs(svtMass->at(iJPsi) - JPSIMASS) > 0.15 ) return false;
+    if(abs(svtMass->at(iJPsi) - JPSIMASS) > 0.150 ) return false;
 
-    vector <int> tkJpsi = tracksFromSV(iJPsi);
-    TLorentzVector tJPsi(0,0,0,0);
+    vector<int> tkJpsi = tracksFromSV(iJPsi);
+    // TLorentzVector tJPsi(0,0,0,0); // No more cut on Jpsi momentum
 
     for( uint i=0; i<tkJpsi.size(); ++i ){
         int j = tkJpsi[i];
         if(trkPt->at(j) < bMuPtCut) return false;
-        if(fabs(trkEta->at(j)) > bMuEtaCut) return false;
-        TLorentzVector a;
-        a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), MUMASS );
-        tJPsi += a;
+        if(abs(trkEta->at(j)) > bMuEtaCut) return false;
+        // TLorentzVector a;
+        // a.SetPtEtaPhiM( trkPt->at(j), trkEta->at(j), trkPhi->at(j), MUMASS );
+        // tJPsi += a;
     }
 
     //if(tJPsi.Pt() < 7.0) return false;
@@ -251,41 +252,36 @@ bool AlbertoUtil::IsTightJPsi(int iJPsi)
 // ========================================================================================
 bool AlbertoUtil::IsTightPhi(int iPhi)
 {
-    if(fabs(svtMass->at(iPhi) - PHIMASS) > 0.01 ) return false;
+    if(abs(svtMass->at(iPhi) - PHIMASS) > 0.010 ) return false;
     
-    vector <int> tkPhi = tracksFromSV(iPhi);
+    vector<int> tkPhi = tracksFromSV(iPhi);
     for( uint i=0; i<tkPhi.size(); ++i ){
         int j = tkPhi[i];
         if(trkPt->at(j) < bKPtCut) return false;
-        if(fabs(trkEta->at(j)) > bKEtaCut) return false;
+        if(abs(trkEta->at(j)) > bKEtaCut) return false;
 
         int K_Hits = trkHitPattern->at(tkPhi[i]);
-        K_Hits = ( int(K_Hits) / 100 ) % 10000;
-        K_Hits = K_Hits % 100;
-        if(K_Hits<4 ) return false;
-
+        if(((int(K_Hits)/100)%10000)%100<4 ) return false;
     }
     return true;
 }
-
 
 // ========================================================================================
 int AlbertoUtil::GetBestBstrangeTight()
 {
     int index = -1;
     double best = 0.;
-    SetBsMassRange(5.2, 5.65);
 
     for( int iB=0; iB<nSVertices; ++iB ){
 
         if((svtType->at(iB)!=PDEnumString::svtBsJPsiPhi) ) continue;
 
         int iJPsi = (subVtxFromSV(iB)).at(0);
-        int iPhi = (subVtxFromSV(iB)).at(1);
+        int iPhi  = (subVtxFromSV(iB)).at(1);
 
-        vector <int> tkSsB = tracksFromSV(iB);
-        vector <int> tkJpsi = tracksFromSV(iJPsi);
-        vector <int> tkPhi = tracksFromSV(iPhi);
+        vector<int> tkSsB  = tracksFromSV(iB);
+        vector<int> tkJpsi = tracksFromSV(iJPsi);
+        vector<int> tkPhi  = tracksFromSV(iPhi);
 
         //JPSI
         if(!IsTightJPsi(iJPsi)) continue;
@@ -293,6 +289,7 @@ int AlbertoUtil::GetBestBstrangeTight()
         //PHI
         if(!IsTightPhi(iPhi)) continue;
 
+        //BS
         TLorentzVector tB(0,0,0,0);
 
         for( uint i=0; i<tkSsB.size(); ++i ){
@@ -304,15 +301,15 @@ int AlbertoUtil::GetBestBstrangeTight()
             tB += a;
         }
 
-        //BS
-        double bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
-        if( svtMass->at(iB)<BsMassRange[0] || svtMass->at(iB)>BsMassRange[1] ) continue;
+        double bVprob = TMath::Prob( svtChi2->at(iB), svtNDOF->at(iB) );
+        if( svtMass->at(iB)<BsMassRangeTight[0] || svtMass->at(iB)>BsMassRangeTight[1] ) continue;
         if( bVprob < bVprobCut ) continue;
         if(tB.Pt() < bPtCut) continue;
 
-        int PV = GetBestPV(iB, tB);
-        if(PV<0) continue;
-        if(GetCt2D(tB, iB) < bCtCut) continue;
+        int iPV = GetBestPV(iB, tB);
+        if(iPV<0) continue;
+        if(GetCt2D(tB, iB, iPV) < bCtCut) continue;
+        if(GetCt2D(tB, iB, iPV) / GetCt2DErr(tB, iB, iPV) < bCtSigmaCut) continue;
 
         if( bVprob < best ) continue;
         index = iB;
@@ -334,11 +331,11 @@ int AlbertoUtil::GetBestBupTight()
         int iJPsi = (subVtxFromSV(iB)).at(0);
         if(!IsTightJPsi(iJPsi)) continue;
 
-        vector <int> tkJpsi = tracksFromSV(iJPsi);
-        vector <int> tkSsB = tracksFromSV(iB);
+        vector<int> tkJpsi = tracksFromSV(iJPsi);
+        vector<int> tkSsB = tracksFromSV(iB);
 
         TLorentzVector tB(0,0,0,0);
-        double KaonPt = 0;
+        double KaonPt = 0.;
 
         for( uint i=0; i<tkSsB.size(); ++i ){
             int j = tkSsB[i];
@@ -350,19 +347,19 @@ int AlbertoUtil::GetBestBupTight()
        }
 
        //Bu
-        double bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
-        if( svtMass->at(iB)<BuMassRange[0] || svtMass->at(iB)>BuMassRange[1] ) continue;
+        double bVprob = TMath::Prob( svtChi2->at(iB), svtNDOF->at(iB) );
+        if( svtMass->at(iB)<BuMassRangeTight[0] || svtMass->at(iB)>BuMassRangeTight[1] ) continue;
         if( bVprob < bVprobCut ) continue;
         if(tB.Pt() < bPtCut) continue;
         if(KaonPt < 1.6) continue;
-        int PV = GetBestPV(iB, tB);
-        if(PV<0) continue;
+        int iPV = GetBestPV(iB, tB);
+        if(iPV<0) continue;
         if(GetCt2D(tB, iB) < bCtCut) continue;
+        if(GetCt2D(tB, iB) / GetCt2DErr(tB, iB, iPV) < bCtSigmaCut) continue;
 
         if( bVprob < best ) continue;
         index = iB;
         best = bVprob;
-
     }
     return index;
 }
@@ -379,8 +376,8 @@ int AlbertoUtil::GetBestBdownTight()
         int iJPsi = (subVtxFromSV(iB)).at(0);
         if(!IsTightJPsi(iJPsi)) continue;
 
-        vector <int> tkJpsi = tracksFromSV(iJPsi);
-        vector <int> tkSsB = tracksFromSV(iB);
+        vector<int> tkJpsi = tracksFromSV(iJPsi);
+        vector<int> tkSsB = tracksFromSV(iB);
 
         TLorentzVector tB(0,0,0,0);
 
@@ -394,8 +391,8 @@ int AlbertoUtil::GetBestBdownTight()
         }
 
         //Bd
-        double bVprob = ChiSquaredProbability( svtChi2->at(iB), svtNDOF->at(iB) );
-        if( svtMass->at(iB)<BdMassRange[0] || svtMass->at(iB)>BdMassRange[1] ) continue;
+        double bVprob = TMath::Prob( svtChi2->at(iB), svtNDOF->at(iB) );
+        if( svtMass->at(iB)<BdMassRangeTight[0] || svtMass->at(iB)>BdMassRangeTight[1] ) continue;
         if( bVprob < bVprobCut ) continue;
         if(tB.Pt() < bPtCut) continue;
         int PV = GetBestPV(iB, tB);
@@ -416,7 +413,7 @@ int AlbertoUtil::GetBestJpsi()
     double bestChi2 = 1e9;
     for( int i=0; i<nSVertices; ++i ){
         if((svtType->at(i)!=PDEnumString::svtJPsi) ) continue;
-        if( fabs(svtMass->at(i)-JPSIMASS) > MassRangeJPsi) continue;
+        if( abs(svtMass->at(i)-JPSIMASS) > MassRangeJPsi) continue;
 
         if( svtChi2->at(i)>bestChi2 ) continue;
         index = i;
@@ -428,17 +425,17 @@ int AlbertoUtil::GetBestJpsi()
 // ========================================================================================
 double AlbertoUtil::GetInvMass(int i1, int i2, double mass1, double mass2)
 {
-    double px1=trkPx->at(i1);
-    double px2=trkPx->at(i2);
-    double py1=trkPy->at(i1);
-    double py2=trkPy->at(i2);
-    double pz1=trkPz->at(i1);
-    double pz2=trkPz->at(i2);
+    double px1 = trkPx->at(i1);
+    double px2 = trkPx->at(i2);
+    double py1 = trkPy->at(i1);
+    double py2 = trkPy->at(i2);
+    double pz1 = trkPz->at(i1);
+    double pz2 = trkPz->at(i2);
 
-    double E1=sqrt( pow(mass1,2) + pow(px1,2)+pow(py1,2)+pow(pz1,2) );
-    double E2=sqrt( pow(mass2,2) + pow(px2,2)+pow(py2,2)+pow(pz2,2) );
+    double E1 = sqrt( pow(mass1,2) + pow(px1,2)+pow(py1,2)+pow(pz1,2) );
+    double E2 = sqrt( pow(mass2,2) + pow(px2,2)+pow(py2,2)+pow(pz2,2) );
 
-    double m=sqrt( pow( (E1+E2),2) - ( pow(px1+px2,2) + pow(py1+py2,2) + pow(pz1+pz2,2) ) );
+    double m = sqrt( pow( (E1+E2),2) - ( pow(px1+px2,2) + pow(py1+py2,2) + pow(pz1+pz2,2) ) );
 
     return m;
 }
@@ -448,10 +445,10 @@ int AlbertoUtil::TagMixStatus( uint genindex )
 {
     int Code = genId->at( genindex );
 
-    const vector <int>& aD = allDaughters(genindex);
+    const vector<int>& aD = allDaughters(genindex);
     if( aD.size()>0 && genId->at(aD[0]) == -Code ) return 2;
 
-    const vector <int>& aM = allMothers(genindex); 
+    const vector<int>& aM = allMothers(genindex); 
     if( aM.size()>0 && genId->at(aM[0]) == -Code ) return 1;
 
     return 0;
@@ -481,14 +478,14 @@ double AlbertoUtil::GetJetCharge(int iJet, double kappa)
     double QJet = 0;
     double ptJet = 0;
 
-    vector <int> list = pfCandFromJet( iJet );
+    vector<int> list = pfCandFromJet( iJet );
 
     for(int it:list){
        double pt = pfcPt->at(it);
        double eta = pfcEta->at(it);
 
        if(pt<0.2) continue;
-       if(fabs(eta)>2.5) continue;
+       if(abs(eta)>2.5) continue;
 
        QJet += pfcCharge->at(it) * pow(pt, kappa);
        ptJet += pow(pt, kappa);
@@ -500,7 +497,7 @@ double AlbertoUtil::GetJetCharge(int iJet, double kappa)
 }
 
 // =====================================================================================
-double AlbertoUtil::GetListCharge(vector <int> *list, double kappa)
+double AlbertoUtil::GetListCharge(vector<int> *list, double kappa)
 {
     double Q = 0;
     double pt = 0;
@@ -596,14 +593,14 @@ double AlbertoUtil::CountEventsWithFit(TH1 *hist, TString process)
 int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 {
     int ssPV = -1;
-    double bestCos = -1;
+    double bestCos = -1.;
+    double maxDz = 5.;
 
     TVector3 vB(t.Px(),t.Py(),t.Pz());
     TVector3 vSVT( svtX->at(isvt), svtY->at(isvt), svtZ->at(isvt) );
 
     for( int i=0; i<nPVertices; ++i ){
-
-       if(fabs(svtZ->at(isvt) - pvtZ->at( i )) > 0.5 ) continue;
+       if(abs(svtZ->at(isvt) - pvtZ->at( i )) > maxDz ) continue;
 
        TVector3 vPV(pvtX->at( i ), pvtY->at( i ), pvtZ->at( i ) );
        TVector3 vPointing;
@@ -614,9 +611,7 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
          bestCos = cos;
          ssPV = i;
        }
-
     }
-
     return ssPV;
 }
 
@@ -624,8 +619,8 @@ int AlbertoUtil::GetBestPV(int isvt, TLorentzVector t)
 TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
 {
     int iJPsi = (subVtxFromSV(iSvt)).at(0);
-    vector <int> tkJpsi = tracksFromSV(iJPsi);
-    vector <int> tkSsB = tracksFromSV(iSvt);
+    vector<int> tkJpsi = tracksFromSV(iJPsi);
+    vector<int> tkSsB = tracksFromSV(iSvt);
     TLorentzVector t(0,0,0,0);
 
     for( uint i=0; i<tkSsB.size(); ++i ){
@@ -644,7 +639,7 @@ TLorentzVector AlbertoUtil::GetTLorentzVecFromJpsiX(int iSvt)
 int AlbertoUtil::GetTightCandidate(TString process)
 {
     if(process=="BsJPsiPhi") return GetBestBstrangeTight();
-    if(process=="BuJPsiK") return GetBestBupTight();
+    if(process=="BuJPsiK")   return GetBestBupTight();
     return -1;
 }
 
@@ -652,7 +647,7 @@ int AlbertoUtil::GetTightCandidate(TString process)
 int AlbertoUtil::GetCandidate(TString process)
 {
     if(process=="BsJPsiPhi") return GetBestBstrange();
-    if(process=="BuJPsiK") return GetBestBup();
+    if(process=="BuJPsiK")   return GetBestBup();
     return -1;
 }
 
@@ -665,14 +660,14 @@ double AlbertoUtil::dZ(int itk, int iPV)
 // =====================================================================================
 double AlbertoUtil::dXYjet(int itk, int iPV, int iJet)
 {
-    return fabs(dXY( itk, pvtX->at(iPV), pvtY->at(iPV) ))*dSign( itk, iJet, pvtX->at(iPV), pvtY->at(iPV) );
+    return abs(dXY( itk, pvtX->at(iPV), pvtY->at(iPV) ))*dSign( itk, iJet, pvtX->at(iPV), pvtY->at(iPV) );
 }
 
 // =================================================================================================
 void AlbertoUtil::PrintMotherChain(int iGen)
 {
     cout<<genId->at(iGen)<<" << ";
-    const vector <int>& vM = allMothers(iGen);
+    const vector<int>& vM = allMothers(iGen);
     uint nmot = vM.size();
     if(nmot>1) for(uint im=0; im<nmot; ++im) if(genId->at(vM[im])!=21) cout<<genId->at(vM[im])<<" ";
     if(nmot==1) PrintMotherChain(vM[0]);
@@ -684,7 +679,7 @@ void AlbertoUtil::PrintDaughterTree(int iGen, const string & pre)
 {
     cout<<genId->at(iGen)<<endl;
 
-    const vector <int>& vD = allDaughters(iGen);
+    const vector<int>& vD = allDaughters(iGen);
     uint ndau = vD.size();
     if(ndau == 0) return;
 
@@ -721,7 +716,7 @@ void AlbertoUtil::PrintDaughterTreePt(int iGen, const string & pre)
 {
     cout<<genId->at(iGen)<<" ["<<genPt->at(iGen)<<"]"<<endl;
 
-    const vector <int>& vD = allDaughters(iGen);
+    const vector<int>& vD = allDaughters(iGen);
     uint ndau = vD.size();
     if(ndau == 0) return;
 
@@ -756,7 +751,7 @@ void AlbertoUtil::PrintDaughterTreePt(int iGen, const string & pre)
 // =================================================================================================
 bool AlbertoUtil::HasDaughter(int iGen)
 {
-    const vector <int>& vD = allDaughters(iGen);
+    const vector<int>& vD = allDaughters(iGen);
     return vD.size()>0 ? true : false;
 }
 
@@ -768,8 +763,9 @@ double AlbertoUtil::GetCt2D(TLorentzVector t, int iSV)
 
     TVector3 vPointing = vSVT - vPV;
     TVector3 vBs = t.Vect();
+    vBs.SetZ(0.);
 
-    return BSMASS/t.Pt() * (vPointing * vBs.Unit());
+    return BSMASS/t.Pt() * (vPointing.Dot(vBs.Unit()));
 }
 
 // =================================================================================================
@@ -780,8 +776,9 @@ double AlbertoUtil::GetCt2D(TLorentzVector t, int iSV, int iPV)
 
     TVector3 vPointing = vSVT - vPV;
     TVector3 vBs = t.Vect();
+    vBs.SetZ(0.);
 
-    return BSMASS/t.Pt() * (vPointing * vBs.Unit());
+    return BSMASS/t.Pt() * (vPointing.Dot(vBs.Unit()));
 }
 
 // =================================================================================================
@@ -793,42 +790,9 @@ double AlbertoUtil::GetCt3D(TLorentzVector t, int iSV, int iPV)
     TVector3 vPointing = vSVT - vPV;
     TVector3 vBs = t.Vect();
 
-    return BSMASS/t.P() * vPointing.Dot(vBs)/vBs.Mag();
+    return BSMASS/t.P() * (vPointing.Dot(vBs.Unit()));
 }
 
-// =================================================================================================
-/*double AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV)
-{
-
-  TVector3 vSVT( svtX->at(iSV), svtY->at(iSV), 0. );
-  TVector3 vPV( bsX, bsY, 0. );
-  
-  TVector3 vPointing = vSVT - vPV;
-  TVector3 vBs = t.Vect();
-
-  TMatrixD covSV(3,3);
-  double covSVArray[]={svtSxx->at(iSV),svtSxy->at(iSV),svtSxz->at(iSV),
-                      svtSxy->at(iSV),svtSyy->at(iSV),svtSyz->at(iSV), 
-                      svtSxz->at(iSV),svtSyz->at(iSV),svtSzz->at(iSV)};
-  covSV.SetMatrixArray(covSVArray);
-
-  TMatrixD covPV(3,3);
-  double covPVArray[]={pvtSxx->at(iPV),pvtSxy->at(iPV),pvtSxz->at(iPV),
-                      pvtSxy->at(iPV),pvtSyy->at(iPV),pvtSyz->at(iPV), 
-                      pvtSxz->at(iPV),pvtSyz->at(iPV),pvtSzz->at(iPV)};
-  covPV.SetMatrixArray(covPVArray);
-
-  TMatrixD covTot= covSV+covPV;
-
-  double distArray2D[]={double(vPointing.X()),double(vPointing.Y()),0.};
-  TVectorD diff2D(3,distArray2D);
-
-  if (diff2D.Norm2Sqr()==0) return -1.; //if the secondary vertex is exactly the same as PV 
-
-  return BSMASS/t.Pt() * sqrt(covTot.Similarity(diff2D)) / sqrt(diff2D.Norm2Sqr()); 
-   
-}
-*/
 // =================================================================================================
 double AlbertoUtil::GetCt2DErr(TLorentzVector t, int iSV, int iPV)
 {
@@ -895,6 +859,7 @@ double AlbertoUtil::GetCt3DErr(TLorentzVector t, int iSV, int iPV)
 void AlbertoUtil::SetJpsiMuCut()
 {
     SetBctCut(0.007);
+    SetBctSigmaCut(-999.);
     SetBptCut(11.);
     SetBmuptCut(3.5);
     SetBkptCut(1.2);
@@ -903,9 +868,10 @@ void AlbertoUtil::SetJpsiMuCut()
 // =================================================================================================
 void AlbertoUtil::SetJpsiTrkTrkCut()
 {
-    SetBctCut(0.02);
+    SetBctCut(0.0);
+    SetBctSigmaCut(3.0);
     SetBptCut(10.);
-    SetBmuptCut(3.6);
+    SetBmuptCut(4.0);
     SetBkptCut(1.0);
 }
 
