@@ -131,23 +131,23 @@ void PDSoftMuonMvaEstimator::computeMvaVariables(int iMuon)
 
 
 // =====================================================================================
-float PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)
+double PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)
 {   
     if( !( muoType->at(iMuon) & PDEnumString::global ) )
     {
-        return -1;
+        return -1.;
     }
 
     int itkmu = muonTrack( iMuon, PDEnumString::muInner );
 
     if( itkmu < 0 )
     {
-        return -1;
+        return -1.;
     }   
 
     if( !(( trkQuality->at( itkmu ) >> 2 ) & 1) )
     {
-        return -2;
+        return -2.;
     }
 
     //VARIABLE EXTRACTION
@@ -155,7 +155,7 @@ float PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)
     //PRESELECTION
     if(!muonPassedPreselection(iMuon))
     {
-        return -2;
+        return -2.;
     }
 
     return muonMvaIdReader_.EvaluateMVA(methodName_);
@@ -164,15 +164,15 @@ float PDSoftMuonMvaEstimator::computeMuonMva(int iMuon)
 // =====================================================================================
 bool PDSoftMuonMvaEstimator::muonPassedPreselection(int iMuon)
 {
-    if ( muoChi2LM->at( iMuon ) > 5000 ) return false;
-    if ( muoChi2LP->at( iMuon ) > 2000 ) return false;
-    if ( muoGlbTrackTailProb->at( iMuon ) > 5000 ) return false;
-    if ( muoTrkKink->at( iMuon ) > 900 ) return false;
-    if ( muoGlbKinkFinderLOG->at( iMuon ) > 50 ) return false;
-    if ( muoTimeAtIpInOutErr->at( iMuon ) > 4 ) return false;
-    if ( muoOuterChi2->at( iMuon ) > 1000 ) return false;
-    if ( muoInnerChi2->at( iMuon ) > 10 ) return false;
-    if ( muoTrkRelChi2->at( iMuon ) > 3 ) return false;
+    if ( muoChi2LM->at( iMuon ) > 5000 )            return false;
+    if ( muoChi2LP->at( iMuon ) > 2000 )            return false;
+    if ( muoGlbTrackTailProb->at( iMuon ) > 5000 )  return false;
+    if ( muoTrkKink->at( iMuon ) > 900 )            return false;
+    if ( muoGlbKinkFinderLOG->at( iMuon ) > 50 )    return false;
+    if ( muoTimeAtIpInOutErr->at( iMuon ) > 4 )     return false;
+    if ( muoOuterChi2->at( iMuon ) > 1000 )         return false;
+    if ( muoInnerChi2->at( iMuon ) > 10 )           return false;
+    if ( muoTrkRelChi2->at( iMuon ) > 3 )           return false;
 
     return true;
 }

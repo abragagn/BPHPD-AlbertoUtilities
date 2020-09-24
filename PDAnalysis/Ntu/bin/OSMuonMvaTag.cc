@@ -4,19 +4,19 @@
 using namespace std;
 
 OSMuonMvaTag::OSMuonMvaTag():
-                osMuonTagReader_("!Color:Silent")
-,               ssIndex_(-1)
-,               pvIndex_(-1)
-,               osMuonIndex_(-1)
-,               osMuonTrackIndex_(-1)
-,               osMuonTagDecision_(0)
-,               osMuonTagMvaValue_(-1.)
-,               osMuonTagMistagProbRaw_(-1.)
-,               osMuonTagMistagProbCalProcess_(-1.)
-,               osMuonTagMistagProbCalProcessBuBs_(-1.)
-,               wp_(0.21)
-,               dzCut_(1.)
-,               nMuonsSel_(0)
+    osMuonTagReader_("!Color:Silent")
+,   ssIndex_(-1)
+,   pvIndex_(-1)
+,   osMuonIndex_(-1)
+,   osMuonTrackIndex_(-1)
+,   osMuonTagDecision_(0)
+,   osMuonTagMvaValue_(-1.)
+,   osMuonTagMistagProbRaw_(-1.)
+,   osMuonTagMistagProbCalProcess_(-1.)
+,   osMuonTagMistagProbCalProcessBuBs_(-1.)
+,   wp_(0.21)
+,   dzCut_(1.)
+,   nMuonsSel_(0)
 {}
 
 OSMuonMvaTag::~OSMuonMvaTag() {}
@@ -29,19 +29,19 @@ void OSMuonMvaTag::inizializeOsMuonTagVars()
     osMuonIndex_ = -1;
     osMuonTrackIndex_ = -1;
     osMuonTagDecision_ = 0;
-    osMuonTagMvaValue_ = -1;
-    osMuonTagMistagProbRaw_ = -1;
-    osMuonTagMistagProbCalProcess_ = -1;
-    osMuonTagMistagProbCalProcessBuBs_ = -1;
+    osMuonTagMvaValue_  = -1.;
+    osMuonTagMistagProbRaw_ = -1.;
+    osMuonTagMistagProbCalProcess_ = -1.;
+    osMuonTagMistagProbCalProcessBuBs_ = -1.;
     nMuonsSel_ = 0;
 }
 
-void OSMuonMvaTag::setOsMuonMvaCut(float wp = 0.21)
+void OSMuonMvaTag::setOsMuonMvaCut(double wp = 0.21)
 {
     wp_ = wp;
 }
 
-void OSMuonMvaTag::setOsMuonDzCut(float dzCut = 1.)
+void OSMuonMvaTag::setOsMuonDzCut(double dzCut = 1.)
 {
     dzCut_ = dzCut;
 }
@@ -94,10 +94,10 @@ bool OSMuonMvaTag::inizializeOSMuonCalibration(
     wCalBsMC_    = (TF1*)fBs->Get("osMuonCal");
 
     wCalBuBs_ = new TF1("osMuonCalBuBs","[0]-[1]*[2]/[3]+[2]/[3]*x",0.,1.);
-    float qs = wCalBsMC_->GetParameter(0);
-    float ms = wCalBsMC_->GetParameter(1);
-    float qu = wCalBuMC_->GetParameter(0);
-    float mu = wCalBuMC_->GetParameter(1);
+    double qs = wCalBsMC_->GetParameter(0);
+    double ms = wCalBsMC_->GetParameter(1);
+    double qu = wCalBuMC_->GetParameter(0);
+    double mu = wCalBuMC_->GetParameter(1);
     wCalBuBs_->SetParameters(qs, qu, ms, mu);
 
     delete f;
@@ -113,25 +113,25 @@ bool OSMuonMvaTag::makeOsMuonTagging(){
     else osMuonTagDecision_ = -1*trkCharge->at(osMuonTrackIndex_); 
 
     computeOsMuonTagVariables();
-    osMuonTagMvaValue_ = osMuonTagReader_.EvaluateMVA(methodName_);
-    osMuonTagMistagProbRaw_ = 1 - osMuonTagMvaValue_;
-    osMuonTagMistagProbCalProcess_ = wCalProcess_->Eval(osMuonTagMistagProbRaw_);
-    osMuonTagMistagProbCalProcessBuBs_ = wCalBuBs_->Eval(osMuonTagMistagProbCalProcess_);
+    osMuonTagMvaValue_                  = osMuonTagReader_.EvaluateMVA(methodName_);
+    osMuonTagMistagProbRaw_             = 1 - osMuonTagMvaValue_;
+    osMuonTagMistagProbCalProcess_      = wCalProcess_->Eval(osMuonTagMistagProbRaw_);
+    osMuonTagMistagProbCalProcessBuBs_  = wCalBuBs_->Eval(osMuonTagMistagProbCalProcess_);
 
     return 1;
 }
 
 int OSMuonMvaTag::selectOsMuon(){
-    int iB = ssIndex_;
-    int iPV = pvIndex_;
+    int     iB  = ssIndex_;
+    int     iPV = pvIndex_;
+    int     bestMuIndex = -1;
+    int     bestMuTrack = -1;
+    double  bestMuPt    = 2.;
 
-    vector <int> tkSsB = tracksFromSV(iB);
+    vector<int> tkSsB = tracksFromSV(iB);
     TLorentzVector tB = GetTLorentzVecFromJpsiX(iB);
     if(pvIndex_ < 0) pvIndex_ = GetBestPV(iB, tB);
 
-    int bestMuIndex = -1;
-    float bestMuPt = 2.;
-    int bestMuTrack = -1;
     nMuonsSel_ = 0;
 
     for(int iMuon = 0; iMuon < nMuons; ++iMuon ){
@@ -141,8 +141,8 @@ int OSMuonMvaTag::selectOsMuon(){
 
         if(std::find(tkSsB.begin(), tkSsB.end(), itkmu) != tkSsB.end()) continue;
 
-        if(muoPt->at( iMuon ) < 2.) continue;
-        if(fabs(muoEta->at( iMuon )) > 2.4) continue;
+        if(muoPt->at(iMuon) < 2.) continue;
+        if(fabs(muoEta->at(iMuon)) > 2.4) continue;
         if(!IsMvaMuon(iMuon, wp_)) continue;
         if(fabs(dZ(itkmu, iPV)) > dzCut_) continue;
         if(deltaR(tB.Eta(), tB.Phi(), muoEta->at(iMuon), muoPhi->at(iMuon)) < 0.4) continue;
@@ -150,91 +150,104 @@ int OSMuonMvaTag::selectOsMuon(){
 
         nMuonsSel_++;
 
-        if(muoPt->at( iMuon ) > bestMuPt){
-            bestMuPt = muoPt->at( iMuon );
+        if(muoPt->at(iMuon) > bestMuPt){
+            bestMuPt    = muoPt->at(iMuon);
             bestMuIndex = iMuon;
             bestMuTrack = itkmu;
         }
     }
 
-    osMuonIndex_ = bestMuIndex;
+    osMuonIndex_      = bestMuIndex;
     osMuonTrackIndex_ = bestMuTrack;
 
     return bestMuIndex;
 }
 
+bool OSMuonMvaTag::makeOsMuonTaggingNoMistag(){
+    if(osMuonIndex_ < 0){ osMuonTagDecision_ = 0; return 0;}
+    else osMuonTagDecision_ = -1*trkCharge->at(osMuonTrackIndex_); 
+
+    return 1;
+}
+
 void OSMuonMvaTag::computeOsMuonTagVariables()
 {
-    int iB = ssIndex_;
+    int iB    = ssIndex_;
     int iMuon = osMuonIndex_;
-    int iPV = pvIndex_;
-
+    int iPV   = pvIndex_;
     int itkmu = muonTrack( iMuon, PDEnumString::muInner );
+
+    double muPt  = muoPt->at(iMuon);
+    double muEta = muoEta->at(iMuon);
+    double muPhi = muoPhi->at(iMuon);
+
     TLorentzVector tB = GetTLorentzVecFromJpsiX(iB);
-    vector <int> tkSsB = tracksFromSV(iB);
+    vector<int> tkSsB = tracksFromSV(iB);
 
     TLorentzVector tConeClean(0.,0.,0.,0.), tMu;
-    tMu.SetPtEtaPhiM(muoPt->at(iMuon),muoEta->at(iMuon),muoPhi->at(iMuon),MassMu);
+    tMu.SetPtEtaPhiM(muPt,muEta,muPhi,MUMASS);
 
-    float kappa = 1;
-    float drCone = 0.4;
+    double kappa  = 1.;
+    double drCone = 0.4;
 
-    float qConeClean = 0., ptConeClean = 0.;
-    float muoConeCleanNF = 0., muoConeCleanCF = 0;
-    int muoConeCleanNCH = 0;
+    double qConeClean = 0., ptConeClean = 0.;
+    // double muoConeCleanNF = 0., muoConeCleanCF = 0;
+    // int    muoConeCleanNCH = 0;
 
     for(int ipf=0; ipf<nPF; ++ipf){
-        float ptpfc = pfcPt->at(ipf);
-        float etapfc = pfcEta->at(ipf);
-        if( deltaR(etapfc, pfcPhi->at(ipf), muoEta->at(iMuon), muoPhi->at(iMuon)) > drCone) continue;
+        double ptpfc  = pfcPt->at(ipf);
+        double etapfc = pfcEta->at(ipf);
+        double phipfc = pfcPhi->at(ipf);
+        int    pfctrk = pfcTrk->at(ipf);
+        if(deltaR(etapfc, phipfc, muEta, muPhi) > drCone) continue;
         if(ptpfc < 0.5) continue;
         if(fabs(etapfc) > 3.0) continue;
         if(pfcCharge->at(ipf) == 0) continue;
-        if(std::find(tkSsB.begin(), tkSsB.end(), pfcTrk->at(ipf)) != tkSsB.end()) continue;
-        if(pfcTrk->at(ipf)<0) continue;
-        if(fabs(dZ(pfcTrk->at(ipf), iPV))>=1.0) continue;
+        if(std::find(tkSsB.begin(), tkSsB.end(), pfctrk) != tkSsB.end()) continue;
+        if(pfctrk<0) continue;
+        if(fabs(dZ(pfctrk, iPV))>=1.0) continue;
   
         TLorentzVector a;
         a.SetPxPyPzE(pfcPx->at(ipf), pfcPy->at(ipf), pfcPz->at(ipf), pfcE->at(ipf));
         tConeClean += a;
 
-        qConeClean += pfcCharge->at(ipf) * pow(ptpfc, kappa);
+        qConeClean  += pfcCharge->at(ipf) * pow(ptpfc, kappa);
         ptConeClean += pow(ptpfc, kappa);
 
-        if(pfcCharge->at(ipf)==0) muoConeCleanNF += pfcE->at(ipf);
-        if(abs(pfcCharge->at(ipf))==1){
-            muoConeCleanNCH++;
-            muoConeCleanCF += pfcE->at(ipf);
-        }
+        // if(pfcCharge->at(ipf)==0) muoConeCleanNF += pfcE->at(ipf);
+        // if(abs(pfcCharge->at(ipf))==1){
+        //     muoConeCleanNCH ++;
+        //     muoConeCleanCF += pfcE->at(ipf);
+        // }
     }
 
     if(ptConeClean != 0) qConeClean /= ptConeClean;
     else qConeClean = 1;
     qConeClean *= trkCharge->at(itkmu);
-    if(tConeClean.E()!=0){
-        muoConeCleanCF /= tConeClean.E();
-        muoConeCleanNF /= tConeClean.E();
-    }
+    // if(tConeClean.E()!=0){
+    //     muoConeCleanCF /= tConeClean.E();
+    //     muoConeCleanNF /= tConeClean.E();
+    // }
 
-    muoConeCleanQ_ = qConeClean;
+    muoConeCleanQ_  = qConeClean;
     muoConeCleanPt_ = tConeClean.Pt();
-    muoConeCleanDr_ = deltaR(tConeClean.Eta(), tConeClean.Phi(), muoEta->at( iMuon ), muoPhi->at(iMuon));
+    muoConeCleanDr_ = deltaR(tConeClean.Eta(), tConeClean.Phi(), muoEta->at(iMuon), muoPhi->at(iMuon));
     if(tConeClean.E()!=0) muoConeCleanEnergyRatio_ = muoE->at(iMuon) / tConeClean.E();
-    else muoConeCleanEnergyRatio_ = 1;
+    else muoConeCleanEnergyRatio_ = 1.;
 
     tConeClean -= tMu;
-    muoConeCleanPtRel_ = muoPt->at( iMuon ) * (tMu.Vect().Unit() * tConeClean.Vect().Unit());
+    muoConeCleanPtRel_ = muoPt->at(iMuon) * (tMu.Vect().Unit() * tConeClean.Vect().Unit());
     tConeClean += tMu; // for IP sign
 
-    muoPt_ = muoPt->at( iMuon );
-    muoEta_ = muoEta->at( iMuon );
-    muoCharge_ = trkCharge->at(itkmu);
-    muoDxy_ = dSign(itkmu, tConeClean.Px(), tConeClean.Py())*abs(trkDxy->at(itkmu));
-    muoExy_ = trkExy->at(itkmu);
-    muoDz_ = dZ(itkmu, iPV);
-    muoEz_ = trkEz->at(itkmu);
+    muoPt_      = muoPt->at(iMuon);
+    muoEta_     = muoEta->at(iMuon);
+    muoCharge_  = trkCharge->at(itkmu);
+    muoDxy_     = dSign(itkmu, tConeClean.Px(), tConeClean.Py())*abs(trkDxy->at(itkmu));
+    muoExy_     = trkExy->at(itkmu);
+    muoDz_      = dZ(itkmu, iPV);
+    muoEz_      = trkEz->at(itkmu);
+    muoDrB_     = deltaR(tB.Eta(), tB.Phi(), muoEta->at(iMuon), muoPhi->at(iMuon));
+    muoPFIso_   = GetMuoPFiso(iMuon);
     muoSoftMvaValue_ = computeMuonMva(iMuon);
-    muoDrB_ = deltaR(tB.Eta(), tB.Phi(), muoEta->at(iMuon), muoPhi->at(iMuon));
-    muoPFIso_ = GetMuoPFiso(iMuon);
     
 }

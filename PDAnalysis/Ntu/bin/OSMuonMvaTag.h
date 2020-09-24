@@ -27,27 +27,44 @@ public:
     void    inizializeOsMuonTagVars();
 
     bool    makeOsMuonTagging();
-    int     selectOsMuon(); 
+    bool    makeOsMuonTaggingNoMistag();
+    int     selectOsMuon();
+    void    computeOsMuonTagVariables();
 
     int     getOsMuon(){ return osMuonIndex_; }
     int     getOsMuonTag(){ return osMuonTagDecision_; }
-    float   getOsMuonTagMvaValue(){ return osMuonTagMvaValue_; }
-    float   getOsMuonTagMistagProbRaw(){ return osMuonTagMistagProbRaw_; }
-    float   getOsMuonTagMistagProbCalProcess(){ return osMuonTagMistagProbCalProcess_; }
-    float   getOsMuonTagMistagProbCalProcessBuBs(){ return osMuonTagMistagProbCalProcessBuBs_; }
+    double  getOsMuonTagMvaValue(){ return osMuonTagMvaValue_; }
+    double  getOsMuonTagMistagProbRaw(){ return osMuonTagMistagProbRaw_; }
+    double  getOsMuonTagMistagProbCalProcess(){ return osMuonTagMistagProbCalProcess_; }
+    double  getOsMuonTagMistagProbCalProcessBuBs(){ return osMuonTagMistagProbCalProcessBuBs_; }
 
     void    setVtxOsMuonTag(int iB, int iPV) { ssIndex_ = iB; pvIndex_ = iPV;}
-    void    setOsMuonMvaCut(float wp);
-    void    setOsMuonDzCut(float dzCut);
+    void    setOsMuonMvaCut(double wp);
+    void    setOsMuonDzCut(double dzCut);
     void    inizializeOSMuonMvaReader(TString, TString);
     bool    inizializeOSMuonCalibration(TString process, TString processBuMC, TString processBsMC, TString methodPath);
 
     int     getNosMuons(){ return nMuonsSel_; }
 
+    float getMuoPt(){ return muoPt_;};
+    float getMuoEta(){ return muoEta_;};
+    float getMuoDxy(){ return muoDxy_;};
+    float getMuoExy(){ return muoExy_;};
+    float getMuoDz(){ return muoDz_;};
+    float getMuoEz(){ return muoEz_;};
+    float getMuoSoftMvaValue(){ return muoSoftMvaValue_;};
+    float getMuoDrB(){ return muoDrB_;};
+    float getMuoPFIso(){ return muoPFIso_;};
+    float getMuoConeCleanPt(){ return muoConeCleanPt_;};
+    float getMuoConeCleanPtRel(){ return muoConeCleanPtRel_;};
+    float getMuoConeCleanDr(){ return muoConeCleanDr_;};
+    float getMuoConeCleanEnergyRatio(){ return muoConeCleanEnergyRatio_;};
+    float getMuoConeCleanQ(){ return muoConeCleanQ_;};
+    float getMuoCharge(){ return muoCharge_;};
+
 private:
     
     TString methodNameFromWeightName();
-    void    computeOsMuonTagVariables();
 
     TMVA::Reader osMuonTagReader_;
     TString weightsFile_;
@@ -60,18 +77,18 @@ private:
     int osMuonTrackIndex_;
     int osMuonTagDecision_;
 
-    float osMuonTagMvaValue_;
-    float osMuonTagMistagProbRaw_;
-    float osMuonTagMistagProbCalProcess_;
-    float osMuonTagMistagProbCalProcessBuBs_;
+    double osMuonTagMvaValue_;
+    double osMuonTagMistagProbRaw_;
+    double osMuonTagMistagProbCalProcess_;
+    double osMuonTagMistagProbCalProcessBuBs_;
 
-    float wp_;
-    float dzCut_;
-    float PFIsoCut_;
+    double wp_;
+    double dzCut_;
+    double PFIsoCut_;
 
     int nMuonsSel_;
 
-    //MVA Variables
+    //MVA Variables (have to be float)
     float muoPt_;
     float muoEta_;
     float muoDxy_;

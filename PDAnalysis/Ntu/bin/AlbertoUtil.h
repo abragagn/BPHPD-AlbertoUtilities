@@ -78,9 +78,9 @@ public:
     double BuMassRange[2] = {5.0, 6.0};
     double BdMassRange[2] = {5.0, 6.0};
 
-    double BsMassRangeTight[2] = {5.24, 5.49};
-    double BuMassRangeTight[2] = {5.10, 5.50};
-    double BdMassRangeTight[2] = {5.10, 5.50};
+    double BsMassRangeTight[2] = {5.25, 5.50};
+    double BuMassRangeTight[2] = {5.00, 5.65};
+    double BdMassRangeTight[2] = {5.00, 5.50};
 
 
     //B tight cuts JpsiMu / JpsiTrkTrk
@@ -94,7 +94,7 @@ public:
     double bKEtaCut     = 2.5;
 
     void SetBctCut(double newValue){ bCtCut = newValue; }
-    void SetBctSigmaCut(double newValue){ bCtCut = newValue; }
+    void SetBctSigmaCut(double newValue){ bCtSigmaCut = newValue; }
     void SetBptCut(double newValue){ bPtCut = newValue; }
     void SetBmuptCut(double newValue){ bMuPtCut = newValue; }
     void SetBkptCut(double newValue){ bKPtCut = newValue; }
